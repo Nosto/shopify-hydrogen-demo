@@ -54,3 +54,18 @@ To run tests in a continuous-integration (CI) environment like GitHub Actions:
 ```bash
 yarn test:ci
 ```
+
+## SET UP STOREFRONT API TOKEN AND DOMAIN
+
+Follow these instructions:
+https://shopify.dev/custom-storefronts/hydrogen/getting-started/create#step-2-update-information-about-your-shopify-storefront
+
+--> shopify.config.js:
+
+```
+export default {
+  storeDomain: 'YOUR_STORE_NAME.myshopify.com',
+  storefrontToken: 'YOUR_STOREFRONT_ACCESS_TOKEN',
+  storefrontApiVersion: '2022-04',
+};
+```
