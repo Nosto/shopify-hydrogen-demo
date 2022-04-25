@@ -1,1 +1,1 @@
-# Demo Store for Shopify Hydrogen
+# Deemo Store for Shopify Hydrogen
