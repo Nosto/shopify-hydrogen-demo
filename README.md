@@ -4,6 +4,15 @@ Hydrogen is a React framework and SDK that you can use to build fast and dynamic
 
 [Check out the docs](https://shopify.dev/custom-storefronts/hydrogen)
 
+## What's in this template
+
+- Styling with [Tailwind](https://tailwindcss.com/)
+- End-to-end testing with [Playwright](https://playwright.dev)
+- Unit testing with [Vitest](https://vitest.dev) and [Testing Library](https://testing-library.com)
+- Code formatting with [Prettier](https://prettier.io)
+- Javascript linting with [ESLint](https://eslint.org) and the Hydrogen [ESLint plugin](https://github.com/Shopify/hydrogen/tree/main/packages/eslint-plugin)
+- CSS linting with [Stylelint](https://stylelint.io)
+
 ## Getting started
 
 **Requirements:**
@@ -16,7 +25,7 @@ yarn
 yarn dev
 ```
 
-Remember to update `shopify.config.js` with your shop's domain and Storefront API token!
+Remember to update `hydrogen.config.js` with your shop's domain and Storefront API token!
 
 ## Previewing a production build
 
@@ -60,12 +69,14 @@ yarn test:ci
 Follow these instructions:
 https://shopify.dev/custom-storefronts/hydrogen/getting-started/create#step-2-update-information-about-your-shopify-storefront
 
---> shopify.config.js:
+--> hydrogen.config.js:
 
 ```
 export default {
-  storeDomain: 'YOUR_STORE_NAME.myshopify.com',
-  storefrontToken: 'YOUR_STOREFRONT_ACCESS_TOKEN',
-  storefrontApiVersion: '2022-04',
+  shopify: {
+    storeDomain: 'YOUR_STORE_NAME.myshopify.com',
+    storefrontToken: 'YOUR_STOREFRONT_ACCESS_TOKEN',
+    storefrontApiVersion: '2022-07',
+  },
 };
 ```
