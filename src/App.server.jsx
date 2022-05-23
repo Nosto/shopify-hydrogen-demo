@@ -9,21 +9,24 @@ import {
   PerformanceMetrics,
   PerformanceMetricsDebug,
 } from '@shopify/hydrogen/client';
+import {NostoProvider} from '@nosto/nosto-react';
 
 function App() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <ShopifyProvider>
-        <CartProvider>
-          <DefaultSeo />
-          <Router>
-            <FileRoutes />
-            <Route path="*" page={<NotFound />} />
-          </Router>
-        </CartProvider>
-        <PerformanceMetrics />
-        {process.env.LOCAL_DEV && <PerformanceMetricsDebug />}
-      </ShopifyProvider>
+      <NostoProvider account="shopify-55957520471">
+        <ShopifyProvider>
+          <CartProvider>
+            <DefaultSeo />
+            <Router>
+              <FileRoutes />
+              <Route path="*" page={<NotFound />} />
+            </Router>
+          </CartProvider>
+          <PerformanceMetrics />
+          {process.env.LOCAL_DEV && <PerformanceMetricsDebug />}
+        </ShopifyProvider>
+      </NostoProvider>
     </Suspense>
   );
 }

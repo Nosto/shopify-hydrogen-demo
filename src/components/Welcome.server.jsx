@@ -6,6 +6,7 @@ import {
 } from '@shopify/hydrogen';
 import gql from 'graphql-tag';
 import {Suspense} from 'react';
+import {NostoHome, NostoPlacement} from '@nosto/nosto-react';
 
 function ExternalIcon() {
   return (
@@ -178,6 +179,9 @@ export default function Welcome() {
           <TemplateLinks />
         </Suspense>
       </div>
+      <NostoPlacement id="frontpage-nosto-1" />
+      <NostoPlacement id="frontpage-nosto-2" />
+      <NostoHome />
     </div>
   );
 }
