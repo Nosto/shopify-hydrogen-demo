@@ -80,3 +80,21 @@ export default {
   },
 };
 ```
+
+## MODIFY VITE.CONFIG FILE TO ACCEP EXTERNAL CLIENT COMPONENt IMPORTS FROM @NOSTO
+
+You need to adjust the Vite config file to make Vite consider the Nosto React components as external client components and treat them accordingly when rendering the app.
+Pass ssr.noExternal: [‘@nosto/nosto-react‘] inside the vite.config.js of your Hydrogen app:
+
+```
+export default defineConfig({
+  plugins: [hydrogen()],
+  optimizeDeps: {include: ['@headlessui/react']},
+  test: {
+    globals: true,
+    testTimeout: 10000,
+    hookTimeout: 10000,
+  },
+  ssr: {noExternal: ['@nosto/nosto-react']},
+});
+```
