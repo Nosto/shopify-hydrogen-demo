@@ -14,6 +14,7 @@
     "build:server": "vite build --outDir dist/server --ssr @shopify/hydrogen/platforms/node",
     "build:worker": "cross-env WORKER=true vite build --outDir dist/worker --ssr @shopify/hydrogen/platforms/worker",
     "serve": "node --enable-source-maps dist/server",
+    "start": "node --enable-source-maps dist/server",
     "test": "WATCH=true vitest",
     "test:ci": "yarn build && vitest run",
     "preview": "shopify hydrogen preview"
