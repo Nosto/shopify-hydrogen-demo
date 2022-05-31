@@ -64,7 +64,7 @@ To run tests in a continuous-integration (CI) environment like GitHub Actions:
 yarn test:ci
 ```
 
-## SET UP STOREFRONT API TOKEN AND DOMAIN
+## Set up storefront API token and domain
 
 Follow these instructions:
 https://shopify.dev/custom-storefronts/hydrogen/getting-started/create#step-2-update-information-about-your-shopify-storefront
@@ -81,7 +81,7 @@ export default {
 };
 ```
 
-## MODIFY VITE.CONFIG FILE TO ACCEP EXTERNAL CLIENT COMPONENT IMPORTS FROM @NOSTO
+## Modify vite.config file to accept external client component importds from @nosto
 
 You need to adjust the Vite config file to make Vite consider the Nosto React components as external client components and treat them accordingly when rendering the app.
 Pass `ssr.noExternal: [‘@nosto/nosto-react‘]` inside the vite.config.js of your Hydrogen app:
