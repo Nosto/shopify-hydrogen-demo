@@ -13,6 +13,9 @@ export default defineConfig({
     storefrontToken: '3ad9cd17e9b93845eba336765e0f33ac',
     storefrontApiVersion: '2022-07',
   },
+  nosto: {
+    merchantId: 'shopify-55957520471',
+  },
   session: CookieSessionStorage('__session', {
     path: '/',
     httpOnly: true,
