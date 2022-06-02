@@ -10,6 +10,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Find and replace storeDomain
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "hydrogen-preview.myshopify.com"
+          replace: "nosto-hydrogen.myshopify.com"
+          include: "hydrogen.config.js"
+      - name: Find and replace storefrontToken
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "3b580e70970c4528da70c98e097c2fa0"
+          replace: ${{secrets.NOSTO_HYDROGEN_STOREFRONT_TOKEN}}
+          include: "hydrogen.config.js"
+      - name: Find and replace merchantId
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: "NOSTO_MERCHANT_ID"
+          replace: "shopify-55957520471"
+          include: "hydrogen.config.js"
       - uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_TOKEN}}
