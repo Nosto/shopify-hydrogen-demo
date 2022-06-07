@@ -4,9 +4,7 @@
 
 Check out a [live demo](https://nosto-hydrogen.herokuapp.com/) of our storefront running against our own store. You can also check out this repository and connect it to your own store by following the [Getting started](#getting-started) section below.
 
-{% hint style="warning" %}
-This project is a work-in-progress and does not yet provide 100% compatibility with all Nosto features. Full compatibility will be achieved in our 1.0.0 release planned for later this year.
-{% endhint %}
+> :warning: This project is a work-in-progress and does not yet provide 100% compatibility with all Nosto features. Full compatibility will be achieved in our 1.0.0 release planned for later this year.
 
 ## Getting started
 
