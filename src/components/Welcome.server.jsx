@@ -164,7 +164,6 @@ export default function Welcome() {
             url="https://shopify.dev/custom-storefronts/hydrogen"
             label="Browse Hydrogen documentation"
           />
-          <DocsButton url="/graphql" label="Open the GraphiQL explorer" />
           <DocsButton
             url="https://github.com/Shopify/hydrogen-examples"
             label="Explore Hydrogen examples"
