@@ -7,12 +7,12 @@ import {
 export default defineConfig({
   routes: import.meta.globEager('./src/routes/**/*.server.[jt](s|sx)'),
   shopify: {
-    storeDomain: 'hydrogen-preview.myshopify.com',
-    storefrontToken: '3b580e70970c4528da70c98e097c2fa0',
+    storeDomain: 'maninostolocal.myshopify.com',
+    storefrontToken: '4d26d6886f78c9b22d532c0578497ed1',
     storefrontApiVersion: '2022-07',
   },
   nosto: {
-    merchantId: 'NOSTO_MERCHANT_ID',
+    merchantId: 'shopify-61881221345',
   },
   session: CookieSessionStorage('__session', {
     path: '/',

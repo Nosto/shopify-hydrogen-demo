@@ -5,6 +5,7 @@ import {
   Link,
   Seo,
   CacheDays,
+  useSession,
 } from '@shopify/hydrogen';
 import gql from 'graphql-tag';
 
@@ -14,7 +15,8 @@ import ProductCard from '../components/ProductCard';
 import Welcome from '../components/Welcome.server';
 import {Suspense} from 'react';
 
-export default function Index({country = {isoCode: 'US'}}) {
+export default function Index() {
+  const country = useSession();
   return (
     <Layout hero={<GradientBackground />}>
       <Suspense fallback={null}>

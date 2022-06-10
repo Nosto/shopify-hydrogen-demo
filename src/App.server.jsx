@@ -9,14 +9,12 @@ import {
   PerformanceMetrics,
   PerformanceMetricsDebug,
 } from '@shopify/hydrogen/client';
-import {NostoProvider} from '@nosto/nosto-react';
-import {default as hydrogenConfig} from '../hydrogen.config';
-const {merchantId} = hydrogenConfig.nosto;
+import WrapperClient from './components/wrapper.client';
 
 function App() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <NostoProvider account={merchantId}>
+       <WrapperClient>
         <ShopifyProvider>
           <CartProvider>
             <DefaultSeo />
@@ -28,7 +26,7 @@ function App() {
           <PerformanceMetrics />
           {process.env.LOCAL_DEV && <PerformanceMetricsDebug />}
         </ShopifyProvider>
-      </NostoProvider>
+        </WrapperClient>
     </Suspense>
   );
 }

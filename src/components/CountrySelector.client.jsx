@@ -1,25 +1,74 @@
-import {useState, Suspense} from 'react';
-import {useCountry, fetchSync} from '@shopify/hydrogen/client';
-import {Listbox} from '@headlessui/react';
+import { useCallback, useState, Suspense, useEffect, StrictMode } from 'react';
+import { useCountry, fetchSync } from '@shopify/hydrogen/client';
+import { Listbox } from '@headlessui/react';
 import SpinnerIcon from './SpinnerIcon.client';
+import { useNostoContext } from '@nosto/nosto-react';
 
 /**
  * A client component that selects the appropriate country to display for products on a website
  */
 export default function CountrySelector() {
   const [listboxOpen, setListboxOpen] = useState(false);
+  const [selectedCountry] = useCountry();
+  const { countryData, currentVariationData, readyFlag } = useNostoContext();
+  const [countries, setCountries] = useState([]);
 
-  const [selectedCountry, setSelectedCountry] = useCountry();
+  const fetchJson = async (url) => {
+    const response = await fetch(url).then(response => response.json());
+    return response;
+  };
+
+  useEffect(() => {
+    if(StrictMode) {
+      console.log("react in strict mode");
+    }
+      fetchJson('/countries').then(data => {
+        setCountries(data);  
+        readyFlag.setReady(false);
+        fetchJson('/country').then(activeCountry => {
+          if (activeCountry?.isoCode) {
+            updateCountry(data, { isoCode: activeCountry?.isoCode, name: activeCountry?.name });
+          } else {
+            updateCountryInSession(data, { isoCode: selectedCountry?.isoCode, name: selectedCountry?.name }, false);
+          }
+        });
+      });
+  }, []);
+
+  const handleSetCountry = useCallback((country) => {
+    updateCountryInSession(countries, country, true);
+  }, []);
+  
+  const updateCountry = (availableCountries, { isoCode, name }) => {
+    countryData.setCountry({ isoCode, name });
+      const matches = availableCountries.filter((countryItem) => countryItem.isoCode === isoCode);
+      if (matches.length > 0) {
+        currentVariationData.setCurrentVariation(matches[0].currency.isoCode);
+      }
+      readyFlag.setReady(true);
+  }
+
+  const updateCountryInSession = (availableCountries, { isoCode, name }, reload) => {
+    fetch(`/country`, {
+      body: JSON.stringify({ isoCode, name }),
+      method: 'POST',
+    }).then(() => {
+      updateCountry(availableCountries, { isoCode, name });
+      if (reload) {
+        window.location.reload(false);
+      }
+    });
+  };
 
   return (
     <div className="hidden lg:block">
-      <Listbox onChange={setSelectedCountry}>
-        {({open}) => {
+      <Listbox onChange={handleSetCountry}>
+        {({ open }) => {
           setTimeout(() => setListboxOpen(open));
           return (
             <>
               <Listbox.Button className="font-medium text-sm h-8 p-2 flex items-center">
-                <span className="mr-4">{selectedCountry.name}</span>
+                <span className="mr-4">{countryData.country?.name}</span>
                 <ArrowIcon isOpen={open} />
               </Listbox.Button>
 
@@ -40,13 +89,15 @@ export default function CountrySelector() {
                       }
                     >
                       <Countries
-                        selectedCountry={selectedCountry}
+                      countries={countries}
+                        selectedCountry={countryData.country}
                         getClassName={(active) => {
                           return (
-                            `w-36 py-2 px-3 flex justify-between items-center text-left cursor-pointer` +
-                            `rounded ${active ? 'bg-gray-200' : null}`
+                            `w-36 py-2 px-3 flex justify-between items-center text-left cursor-pointer rounded` +
+                            `${active ? ' bg-gray-200' : ''}`
                           );
                         }}
+                        updateVariation={(variation) => currentVariationData.setCurrentVariation(variation)}
                       />
                     </Suspense>
                   )}
@@ -60,14 +111,16 @@ export default function CountrySelector() {
   );
 }
 
-export function Countries({selectedCountry, getClassName}) {
-  const countries = fetchSync('/countries').json();
+export function Countries({ countries, selectedCountry, getClassName, updateVariation }) {
 
   return countries.map((country) => {
     const isSelected = country.isoCode === selectedCountry.isoCode;
+    if (isSelected) {
+      updateVariation(country.currency.isoCode);
+    }
     return (
       <Listbox.Option key={country.isoCode} value={country}>
-        {({active}) => (
+        {({ active }) => (
           <div className={getClassName(active)}>
             {country.name}
             {isSelected ? <CheckIcon /> : null}
@@ -99,12 +152,11 @@ export function CheckIcon() {
   );
 }
 
-export function ArrowIcon({isOpen}) {
+export function ArrowIcon({ isOpen }) {
   return (
     <svg
-      className={`transition-transform duration-300 ${
-        isOpen ? 'rotate-180' : null
-      }`}
+      className={`transition-transform duration-300 ${isOpen ? 'rotate-180' : null
+        }`}
       aria-hidden="true"
       width="10"
       height="6"

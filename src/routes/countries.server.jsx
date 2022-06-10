@@ -1,4 +1,13 @@
-export async function api(request, {queryShop}) {
+
+export async function api(request, {queryShop, session}) {
+
+    if (request.method === 'POST') {
+      const {isoCode, name} = await request.json();
+      await session.set('isoCode', isoCode);
+      await session.set('name', name);
+      return 'success';
+    }
+
   const {
     data: {
       localization: {availableCountries},

@@ -81,3 +81,6 @@ dist
 
 # IntelliJ IDEA
 .idea/
+
+# VS Code
+.vscode/

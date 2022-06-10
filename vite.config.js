@@ -3,12 +3,18 @@ import hydrogen from '@shopify/hydrogen/plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [hydrogen()],
-  optimizeDeps: {include: ['@headlessui/react']},
+  plugins: [
+    hydrogen()
+  ],
+  optimizeDeps: {
+    include: ['@headlessui/react'],
+    exclude: ['@nosto/nosto-react']
+  },
   test: {
     globals: true,
     testTimeout: 10000,
     hookTimeout: 10000,
   },
-  ssr: {noExternal: ['@nosto/nosto-react']},
+  // @ts-ignore
+  ssr: {noExternal: ['@nosto/nosto-react']}
 });
