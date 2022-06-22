@@ -1,4 +1,4 @@
-import {useShop, useShopQuery, Seo, useRouteParams, useSession} from '@shopify/hydrogen';
+import { useShop, useShopQuery, Seo, useRouteParams, useSession } from '@shopify/hydrogen';
 import gql from 'graphql-tag';
 
 import ProductDetails from '../../components/ProductDetails.client';
@@ -6,12 +6,12 @@ import NotFound from '../../components/NotFound.server';
 import Layout from '../../components/Layout.server';
 
 export default function Product() {
-  const {handle} = useRouteParams();
+  const { handle } = useRouteParams();
   const country = useSession();
-  const {languageCode} = useShop();
+  const { languageCode } = useShop();
 
   const {
-    data: {product},
+    data: { product },
   } = useShopQuery({
     query: QUERY,
     variables: {
@@ -62,8 +62,7 @@ const QUERY = gql`
       handle
       id
       media(first: 6) {
-        edges {
-          node {
+          nodes {
             ... on MediaImage {
               mediaContentType
               image {
@@ -104,11 +103,9 @@ const QUERY = gql`
               }
             }
           }
-        }
       }
       metafields(first: 20) {
-        edges {
-          node {
+          nodes {
             id
             type
             namespace
@@ -132,7 +129,6 @@ const QUERY = gql`
               }
             }
           }
-        }
       }
       priceRange {
         maxVariantPrice {
@@ -150,8 +146,7 @@ const QUERY = gql`
       }
       title
       variants(first: 250) {
-        edges {
-          node {
+          nodes {
             availableForSale
             compareAtPriceV2 {
               amount
@@ -166,8 +161,7 @@ const QUERY = gql`
               height
             }
             metafields(first: 10) {
-              edges {
-                node {
+                nodes {
                   id
                   type
                   namespace
@@ -190,7 +184,6 @@ const QUERY = gql`
                       }
                     }
                   }
-                }
               }
             }
             priceV2 {
@@ -215,7 +208,6 @@ const QUERY = gql`
               referenceValue
             }
           }
-        }
       }
       vendor
     }

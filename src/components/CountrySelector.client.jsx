@@ -10,7 +10,7 @@ import { useNostoContext } from '@nosto/nosto-react';
 export default function CountrySelector() {
   const [listboxOpen, setListboxOpen] = useState(false);
   const [selectedCountry] = useCountry();
-  const { countryData, currentVariationData, readyFlag } = useNostoContext();
+  const { countryData, currentVariationData, countryLoadComplete } = useNostoContext();
   const [countries, setCountries] = useState([]);
 
   const fetchJson = async (url) => {
@@ -19,12 +19,9 @@ export default function CountrySelector() {
   };
 
   useEffect(() => {
-    if(StrictMode) {
-      console.log("react in strict mode");
-    }
       fetchJson('/countries').then(data => {
         setCountries(data);  
-        readyFlag.setReady(false);
+        countryLoadComplete.setValue(false);
         fetchJson('/country').then(activeCountry => {
           if (activeCountry?.isoCode) {
             updateCountry(data, { isoCode: activeCountry?.isoCode, name: activeCountry?.name });
@@ -45,7 +42,7 @@ export default function CountrySelector() {
       if (matches.length > 0) {
         currentVariationData.setCurrentVariation(matches[0].currency.isoCode);
       }
-      readyFlag.setReady(true);
+      countryLoadComplete.setValue(true);
   }
 
   const updateCountryInSession = (availableCountries, { isoCode, name }, reload) => {
