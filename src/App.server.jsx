@@ -9,9 +9,9 @@ import {
   PerformanceMetrics,
   PerformanceMetricsDebug,
 } from '@shopify/hydrogen/client';
-import { NostoProvider } from '@nosto/nosto-react';
-import { default as HydrogenConfig } from '../hydrogen.config';
-const { merchantId } = HydrogenConfig.nosto;
+import {NostoProvider} from '@nosto/nosto-react';
+import {default as hydrogenConfig} from '../hydrogen.config';
+const {merchantId} = hydrogenConfig.nosto;
 
 function App() {
   return (

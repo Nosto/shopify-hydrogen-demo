@@ -1,5 +1,5 @@
-import { useCallback, useState, Suspense, useEffect, StrictMode } from 'react';
-import { useCountry, fetchSync } from '@shopify/hydrogen/client';
+import { useCallback, useState, Suspense, useEffect } from 'react';
+import { useCountry } from '@shopify/hydrogen/client';
 import { Listbox } from '@headlessui/react';
 import SpinnerIcon from './SpinnerIcon.client';
 import { useNostoContext } from '@nosto/nosto-react';

@@ -62,7 +62,8 @@ const QUERY = gql`
       handle
       id
       media(first: 6) {
-          nodes {
+        edges {
+          node {
             ... on MediaImage {
               mediaContentType
               image {
@@ -103,9 +104,11 @@ const QUERY = gql`
               }
             }
           }
+        }
       }
       metafields(first: 20) {
-          nodes {
+        edges {
+          node {
             id
             type
             namespace
@@ -129,6 +132,7 @@ const QUERY = gql`
               }
             }
           }
+        }
       }
       priceRange {
         maxVariantPrice {
@@ -146,7 +150,8 @@ const QUERY = gql`
       }
       title
       variants(first: 250) {
-          nodes {
+        edges {
+          node {
             availableForSale
             compareAtPriceV2 {
               amount
@@ -161,7 +166,8 @@ const QUERY = gql`
               height
             }
             metafields(first: 10) {
-                nodes {
+              edges {
+                node {
                   id
                   type
                   namespace
@@ -184,6 +190,7 @@ const QUERY = gql`
                       }
                     }
                   }
+                }
               }
             }
             priceV2 {
@@ -208,6 +215,7 @@ const QUERY = gql`
               referenceValue
             }
           }
+        }
       }
       vendor
     }
