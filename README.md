@@ -1,10 +1,10 @@
-# Nosto Hydrogen Storefront
+# Hydrogen Demo Store
 
-[Hydrogen](https://hydrogen.shopify.dev) is Shopify's React-based framework for building custom storefronts. This demo storefront shows how our [React component library](https://github.com/Nosto/nosto-react) can be integrated with a Hydrogen-based storefront.
+Hydrogen is a React framework and SDK that you can use to build fast and dynamic Shopify custom storefronts.
 
-Check out a [live demo](https://nosto-hydrogen.herokuapp.com/) of our storefront running against our own store. You can also check out this repository and connect it to your own store by following the [Getting started](#getting-started) section below.
+[Check out the docs](https://shopify.dev/custom-storefronts/hydrogen)
 
-> :warning: This project is a work-in-progress and does not yet provide 100% compatibility with all Nosto features. Full compatibility will be achieved in our 1.0.0 release planned for later this year.
+[Run this template on StackBlitz](https://stackblitz.com/github/Shopify/hydrogen/tree/stackblitz/templates/demo-store)
 
 ## Getting started
 
@@ -13,48 +13,36 @@ Check out a [live demo](https://nosto-hydrogen.herokuapp.com/) of our storefront
 - Node.js version 16.5.0 or higher
 - Yarn
 
+To create a new Hydrogen app, run:
+
 ```bash
-yarn
-yarn dev
+npm init @shopify/hydrogen
+```
+
+## Running the dev server
+
+Then `cd` into the new directory and run:
+
+```bash
+npm install
+npm run dev
 ```
 
 Remember to update `hydrogen.config.js` with your shop's domain and Storefront API token!
 
-## Previewing a production build
-
-To run a local preview of your Hydrogen app in an environment similar to Oxygen, build your Hydrogen app and then run `yarn preview`:
-
-```bash
-yarn build
-yarn preview
-```
-
 ## Building for production
 
 ```bash
-yarn build
+npm run build
 ```
 
-Then, you can run a local `server.js` using the production build with:
+## Previewing a production build
+
+To run a local preview of your Hydrogen app in an environment similar to Oxygen, build your Hydrogen app and then run `npm run preview`:
 
 ```bash
-yarn serve
-```
-
-## Running tests
-
-This project contains basic end-to-end (E2E) tests in the `/tests/e2e` folder powered by [Vitest](https://vitest.dev).
-
-You can run tests in development, and they will automatically reload when you make changes to the component you provide to `hydrogen.watchForUpdates()`:
-
-```bash
-yarn test
-```
-
-To run tests in a continuous-integration (CI) environment like GitHub Actions:
-
-```bash
-yarn test:ci
+npm run build
+npm run preview
 ```
 
 ## Set up storefront API token and domain
