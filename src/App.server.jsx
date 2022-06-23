@@ -15,6 +15,7 @@ import {
 import {HeaderFallback} from '~/components';
 import {DefaultSeo, NotFound} from '~/components/index.server';
 
+import {NostoProvider} from '@nosto/nosto-react';
 import {default as hydrogenConfig} from '../hydrogen.config';
 const {merchantId} = hydrogenConfig.nosto;
 
@@ -34,11 +35,13 @@ function App({routes, request}) {
               <DefaultSeo />
             </Suspense>
             <Router>
-              <FileRoutes
-                basePath={countryCode ? `/${countryCode}/` : undefined}
-                routes={routes}
-              />
-              <Route path="*" page={<NotFound />} />
+              <NostoProvider account={merchantId}>
+                <FileRoutes
+                  basePath={countryCode ? `/${countryCode}/` : undefined}
+                  routes={routes}
+                />
+                <Route path="*" page={<NotFound />} />
+              </NostoProvider>
             </Router>
           </CartProvider>
           <PerformanceMetrics />
