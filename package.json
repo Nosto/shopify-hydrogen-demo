@@ -1,7 +1,7 @@
 {
   "name": "hydrogen-new",
   "description": "Demo store template for @shopify/hydrogen",
-  "version": "0.0.0",
+  "version": "0.0.5",
   "license": "MIT",
   "private": true,
   "scripts": {
