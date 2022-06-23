@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "shopify hydrogen dev",
     "build": "shopify hydrogen build",
-    "heroku-prebuild": "yarn build --target node",
+    "prepare": "yarn build --target node",
     "preview": "shopify hydrogen preview",
     "start": "node dist/node",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
