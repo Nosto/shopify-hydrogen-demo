@@ -14,6 +14,8 @@ import {getHeroPlaceholder} from '~/lib/placeholders';
 import {FeaturedCollections, Hero} from '~/components';
 import {Layout, ProductSwimlane} from '~/components/index.server';
 
+import {NostoPlacement, NostoHome} from '@nosto/nosto-react';
+
 export default function Homepage() {
   const {
     language: {isoCode: languageCode},
@@ -50,6 +52,11 @@ export default function Homepage() {
       {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
+
+      <NostoPlacement id="frontpage-nosto-1" />
+      <NostoPlacement id="frontpage-nosto-2" />
+      <NostoHome />
+
       <ProductSwimlane
         data={featuredProducts.nodes}
         title="Featured Products"
