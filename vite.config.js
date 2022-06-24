@@ -8,8 +8,13 @@ export default defineConfig({
     alias: [{find: /^~\/(.*)/, replacement: '/src/$1'}],
   },
   optimizeDeps: {
-    include: ['@headlessui/react', 'clsx', 'react-use', 'typographic-base'],
-    exclude: ['@nosto/nosto-react'],    
+    include: [
+      '@headlessui/react',
+      'clsx',
+      'react-use',
+      'typographic-base',
+      '@nosto/nosto-react',
+    ],
   },
   test: {
     globals: true,
