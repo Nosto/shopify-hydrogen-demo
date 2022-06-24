@@ -9,7 +9,7 @@ export default defineConfig({
     storefrontApiVersion: '2022-07',
   },
   nosto: {
-    merchantId: 'NOSTO_MERCHANT_ID',
+    merchantId: 'shopify-55957520471',
   },
   session: CookieSessionStorage('__session', {
     path: '/',
