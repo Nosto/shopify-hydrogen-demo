@@ -14,7 +14,7 @@ import {getHeroPlaceholder} from '~/lib/placeholders';
 import {FeaturedCollections, Hero} from '~/components';
 import {Layout, ProductSwimlane} from '~/components/index.server';
 
-import {NostoPlacement, NostoHome} from '@nosto/nosto-react';
+import NostoComponent from '../components/NostoComponents.client';
 
 export default function Homepage() {
   const {
@@ -53,9 +53,9 @@ export default function Homepage() {
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
 
-      <NostoPlacement id="frontpage-nosto-1" />
-      <NostoPlacement id="frontpage-nosto-2" />
-      <NostoHome />
+      <NostoComponent type="NostoPlacement" id="frontpage-nosto-1" />
+      <NostoComponent type="NostoPlacement" id="frontpage-nosto-2" />
+      <NostoComponent type="NostoHome" />
 
       <ProductSwimlane
         data={featuredProducts.nodes}

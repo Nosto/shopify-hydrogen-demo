@@ -9,6 +9,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@headlessui/react', 'clsx', 'react-use', 'typographic-base'],
+    exclude: ['@nosto/nosto-react'],
   },
   test: {
     globals: true,
