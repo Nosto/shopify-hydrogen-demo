@@ -12,6 +12,8 @@ import {PRODUCT_CARD_FRAGMENT} from '~/lib/fragments';
 import {PageHeader, ProductGrid, Section, Text} from '~/components';
 import {NotFound, Layout} from '~/components/index.server';
 
+import NostoComponent from '../../components/NostoComponents.client';
+
 const pageBy = 48;
 
 export default function Collection({params}) {
@@ -68,6 +70,8 @@ export default function Collection({params}) {
           url={`/collections/${handle}?country=${country}`}
         />
       </Section>
+      <NostoComponent type="NostoPlacement" id="categorypage-nosto-1" />
+      <NostoComponent type="NostoCategory" category={collection.title} />
     </Layout>
   );
 }
