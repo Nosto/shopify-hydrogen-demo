@@ -6,8 +6,8 @@ export default function NostoComponent({type, ...props}) {
   if (Component) {
     return <Component {...props} />;
   } else {
-    console.warn(
-      `No NostoComponent found with type: ${type}. Make sure to pass a correct type attribute.`,
+    console.error(
+      `No NostoComponent found with type: ${type} \n Make sure to pass a correct type attribute.`,
     );
     return <>{props.children}</>;
   }
