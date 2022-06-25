@@ -1,7 +1,14 @@
 import * as NostoComponents from '@nosto/nosto-react';
 
-//Render Nosto comonent based on type prop:
+//Render Nosto component based on type prop:
 export default function NostoComponent({type, ...props}) {
   const Component = NostoComponents[type];
-  return <Component {...props} />;
+  if (Component) {
+    return <Component {...props} />;
+  } else {
+    console.warn(
+      `No NostoComponent found with type: ${type}. Make sure to pass a correct type attribute.`,
+    );
+    return <>{props.children}</>;
+  }
 }
