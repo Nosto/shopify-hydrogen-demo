@@ -35,7 +35,11 @@ function App({routes, request}) {
               <DefaultSeo />
             </Suspense>
             <Router>
-              <NostoComponent type="NostoProvider" account={merchantId}>
+              <NostoComponent
+                currentVariation=""
+                type="NostoProvider"
+                account={merchantId}
+              >
                 <FileRoutes
                   basePath={countryCode ? `/${countryCode}/` : undefined}
                   routes={routes}
