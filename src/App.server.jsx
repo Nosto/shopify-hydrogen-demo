@@ -15,7 +15,7 @@ import {
 import {HeaderFallback} from '~/components';
 import {DefaultSeo, NotFound} from '~/components/index.server';
 
-import NostoComponent from './components/NostoComponents.client';
+import NostoComponent from '~/components/NostoComponents.client';
 import {default as hydrogenConfig} from '../hydrogen.config';
 const {merchantId} = hydrogenConfig.nosto;
 
