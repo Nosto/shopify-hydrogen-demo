@@ -1,7 +1,7 @@
 import * as NostoComponents from '@nosto/nosto-react';
 import {useLocalization} from '@shopify/hydrogen';
 
-//Render Nosto component based on type prop:
+//Render NostoComponent based on type prop:
 export default function NostoComponent({type, ...props}) {
   const {country} = useLocalization();
 

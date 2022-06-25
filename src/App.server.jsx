@@ -36,8 +36,8 @@ function App({routes, request}) {
             </Suspense>
             <Router>
               <NostoComponent
-                currentVariation=""
                 type="NostoProvider"
+                multiCurrency={false}
                 account={merchantId}
               >
                 <FileRoutes
