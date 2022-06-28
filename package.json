@@ -35,7 +35,7 @@
   "dependencies": {
     "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
-    "@nosto/nosto-react": "github:Nosto/nosto-react#improvement/updatesForHydrogen@1.0.0",
+    "@nosto/nosto-react": "github:Nosto/nosto-react#UpdatesForProductPage",
     "@shopify/hydrogen": "^1.0.0",
     "clsx": "^1.1.1",
     "graphql-tag": "^2.12.6",

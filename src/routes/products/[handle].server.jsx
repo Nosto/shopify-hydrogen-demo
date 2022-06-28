@@ -22,6 +22,8 @@ import {
   Text,
 } from '~/components';
 
+import NostoComponent from '../../components/NostoComponents.client';
+
 export default function Product() {
   const {handle} = useRouteParams();
   const {
@@ -53,6 +55,9 @@ export default function Product() {
   });
 
   const {media, title, vendor, description, id} = product;
+  let nostoProductId = id.split('/');
+  nostoProductId = nostoProductId[nostoProductId.length - 1];
+
   const {shippingPolicy, refundPolicy} = shop;
 
   return (
@@ -104,6 +109,13 @@ export default function Product() {
             </div>
           </div>
         </Section>
+        <NostoComponent type="NostoPlacement" id="productpage-nosto-1" />
+        <NostoComponent type="NostoPlacement" id="productpage-nosto-2" />
+        <NostoComponent
+          type="NostoProduct"
+          product={nostoProductId}
+          tagging={product}
+        />
         <Suspense>
           <ProductSwimlane title="Related Products" data={id} />
         </Suspense>

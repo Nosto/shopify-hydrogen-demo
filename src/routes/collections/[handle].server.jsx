@@ -71,7 +71,7 @@ export default function Collection({params}) {
         />
       </Section>
       <NostoComponent type="NostoPlacement" id="categorypage-nosto-1" />
-      <NostoComponent type="NostoCategory" category={collection.title} />
+      <NostoComponent type="NostoCategory" category={'/' + handle} />
     </Layout>
   );
 }
