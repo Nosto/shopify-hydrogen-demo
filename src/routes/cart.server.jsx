@@ -2,6 +2,7 @@ import {Seo} from '@shopify/hydrogen';
 import {Suspense} from 'react';
 import {PageHeader, Section, CartDetails} from '~/components';
 import {Layout} from '~/components/index.server';
+import NostoComponent from '../components/NostoComponents.client';
 
 export default function Cart() {
   return (
@@ -20,6 +21,8 @@ export default function Cart() {
       <Section padding="x">
         <CartDetails layout="page" />
       </Section>
+      <NostoComponent type="NostoPlacement" id="cartpage-nosto-3" />
+      <NostoComponent type="NostoCheckout" />
     </Layout>
   );
 }

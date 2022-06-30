@@ -5,6 +5,8 @@ import {ProductGrid, Section, Text} from '~/components';
 import {NoResultRecommendations, SearchPage} from '~/components/index.server';
 import {PAGINATION_SIZE} from '~/lib/const';
 
+import NostoComponent from '../components/NostoComponents.client';
+
 export default function Search({pageBy = PAGINATION_SIZE, params}) {
   const {
     language: {isoCode: languageCode},
@@ -39,6 +41,13 @@ export default function Search({pageBy = PAGINATION_SIZE, params}) {
             <Text className="opacity-50">No results, try something else.</Text>
           </Section>
         )}
+
+        <NostoComponent type="NostoPlacement" id="searchpage-nosto-1" />
+        <NostoComponent
+          type="NostoSearch"
+          query={searchTerm ? decodeURI(searchTerm) : ''}
+        />
+
         <NoResultRecommendations
           country={countryCode}
           language={languageCode}
@@ -50,6 +59,12 @@ export default function Search({pageBy = PAGINATION_SIZE, params}) {
   return (
     <SearchPage searchTerm={decodeURI(searchTerm)}>
       <Section>
+        <NostoComponent type="NostoPlacement" id="searchpage-nosto-1" />
+        <NostoComponent
+          type="NostoSearch"
+          query={searchTerm ? decodeURI(searchTerm) : ''}
+        />
+
         <ProductGrid
           key="search"
           url={`/search?country=${countryCode}&q=${searchTerm}`}

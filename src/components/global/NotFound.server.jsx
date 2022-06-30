@@ -3,6 +3,7 @@ import {gql, useLocalization, useShopQuery} from '@shopify/hydrogen';
 import {PRODUCT_CARD_FRAGMENT} from '~/lib/fragments';
 import {Button, FeaturedCollections, PageHeader, Text} from '~/components';
 import {ProductSwimlane, Layout} from '~/components/index.server';
+import NostoComponent from '../NostoComponents.client';
 
 export function NotFound({response, type = 'page'}) {
   if (response) {
@@ -38,6 +39,10 @@ export function NotFound({response, type = 'page'}) {
           Take me to the home page
         </Button>
       </PageHeader>
+
+      <NostoComponent type="NostoPlacement" id="notfound-nosto-1" />
+      <NostoComponent type="Nosto404" />
+
       {featuredCollections.nodes.length < 2 && (
         <FeaturedCollections
           title="Popular Collections"
