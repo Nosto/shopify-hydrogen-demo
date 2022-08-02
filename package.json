@@ -1,7 +1,7 @@
 {
   "name": "hydrogen-new",
   "description": "Demo store template for @shopify/hydrogen",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -15,8 +15,8 @@
     "test:ci": "yarn build -t node && vitest run"
   },
   "devDependencies": {
-    "@shopify/cli": "3.0.24",
-    "@shopify/cli-hydrogen": "3.0.24",
+    "@shopify/cli": "3.5.0",
+    "@shopify/cli-hydrogen": "3.5.0",
     "@shopify/prettier-config": "^1.1.2",
     "@tailwindcss/forms": "^0.5.2",
     "@tailwindcss/typography": "^0.5.2",
@@ -36,7 +36,7 @@
     "@headlessui/react": "^1.6.4",
     "@heroicons/react": "^1.0.6",
     "@nosto/nosto-react": "^0.1.4",
-    "@shopify/hydrogen": "^1.0.0",
+    "@shopify/hydrogen": "^1.2.0",
     "clsx": "^1.1.1",
     "graphql-tag": "^2.12.6",
     "react": "^18.2.0",

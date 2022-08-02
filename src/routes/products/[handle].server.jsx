@@ -22,7 +22,7 @@ import {
   Text,
 } from '~/components';
 
-import NostoComponent from '../../components/NostoComponents.client';
+import NostoComponent from '~/components/NostoComponents.client';
 
 export default function Product() {
   const {handle} = useRouteParams();
@@ -54,7 +54,7 @@ export default function Product() {
     },
   });
 
-  const {media, title, vendor, description, id} = product;
+  const {media, title, vendor, descriptionHtml, id} = product;
   let nostoProductId = id.split('/');
   nostoProductId = nostoProductId[nostoProductId.length - 1];
 
@@ -84,10 +84,10 @@ export default function Product() {
                 </div>
                 <ProductForm />
                 <div className="grid gap-4 py-4">
-                  {description && (
+                  {descriptionHtml && (
                     <ProductDetail
                       title="Product Details"
-                      content={description}
+                      content={descriptionHtml}
                     />
                   )}
                   {shippingPolicy?.body && (
@@ -135,7 +135,7 @@ const PRODUCT_QUERY = gql`
       id
       title
       vendor
-      description
+      descriptionHtml
       media(first: 7) {
         nodes {
           ...Media
