@@ -1,7 +1,6 @@
 import {chromium} from 'playwright';
+import '@shopify/hydrogen/web-polyfills';
 import {createServer as createViteDevServer} from 'vite';
-
-export const DEFAULT_DELAY = 60000;
 
 export async function startHydrogenServer() {
   const app = import.meta.env.WATCH
