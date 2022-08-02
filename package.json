@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "dev": "shopify hydrogen dev",
-    "build": "shopify hydrogen build",
+    "build": "shopify hydrogen build --target node",
     "preview": "shopify hydrogen preview",
     "start": "node dist/node",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx src",
