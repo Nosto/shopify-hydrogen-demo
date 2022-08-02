@@ -38,6 +38,7 @@ function App({request}) {
               multiCurrency={false}
               account={merchantId}
             >
+              <NostoComponent type="NostoSession" />
               <FileRoutes
                 basePath={countryCode ? `/${countryCode}/` : undefined}
               />
