@@ -4,7 +4,7 @@ import React from 'react';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 
 export default function NostoComponent({type, ...props}) {
-  const {storeDomain} = useShop();
+  const {storeDomain, storefrontToken} = useShop();
   const {country} = useLocalization();
   const typeSpecificProps = {};
   const shopifyCart = useCart();
@@ -22,18 +22,33 @@ export default function NostoComponent({type, ...props}) {
           let unit_price = item?.merchandise?.priceV2?.amount;
           let price_currency_code = item?.merchandise?.priceV2?.currencyCode;
 
-          fetch(`https://${storeDomain}/products/${handle}.js`)
+          let query = `query {
+            productByHandle(handle: "${handle}") {
+              id
+            }
+          }`;
+
+          fetch(`https://${storeDomain}/api/2022-07/graphql.json`, {
+            method: 'post',
+            headers: {
+              'Content-Type': 'application/graphql',
+              'X-Shopify-Storefront-Access-Token': storefrontToken,
+            },
+            body: query,
+          })
             .catch(resolve)
             .then((resp) => resp.json())
             .then((resp) => {
-              let product_id = resp.id || undefined;
-              nostoCartCopy.push({
-                product_id,
-                sku_id,
-                quantity,
-                unit_price,
-                price_currency_code,
-              });
+              if (resp?.data?.productByHandle?.id) {
+                let product_id = resp.data.productByHandle.id.split('/').at(-1);
+                nostoCartCopy.push({
+                  product_id,
+                  sku_id,
+                  quantity,
+                  unit_price,
+                  price_currency_code,
+                });
+              }
               resolve();
             });
         });
