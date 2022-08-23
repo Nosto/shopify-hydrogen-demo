@@ -15,6 +15,7 @@ import {HeaderFallback} from '~/components';
 import {DefaultSeo, NotFound} from '~/components/index.server';
 
 import NostoComponent from '~/components/NostoComponents.client';
+import NostoSession from '~/components/NostoSessionServer.server';
 import {default as hydrogenConfig} from '../hydrogen.config';
 const {merchantId} = hydrogenConfig.nosto;
 
@@ -38,7 +39,7 @@ function App({request}) {
               multiCurrency={false}
               account={merchantId}
             >
-              <NostoComponent type="NostoSession" />
+              <NostoSession />
               <FileRoutes
                 basePath={countryCode ? `/${countryCode}/` : undefined}
               />
