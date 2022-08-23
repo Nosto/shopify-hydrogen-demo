@@ -13,7 +13,6 @@ export default function NostoComponent({type, ...props}) {
   useDeepCompareEffect(() => {
     if (type == 'NostoSession') {
       const nostoCartCopy = [];
-      console.log(shopifyCart.lines);
       shopifyCart.lines.forEach((item) => {
         let product_id =
           item?.merchandise?.product.id.split('/').at(-1) || undefined;
