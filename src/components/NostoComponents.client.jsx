@@ -34,6 +34,7 @@ export default function NostoComponent({type, ...props}) {
     let newsletter = props?.customerData?.acceptsMarketing ?? undefined;
     let customer_reference =
       props?.customerData?.customerReference || undefined;
+
     typeSpecificProps.customer = {
       first_name,
       last_name,
