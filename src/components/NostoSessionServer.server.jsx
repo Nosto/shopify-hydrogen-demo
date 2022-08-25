@@ -28,11 +28,5 @@ export default function NostoSession(props) {
       .digest('hex');
   }
 
-  return (
-    <NostoComponent
-      {...props}
-      customerData={customerData}
-      type="NostoSession"
-    />
-  );
+  return <NostoComponent customerData={customerData} type="NostoSession" />;
 }
