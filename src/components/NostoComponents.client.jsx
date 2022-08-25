@@ -41,7 +41,6 @@ export default function NostoComponent({type, ...props}) {
       newsletter,
       customer_reference,
     };
-    console.log(typeSpecificProps.customer);
   }
 
   //Get currentVariation based on country:
