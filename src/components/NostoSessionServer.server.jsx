@@ -1,7 +1,9 @@
 import NostoComponent from './NostoComponents.client';
-import {useShopQuery, gql, useSession} from '@shopify/hydrogen';
+import {useShopQuery, gql, useSession, useShop} from '@shopify/hydrogen';
+import Crypto from 'crypto';
 
 export default function NostoSession(props) {
+  const {storeDomain} = useShop();
   const {customerAccessToken} = useSession();
   const QUERY = gql`
           query {
@@ -9,12 +11,28 @@ export default function NostoSession(props) {
             firstName
             lastName
             email
+            acceptsMarketing
+            id
           }
         }
         `;
-  const {data: customerData} = useShopQuery({
+  const {
+    data: {customer: customerData},
+  } = useShopQuery({
     query: QUERY,
   });
 
-  return <NostoComponent {...props} {...customerData} type="NostoSession" />;
+  if (customerData?.id && null) {
+    customerData.customerReference = Crypto.createHash('sha256')
+      .update(customerData.id + storeDomain)
+      .digest('hex');
+  }
+
+  return (
+    <NostoComponent
+      {...props}
+      customerData={customerData}
+      type="NostoSession"
+    />
+  );
 }
