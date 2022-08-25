@@ -22,7 +22,7 @@ export default function NostoSession(props) {
     query: QUERY,
   });
 
-  if (customerData?.id && null) {
+  if (customerData?.id && storeDomain) {
     customerData.customerReference = Crypto.createHash('sha256')
       .update(customerData.id + storeDomain)
       .digest('hex');
