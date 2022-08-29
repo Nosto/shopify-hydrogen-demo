@@ -30,8 +30,18 @@ export default function NostoComponent({type, ...props}) {
     //Sync customer with Nosto:
     let first_name = props?.customerData?.firstName || undefined;
     let last_name = props?.customerData?.lastName || undefined;
-    let email = props?.customer?.email || undefined;
-    typeSpecificProps.customer = {first_name, last_name, email};
+    let email = props?.customerData?.email || undefined;
+    let newsletter = props?.customerData?.acceptsMarketing ?? undefined;
+    let customer_reference =
+      props?.customerData?.customerReference || undefined;
+
+    typeSpecificProps.customer = {
+      first_name,
+      last_name,
+      email,
+      newsletter,
+      customer_reference,
+    };
   }
 
   //Get currentVariation based on country:
