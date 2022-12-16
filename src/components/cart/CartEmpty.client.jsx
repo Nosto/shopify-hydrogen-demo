@@ -48,7 +48,16 @@ export function CartEmpty({onClose, layout = 'drawer'}) {
 }
 
 function TopProducts({onClose}) {
-  const products = fetchSync('/api/bestSellers').json();
+  const response = fetchSync('/api/bestSellers');
+
+  if (!response.ok) {
+    console.error(
+      `Unable to load top products ${response.url} returned a ${response.status}`,
+    );
+    return null;
+  }
+
+  const products = response.json();
 
   if (products.length === 0) {
     return <Text format>No products found.</Text>;

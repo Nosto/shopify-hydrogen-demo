@@ -7,6 +7,7 @@ import {
   useSession,
   useLocalization,
   useShopQuery,
+  useServerAnalytics,
 } from '@shopify/hydrogen';
 
 import {PRODUCT_CARD_FRAGMENT} from '~/lib/fragments';
@@ -45,6 +46,13 @@ export default function Account({response}) {
   const {customer, featuredCollections, featuredProducts} = data;
 
   if (!customer) return response.redirect('/account/login');
+
+  // The logged-in analytics state.
+  useServerAnalytics({
+    shopify: {
+      customerId: customer.id,
+    },
+  });
 
   const addresses = flattenConnection(customer.addresses).map((address) => ({
     ...address,
@@ -172,6 +180,7 @@ const CUSTOMER_QUERY = gql`
     $language: LanguageCode
   ) @inContext(country: $country, language: $language) {
     customer(customerAccessToken: $customerAccessToken) {
+      id
       firstName
       lastName
       phone

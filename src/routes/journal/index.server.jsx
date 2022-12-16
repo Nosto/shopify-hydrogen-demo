@@ -5,6 +5,8 @@ import {
   Seo,
   useLocalization,
   useShopQuery,
+  useServerAnalytics,
+  ShopifyAnalyticsConstants,
 } from '@shopify/hydrogen';
 import {Suspense} from 'react';
 
@@ -41,6 +43,13 @@ function JournalsGrid({pageBy}) {
       language: languageCode,
       blogHandle: BLOG_HANDLE,
       pageBy,
+    },
+  });
+
+  useServerAnalytics({
+    shopify: {
+      canonicalPath: `/${BLOG_HANDLE}`,
+      pageType: ShopifyAnalyticsConstants.pageType.page,
     },
   });
 

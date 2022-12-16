@@ -9,15 +9,12 @@ import {
   ShopifyAnalytics,
   ShopifyProvider,
   CartProvider,
+  useSession,
+  useServerAnalytics,
+  Seo,
 } from '@shopify/hydrogen';
-
-import {HeaderFallback} from '~/components';
-import {DefaultSeo, NotFound} from '~/components/index.server';
-
-import NostoComponent from '~/components/NostoComponents.client';
-import NostoSession from '~/components/NostoSessionServer.server';
-import {default as hydrogenConfig} from '../hydrogen.config';
-const {merchantId} = hydrogenConfig.nosto;
+import {HeaderFallback, EventsListener} from '~/components';
+import {NotFound} from '~/components/index.server';
 
 function App({request}) {
   const pathname = new URL(request.normalizedUrl).pathname;
@@ -26,30 +23,41 @@ function App({request}) {
 
   const isHome = pathname === `/${countryCode ? countryCode + '/' : ''}`;
 
+  const {customerAccessToken} = useSession();
+
+  useServerAnalytics({
+    shopify: {
+      isLoggedIn: !!customerAccessToken,
+    },
+  });
+
   return (
     <Suspense fallback={<HeaderFallback isHome={isHome} />}>
+      <EventsListener />
       <ShopifyProvider countryCode={countryCode}>
-        <CartProvider countryCode={countryCode}>
-          <Suspense>
-            <DefaultSeo />
-          </Suspense>
+        <Seo
+          type="defaultSeo"
+          data={{
+            title: 'Hydrogen',
+            description:
+              "A custom storefront powered by Hydrogen, Shopify's React-based framework for building headless.",
+            titleTemplate: `%s · Hydrogen`,
+          }}
+        />
+        <CartProvider
+          countryCode={countryCode}
+          customerAccessToken={customerAccessToken}
+        >
           <Router>
-            <NostoComponent
-              type="NostoProvider"
-              multiCurrency={false}
-              account={merchantId}
-            >
-              <NostoSession />
-              <FileRoutes
-                basePath={countryCode ? `/${countryCode}/` : undefined}
-              />
-              <Route path="*" page={<NotFound />} />
-            </NostoComponent>
+            <FileRoutes
+              basePath={countryCode ? `/${countryCode}/` : undefined}
+            />
+            <Route path="*" page={<NotFound />} />
           </Router>
         </CartProvider>
         <PerformanceMetrics />
         {import.meta.env.DEV && <PerformanceMetricsDebug />}
-        <ShopifyAnalytics />
+        <ShopifyAnalytics cookieDomain="hydrogen.shop" />
       </ShopifyProvider>
     </Suspense>
   );

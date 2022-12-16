@@ -1,5 +1,12 @@
 import {Suspense} from 'react';
-import {useShopQuery, useLocalization, gql, Seo} from '@shopify/hydrogen';
+import {
+  useShopQuery,
+  useLocalization,
+  gql,
+  Seo,
+  useServerAnalytics,
+  ShopifyAnalyticsConstants,
+} from '@shopify/hydrogen';
 
 import {PageHeader, Section, Grid} from '~/components';
 import {Layout, CollectionCard} from '~/components/index.server';
@@ -33,6 +40,13 @@ function CollectionGrid() {
       language: languageCode,
     },
     preload: true,
+  });
+
+  useServerAnalytics({
+    shopify: {
+      canonicalPath: '/collections',
+      pageType: ShopifyAnalyticsConstants.pageType.listCollections,
+    },
   });
 
   const collections = data.collections.nodes;

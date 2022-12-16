@@ -78,7 +78,3 @@ jspm_packages/
 
 # Vite output
 dist
-
-# IntelliJ IDEA
-.idea/
-nosto-shopify-hydrogen.iml

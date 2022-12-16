@@ -1,6 +1,9 @@
 import {chromium} from 'playwright';
 import '@shopify/hydrogen/web-polyfills';
-import {createServer as createViteDevServer} from 'vite';
+
+// `version` is only exported in Vite 3
+import * as vite from 'vite';
+const {createServer: createViteDevServer, version} = vite;
 
 export async function startHydrogenServer() {
   const app = import.meta.env.WATCH
@@ -41,8 +44,9 @@ async function createNodeServer() {
 }
 
 async function createDevServer() {
+  const isVite3 = version?.startsWith('3.');
   const app = await createViteDevServer({
-    server: {force: true},
+    [isVite3 ? 'optimizeDeps' : 'server']: {force: true},
     logLevel: 'silent',
   });
   const server = await app.listen(0);

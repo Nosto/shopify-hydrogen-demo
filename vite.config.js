@@ -9,12 +9,12 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ['@headlessui/react', 'clsx', 'react-use', 'typographic-base'],
-    exclude: ['@nosto/nosto-react'],
   },
   test: {
     globals: true,
     testTimeout: 10000,
     hookTimeout: 10000,
+    maxThreads: 1,
+    minThreads: 1,
   },
-  ssr: {noExternal: ['@nosto/nosto-react']},
 });

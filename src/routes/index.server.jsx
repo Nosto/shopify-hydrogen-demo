@@ -14,11 +14,10 @@ import {getHeroPlaceholder} from '~/lib/placeholders';
 import {FeaturedCollections, Hero} from '~/components';
 import {Layout, ProductSwimlane} from '~/components/index.server';
 
-import NostoComponent from '../components/NostoComponents.client';
-
 export default function Homepage() {
   useServerAnalytics({
     shopify: {
+      canonicalPath: '/',
       pageType: ShopifyAnalyticsConstants.pageType.home,
     },
   });
@@ -62,11 +61,6 @@ function HomepageContent() {
       {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
-
-      <NostoComponent type="NostoPlacement" id="frontpage-nosto-1" />
-      <NostoComponent type="NostoPlacement" id="frontpage-nosto-2" />
-      <NostoComponent type="NostoHome" />
-
       <ProductSwimlane
         data={featuredProducts.nodes}
         title="Featured Products"
@@ -113,7 +107,7 @@ function SeoForHomepage() {
  * - hero.byline            Single line text
  * - hero.cta               Single line text
  * - hero.spread            File
- * - hero.spread_seconary   File
+ * - hero.spread_secondary  File
  *
  * @see https://help.shopify.com/manual/metafields/metafield-definitions/creating-custom-metafield-definitions
  * @see https://github.com/Shopify/hydrogen/discussions/1790

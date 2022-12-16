@@ -22,8 +22,6 @@ import {
   Text,
 } from '~/components';
 
-import NostoComponent from '~/components/NostoComponents.client';
-
 export default function Product() {
   const {handle} = useRouteParams();
   const {
@@ -47,18 +45,34 @@ export default function Product() {
     return <NotFound type="product" />;
   }
 
+  const {media, title, vendor, descriptionHtml, id, productType} = product;
+  const {shippingPolicy, refundPolicy} = shop;
+  const {
+    priceV2,
+    id: variantId,
+    sku,
+    title: variantTitle,
+  } = product.variants.nodes[0];
+
   useServerAnalytics({
     shopify: {
+      canonicalPath: `/products/${handle}`,
       pageType: ShopifyAnalyticsConstants.pageType.product,
-      resourceId: product.id,
+      resourceId: id,
+      products: [
+        {
+          product_gid: id,
+          variant_gid: variantId,
+          variant: variantTitle,
+          name: title,
+          brand: vendor,
+          category: productType,
+          price: priceV2.amount,
+          sku,
+        },
+      ],
     },
   });
-
-  const {media, title, vendor, descriptionHtml, id} = product;
-  let nostoProductId = id.split('/');
-  nostoProductId = nostoProductId[nostoProductId.length - 1];
-
-  const {shippingPolicy, refundPolicy} = shop;
 
   return (
     <Layout>
@@ -109,13 +123,6 @@ export default function Product() {
             </div>
           </div>
         </Section>
-        <NostoComponent type="NostoPlacement" id="productpage-nosto-1" />
-        <NostoComponent type="NostoPlacement" id="productpage-nosto-2" />
-        <NostoComponent
-          type="NostoProduct"
-          product={nostoProductId}
-          tagging={product}
-        />
         <Suspense>
           <ProductSwimlane title="Related Products" data={id} />
         </Suspense>
@@ -141,6 +148,7 @@ const PRODUCT_QUERY = gql`
           ...Media
         }
       }
+      productType
       variants(first: 100) {
         nodes {
           id
