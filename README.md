@@ -1,4 +1,7 @@
-# Hydrogen Demo Store
+# Nosto Hydrogen Demo Storefront
+
+> :warning: This project is a work-in-progress and does not yet provide 100% compatibility with all Nosto features. Full compatibility will be achieved in our 1.0.0 release planned for later this year.
+
 
 Hydrogen is a React framework and SDK that you can use to build fast and dynamic Shopify custom storefronts.
 
