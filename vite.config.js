@@ -18,3 +18,4 @@ export default defineConfig({
   },
   ssr: {noExternal: ['@nosto/nosto-react']},
 });
+  //FALLBACK
