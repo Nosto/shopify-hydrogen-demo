@@ -72,7 +72,6 @@ function HomepageContent() {
         divider="bottom"
       />
       {secondaryHero && <Hero {...secondaryHero} />}
-      TET
       <FeaturedCollections
         data={featuredCollections.nodes}
         title="Collections"
