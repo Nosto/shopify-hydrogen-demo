@@ -53,6 +53,8 @@ function HomepageContent() {
 
   const {heroBanners, featuredCollections, featuredProducts} = data;
 
+  console.log(JSON.stringify(featuredCollections.nodes));
+
   // fill in the hero banners with placeholders if they're missing
   const [primaryHero, secondaryHero, tertiaryHero] = getHeroPlaceholder(
     heroBanners.nodes,
@@ -63,17 +65,16 @@ function HomepageContent() {
       {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
-
       <NostoPlacement id="frontpage-nosto-1" />
       <NostoPlacement id="frontpage-nosto-2" />
       <NostoHome />
-
       <ProductSwimlane
         data={featuredProducts.nodes}
         title="Featured Products"
         divider="bottom"
       />
       {secondaryHero && <Hero {...secondaryHero} />}
+      TET
       <FeaturedCollections
         data={featuredCollections.nodes}
         title="Collections"
@@ -156,11 +157,7 @@ const HOMEPAGE_CONTENT_QUERY = gql`
         }
       }
     }
-    featuredCollections: collections(
-      first: 3
-      query: "collection_type:smart"
-      sortKey: UPDATED_AT
-    ) {
+    featuredCollections: collections(first: 3, sortKey: UPDATED_AT) {
       nodes {
         id
         title
