@@ -53,8 +53,6 @@ function HomepageContent() {
 
   const {heroBanners, featuredCollections, featuredProducts} = data;
 
-  console.log(JSON.stringify(featuredCollections.nodes));
-
   // fill in the hero banners with placeholders if they're missing
   const [primaryHero, secondaryHero, tertiaryHero] = getHeroPlaceholder(
     heroBanners.nodes,
