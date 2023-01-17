@@ -22,6 +22,8 @@ import {
   Text,
 } from '~/components';
 
+import {NostoProduct, NostoPlacement} from '@nosto/shopify-hydrogen';
+
 export default function Product() {
   const {handle} = useRouteParams();
   const {
@@ -53,6 +55,8 @@ export default function Product() {
     sku,
     title: variantTitle,
   } = product.variants.nodes[0];
+
+  let nostoProductId = id.split('/')?.at(-1);
 
   useServerAnalytics({
     shopify: {
@@ -123,6 +127,9 @@ export default function Product() {
             </div>
           </div>
         </Section>
+        <NostoPlacement id="productpage-nosto-1" />
+        <NostoPlacement id="productpage-nosto-2" />
+        <NostoProduct product={nostoProductId} tagging={product} />
         <Suspense>
           <ProductSwimlane title="Related Products" data={id} />
         </Suspense>
