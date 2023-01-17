@@ -15,7 +15,6 @@ import {
 } from '@shopify/hydrogen';
 import {HeaderFallback, EventsListener} from '~/components';
 import {NotFound} from '~/components/index.server';
-// import {Nosto404, NostoSession} from '@nosto/nosto-react/shopify-hydrogen';
 
 import {
   NostoProvider,
@@ -23,10 +22,6 @@ import {
   NostoHome,
   NostoSession,
 } from '@nosto/shopify-hydrogen';
-
-// import {NostoHome as NostoHomeBuild} from '@nosto/shopify-hydrogen/build';
-
-// import {ClientTest} from '@nosto/nosto-react/shopify-hydrogen';
 
 function App({request}) {
   const pathname = new URL(request.normalizedUrl).pathname;
@@ -56,21 +51,18 @@ function App({request}) {
             titleTemplate: `%s · Hydrogen`,
           }}
         />
-        <NostoProvider account="test-account">
-          <NostoPlacement id="palcement-test"></NostoPlacement>
-          <NostoHome></NostoHome>
-          <NostoSession />
-          TEST
-        </NostoProvider>
         <CartProvider
           countryCode={countryCode}
           customerAccessToken={customerAccessToken}
         >
           <Router>
-            <FileRoutes
-              basePath={countryCode ? `/${countryCode}/` : undefined}
-            />
-            <Route path="*" page={<NotFound />} />
+            <NostoProvider account="shopify-55957520471">
+              <FileRoutes
+                basePath={countryCode ? `/${countryCode}/` : undefined}
+              />
+              <Route path="*" page={<NotFound />} />
+              <NostoSession />
+            </NostoProvider>
           </Router>
         </CartProvider>
         <PerformanceMetrics />

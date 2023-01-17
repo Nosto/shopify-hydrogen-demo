@@ -7,6 +7,6 @@
     "jsx": "react-jsx",
     "types": ["vite/client", "vitest/globals"]
   },
-  "exclude": ["node_modules", "dist"],
+  "exclude": ["node_modules", "demo/dist"],
   "include": ["**/*.js", "**/*.jsx"]
 }
