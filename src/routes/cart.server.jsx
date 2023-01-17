@@ -2,6 +2,8 @@ import {Seo} from '@shopify/hydrogen';
 import {PageHeader, Section, CartDetails} from '~/components';
 import {Layout} from '~/components/index.server';
 
+import {NostoCheckout, NostoPlacement} from '@nosto/shopify-hydrogen';
+
 export default function Cart() {
   return (
     <Layout>
@@ -10,6 +12,8 @@ export default function Cart() {
       <Section className="max-w-7xl mx-auto">
         <CartDetails layout="page" />
       </Section>
+      <NostoPlacement id="cartpage-nosto-1" />
+      <NostoCheckout />
     </Layout>
   );
 }

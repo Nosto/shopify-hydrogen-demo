@@ -12,6 +12,8 @@ import {PRODUCT_CARD_FRAGMENT} from '~/lib/fragments';
 import {PageHeader, ProductGrid, Section, Text} from '~/components';
 import {NotFound, Layout} from '~/components/index.server';
 
+import {NostoCategory, NostoPlacement} from '@nosto/shopify-hydrogen';
+
 const pageBy = 48;
 
 export default function Collection({params}) {
@@ -63,6 +65,10 @@ export default function Collection({params}) {
           </div>
         )}
       </PageHeader>
+
+      <NostoPlacement id="categorypage-nosto-1" />
+      <NostoCategory category={collection.title} />
+
       <Section>
         <ProductGrid
           key={collection.id}

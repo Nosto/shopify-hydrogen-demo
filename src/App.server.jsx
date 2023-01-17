@@ -16,6 +16,8 @@ import {
 import {HeaderFallback, EventsListener} from '~/components';
 import {NotFound} from '~/components/index.server';
 
+import {NostoProvider, NostoSession} from '@nosto/shopify-hydrogen';
+
 function App({request}) {
   const pathname = new URL(request.normalizedUrl).pathname;
   const localeMatch = /^\/([a-z]{2})(\/|$)/i.exec(pathname);
@@ -49,10 +51,13 @@ function App({request}) {
           customerAccessToken={customerAccessToken}
         >
           <Router>
-            <FileRoutes
-              basePath={countryCode ? `/${countryCode}/` : undefined}
-            />
-            <Route path="*" page={<NotFound />} />
+            <NostoProvider account="shopify-11368366139">
+              <FileRoutes
+                basePath={countryCode ? `/${countryCode}/` : undefined}
+              />
+              <Route path="*" page={<NotFound />} />
+              <NostoSession />
+            </NostoProvider>
           </Router>
         </CartProvider>
         <PerformanceMetrics />
