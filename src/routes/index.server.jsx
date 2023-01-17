@@ -14,6 +14,8 @@ import {getHeroPlaceholder} from '~/lib/placeholders';
 import {FeaturedCollections, Hero} from '~/components';
 import {Layout, ProductSwimlane} from '~/components/index.server';
 
+import {NostoHome, NostoPlacement} from '@nosto/shopify-hydrogen';
+
 export default function Homepage() {
   useServerAnalytics({
     shopify: {
@@ -61,6 +63,11 @@ function HomepageContent() {
       {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
+
+      <NostoPlacement id="frontpage-nosto-1" />
+      <NostoPlacement id="frontpage-nosto-2" />
+      <NostoHome />
+
       <ProductSwimlane
         data={featuredProducts.nodes}
         title="Featured Products"

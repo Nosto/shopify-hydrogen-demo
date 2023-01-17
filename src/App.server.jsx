@@ -56,7 +56,7 @@ function App({request}) {
           customerAccessToken={customerAccessToken}
         >
           <Router>
-            <NostoProvider account="shopify-55957520471">
+            <NostoProvider account="shopify-11368366139">
               <FileRoutes
                 basePath={countryCode ? `/${countryCode}/` : undefined}
               />
