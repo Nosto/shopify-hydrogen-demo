@@ -4,6 +4,7 @@ import {Suspense} from 'react';
 import {PRODUCT_CARD_FRAGMENT} from '~/lib/fragments';
 import {Button, FeaturedCollections, PageHeader, Text} from '~/components';
 import {ProductSwimlane, Layout} from '~/components/index.server';
+import {Nosto404, NostoPlacement} from '@nosto/shopify-hydrogen';
 
 export function NotFound({response, type = 'page'}) {
   if (response) {
@@ -24,6 +25,8 @@ export function NotFound({response, type = 'page'}) {
           Take me to the home page
         </Button>
       </PageHeader>
+      <NostoPlacement id="notfound-nosto-1" />
+      <Nosto404 />
       <Suspense>
         <FeaturedSection />
       </Suspense>
