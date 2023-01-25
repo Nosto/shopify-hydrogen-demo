@@ -35,7 +35,7 @@
   "prettier": "@shopify/prettier-config",
   "dependencies": {
     "@headlessui/react": "^1.7.0",
-    "@nosto/shopify-hydrogen": "^0.5.0",
+    "@nosto/shopify-hydrogen": "^0.6.0",
     "@shopify/hydrogen": "^1.6.5",
     "clsx": "^1.1.1",
     "graphql-tag": "^2.12.6",
