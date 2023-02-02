@@ -41,7 +41,9 @@
     "graphql-tag": "^2.12.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-slick": "^0.29.0",
     "react-use": "^17.4.0",
+    "slick-carousel": "^1.8.1",
     "typographic-base": "^1.0.4"
   }
 }
