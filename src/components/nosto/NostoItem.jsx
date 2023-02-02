@@ -2,7 +2,7 @@ import './css/NostoItem.css';
 
 export function NostoItem({product}) {
   return (
-    <div className="nosto-item" key={product.productId}>
+    <div className="nosto-item">
       <a href={product.url}>
         <div className="nosto-image-container">
           <div className="nosto-image">
