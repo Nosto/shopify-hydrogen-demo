@@ -1,5 +1,3 @@
-import './css/NostoItem.css';
-
 export function NostoItem({product}) {
   return (
     <div className="nosto-item">
