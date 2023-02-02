@@ -4,7 +4,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 export function NostoSlot({recommendation}) {
-  let {title, result_id, products} = recommendation;
+  let {title, products} = recommendation;
 
   let carouselSettings = {
     slidesToShow: 5,
