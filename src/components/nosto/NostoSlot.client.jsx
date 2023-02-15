@@ -1,7 +1,7 @@
 import {NostoItem} from './NostoItem.client';
 import './nostoSlot.css';
 
-export default function NostoSlot({nostoRecommendation}) {
+export function NostoSlot({nostoRecommendation}) {
   let {title, products, result_id} = nostoRecommendation;
 
   function reportClick(productId) {
