@@ -1,6 +1,12 @@
-.nosto-slot {
-  max-width: 1000px;
+.nosto-container {
+  max-width: 1200px;
   margin: 0 auto;
+  padding: 50px;
+  text-align: center;
+}
+.nosto-title {
+  font-size: 30px;
+  margin-bottom: 40px;
 }
 .nosto-list {
   display: flex;
