@@ -48,6 +48,7 @@ export default function Product() {
   }
 
   const {media, title, vendor, descriptionHtml, id, productType} = product;
+
   const {shippingPolicy, refundPolicy} = shop;
   const {
     priceV2,
@@ -129,6 +130,8 @@ export default function Product() {
         </Section>
         <NostoPlacement id="productpage-nosto-1" />
         <NostoPlacement id="productpage-nosto-2" />
+        <NostoPlacement id="productpage-nosto-33333" />
+        <div>{JSON.stringify(product)}</div>
         <NostoProduct product={nostoProductId} tagging={product} />
         <Suspense>
           <ProductSwimlane title="Related Products" data={id} />
