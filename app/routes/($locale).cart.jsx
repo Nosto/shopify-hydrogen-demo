@@ -1,14 +1,14 @@
-import {Await, useMatches} from '@remix-run/react';
-import {Suspense} from 'react';
+import { Await, useMatches } from '@remix-run/react';
+import { Suspense } from 'react';
 import invariant from 'tiny-invariant';
-import {json} from '@shopify/remix-oxygen';
+import { json } from '@shopify/remix-oxygen';
 
-import {CartLoading, Cart} from '~/components';
-import {isLocalPath, getCartId} from '~/lib/utils';
-import {CartAction} from '~/lib/type';
+import { CartLoading, Cart } from '~/components';
+import { isLocalPath, getCartId } from '~/lib/utils';
+import { CartAction } from '~/lib/type';
 
-export async function action({request, context}) {
-  const {session, storefront} = context;
+export async function action({ request, context }) {
+  const { session, storefront } = context;
   const headers = new Headers();
   let cartId = getCartId(request);
 
@@ -39,7 +39,7 @@ export async function action({request, context}) {
        */
       if (!cartId) {
         result = await cartCreate({
-          input: countryCode ? {lines, buyerIdentity: {countryCode}} : {lines},
+          input: countryCode ? { lines, buyerIdentity: { countryCode } } : { lines },
           storefront,
         });
       } else {
@@ -107,22 +107,22 @@ export async function action({request, context}) {
 
       result = cartId
         ? await cartUpdateBuyerIdentity({
-            cartId,
+          cartId,
+          buyerIdentity: {
+            ...buyerIdentity,
+            customerAccessToken,
+          },
+          storefront,
+        })
+        : await cartCreate({
+          input: {
             buyerIdentity: {
               ...buyerIdentity,
               customerAccessToken,
             },
-            storefront,
-          })
-        : await cartCreate({
-            input: {
-              buyerIdentity: {
-                ...buyerIdentity,
-                customerAccessToken,
-              },
-            },
-            storefront,
-          });
+          },
+          storefront,
+        });
 
       cartId = result.cart.id;
 
@@ -142,7 +142,7 @@ export async function action({request, context}) {
     headers.set('Location', redirectTo);
   }
 
-  const {cart, errors} = result;
+  const { cart, errors } = result;
   return json(
     {
       cart,
@@ -151,7 +151,7 @@ export async function action({request, context}) {
         cartId,
       },
     },
-    {status, headers},
+    { status, headers },
   );
 }
 
@@ -213,9 +213,9 @@ const CREATE_CART_MUTATION = `#graphql
  * @returns result {cart, errors}
  * @preserve
  */
-export async function cartCreate({input, storefront}) {
-  const {cartCreate} = await storefront.mutate(CREATE_CART_MUTATION, {
-    variables: {input},
+export async function cartCreate({ input, storefront }) {
+  const { cartCreate } = await storefront.mutate(CREATE_CART_MUTATION, {
+    variables: { input },
   });
 
   invariant(cartCreate, 'No data returned from cartCreate mutation');
@@ -247,9 +247,9 @@ const ADD_LINES_MUTATION = `#graphql
  * @returns result {cart, errors}
  * @preserve
  */
-export async function cartAdd({cartId, lines, storefront}) {
-  const {cartLinesAdd} = await storefront.mutate(ADD_LINES_MUTATION, {
-    variables: {cartId, lines},
+export async function cartAdd({ cartId, lines, storefront }) {
+  const { cartLinesAdd } = await storefront.mutate(ADD_LINES_MUTATION, {
+    variables: { cartId, lines },
   });
 
   invariant(cartLinesAdd, 'No data returned from cartLinesAdd mutation');
@@ -295,8 +295,8 @@ const REMOVE_LINE_ITEMS_MUTATION = `#graphql
  * @returns mutated cart
  * @preserve
  */
-export async function cartRemove({cartId, lineIds, storefront}) {
-  const {cartLinesRemove} = await storefront.mutate(
+export async function cartRemove({ cartId, lineIds, storefront }) {
+  const { cartLinesRemove } = await storefront.mutate(
     REMOVE_LINE_ITEMS_MUTATION,
     {
       variables: {
@@ -334,9 +334,9 @@ const LINES_UPDATE_MUTATION = `#graphql
  * @returns mutated cart
  * @preserve
  */
-export async function cartUpdate({cartId, lines, storefront}) {
-  const {cartLinesUpdate} = await storefront.mutate(LINES_UPDATE_MUTATION, {
-    variables: {cartId, lines},
+export async function cartUpdate({ cartId, lines, storefront }) {
+  const { cartLinesUpdate } = await storefront.mutate(LINES_UPDATE_MUTATION, {
+    variables: { cartId, lines },
   });
 
   invariant(
@@ -388,7 +388,7 @@ export async function cartUpdateBuyerIdentity({
   buyerIdentity,
   storefront,
 }) {
-  const {cartBuyerIdentityUpdate} = await storefront.mutate(
+  const { cartBuyerIdentityUpdate } = await storefront.mutate(
     UPDATE_CART_BUYER_COUNTRY,
     {
       variables: {
@@ -435,7 +435,7 @@ export async function cartDiscountCodesUpdate({
   discountCodes,
   storefront,
 }) {
-  const {cartDiscountCodesUpdate} = await storefront.mutate(
+  const { cartDiscountCodesUpdate } = await storefront.mutate(
     DISCOUNT_CODES_UPDATE,
     {
       variables: {

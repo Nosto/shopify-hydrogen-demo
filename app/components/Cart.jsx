@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import {useRef} from 'react';
-import {useScroll} from 'react-use';
-import {flattenConnection, Image, Money} from '@shopify/hydrogen';
-import {useFetcher} from '@remix-run/react';
+import { useRef } from 'react';
+import { useScroll } from 'react-use';
+import { flattenConnection, Image, Money } from '@shopify/hydrogen';
+import { useFetcher } from '@remix-run/react';
 
 import {
   Button,
@@ -12,21 +12,28 @@ import {
   Link,
   FeaturedProducts,
 } from '~/components';
-import {getInputStyleClasses} from '~/lib/utils';
-import {CartAction} from '~/lib/type';
+import { getInputStyleClasses } from '~/lib/utils';
+import { CartAction } from '~/lib/type';
 
-export function Cart({layout, onClose, cart}) {
+import { NostoCheckout, NostoPlacement } from '@nosto/shopify-hydrogen';
+
+export function Cart({ layout, onClose, cart }) {
   const linesCount = Boolean(cart?.lines?.edges?.length || 0);
 
   return (
     <>
       <CartEmpty hidden={linesCount} onClose={onClose} layout={layout} />
       <CartDetails cart={cart} layout={layout} />
+
+      {/* Render specific Nosto slot when there are items in cart: */}
+      {linesCount && (<NostoPlacement id="cartpage-nosto-1" />)}
+
+      <NostoCheckout />
     </>
   );
 }
 
-export function CartDetails({layout, cart}) {
+export function CartDetails({ layout, cart }) {
   // @todo: get optimistic cart cost
   const cartHasItems = !!cart && cart.totalQuantity > 0;
   const container = {
@@ -52,8 +59,8 @@ export function CartDetails({layout, cart}) {
  * @param discountCodes the current discount codes applied to the cart
  * @todo rework when a design is ready
  */
-function CartDiscounts({discountCodes}) {
-  const codes = discountCodes?.map(({code}) => code).join(', ') || null;
+function CartDiscounts({ discountCodes }) {
+  const codes = discountCodes?.map(({ code }) => code).join(', ') || null;
 
   return (
     <>
@@ -66,7 +73,7 @@ function CartDiscounts({discountCodes}) {
               <button>
                 <IconRemove
                   aria-hidden="true"
-                  style={{height: 18, marginRight: 4}}
+                  style={{ height: 18, marginRight: 4 }}
                 />
               </button>
             </UpdateDiscountForm>
@@ -98,7 +105,7 @@ function CartDiscounts({discountCodes}) {
   );
 }
 
-function UpdateDiscountForm({children}) {
+function UpdateDiscountForm({ children }) {
   const fetcher = useFetcher();
   return (
     <fetcher.Form action="/cart" method="post">
@@ -112,10 +119,10 @@ function UpdateDiscountForm({children}) {
   );
 }
 
-function CartLines({layout = 'drawer', lines: cartLines}) {
+function CartLines({ layout = 'drawer', lines: cartLines }) {
   const currentLines = cartLines ? flattenConnection(cartLines) : [];
   const scrollRef = useRef(null);
-  const {y} = useScroll(scrollRef);
+  const { y } = useScroll(scrollRef);
 
   const className = clsx([
     y > 0 ? 'border-t' : '',
@@ -139,7 +146,7 @@ function CartLines({layout = 'drawer', lines: cartLines}) {
   );
 }
 
-function CartCheckoutActions({checkoutUrl}) {
+function CartCheckoutActions({ checkoutUrl }) {
   if (!checkoutUrl) return null;
 
   return (
@@ -154,7 +161,7 @@ function CartCheckoutActions({checkoutUrl}) {
   );
 }
 
-function CartSummary({cost, layout, children = null}) {
+function CartSummary({ cost, layout, children = null }) {
   const summary = {
     drawer: 'grid gap-4 p-6 border-t md:px-12',
     page: 'sticky top-nav grid gap-6 p-4 md:px-6 md:translate-y-4 bg-primary/5 rounded w-full',
@@ -182,10 +189,10 @@ function CartSummary({cost, layout, children = null}) {
   );
 }
 
-function CartLineItem({line}) {
+function CartLineItem({ line }) {
   if (!line?.id) return null;
 
-  const {id, quantity, merchandise} = line;
+  const { id, quantity, merchandise } = line;
 
   if (typeof quantity === 'undefined' || !merchandise?.product) return null;
 
@@ -238,7 +245,7 @@ function CartLineItem({line}) {
   );
 }
 
-function ItemRemoveButton({lineIds}) {
+function ItemRemoveButton({ lineIds }) {
   const fetcher = useFetcher();
 
   return (
@@ -260,9 +267,9 @@ function ItemRemoveButton({lineIds}) {
   );
 }
 
-function CartLineQuantityAdjust({line}) {
+function CartLineQuantityAdjust({ line }) {
   if (!line || typeof line?.quantity === 'undefined') return null;
-  const {id: lineId, quantity} = line;
+  const { id: lineId, quantity } = line;
   const prevQuantity = Number(Math.max(0, quantity - 1).toFixed(0));
   const nextQuantity = Number((quantity + 1).toFixed(0));
 
@@ -272,7 +279,7 @@ function CartLineQuantityAdjust({line}) {
         Quantity, {quantity}
       </label>
       <div className="flex items-center border rounded">
-        <UpdateCartButton lines={[{id: lineId, quantity: prevQuantity}]}>
+        <UpdateCartButton lines={[{ id: lineId, quantity: prevQuantity }]}>
           <button
             name="decrease-quantity"
             aria-label="Decrease quantity"
@@ -288,7 +295,7 @@ function CartLineQuantityAdjust({line}) {
           {quantity}
         </div>
 
-        <UpdateCartButton lines={[{id: lineId, quantity: nextQuantity}]}>
+        <UpdateCartButton lines={[{ id: lineId, quantity: nextQuantity }]}>
           <button
             className="w-10 h-10 transition text-primary/50 hover:text-primary"
             name="increase-quantity"
@@ -303,7 +310,7 @@ function CartLineQuantityAdjust({line}) {
   );
 }
 
-function UpdateCartButton({children, lines}) {
+function UpdateCartButton({ children, lines }) {
   const fetcher = useFetcher();
 
   return (
@@ -315,7 +322,7 @@ function UpdateCartButton({children, lines}) {
   );
 }
 
-function CartLinePrice({line, priceType = 'regular', ...passthroughProps}) {
+function CartLinePrice({ line, priceType = 'regular', ...passthroughProps }) {
   if (!line?.cost?.amountPerQuantity || !line?.cost?.totalAmount) return null;
 
   const moneyV2 =
@@ -330,9 +337,9 @@ function CartLinePrice({line, priceType = 'regular', ...passthroughProps}) {
   return <Money withoutTrailingZeros {...passthroughProps} data={moneyV2} />;
 }
 
-export function CartEmpty({hidden = false, layout = 'drawer', onClose}) {
+export function CartEmpty({ hidden = false, layout = 'drawer', onClose }) {
   const scrollRef = useRef(null);
-  const {y} = useScroll(scrollRef);
+  const { y } = useScroll(scrollRef);
 
   const container = {
     drawer: clsx([
@@ -356,6 +363,10 @@ export function CartEmpty({hidden = false, layout = 'drawer', onClose}) {
           <Button onClick={onClose}>Continue shopping</Button>
         </div>
       </section>
+
+      {/* Render specific Nosto slot when cart is empty: */}
+      {!hidden && (<NostoPlacement id="cartpage-nosto-2" />)}
+
       <section className="grid gap-8 pt-16">
         <FeaturedProducts
           count={4}
