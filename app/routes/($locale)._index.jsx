@@ -1,18 +1,20 @@
-import {defer} from '@shopify/remix-oxygen';
-import {Suspense} from 'react';
-import {Await, useLoaderData} from '@remix-run/react';
-import {AnalyticsPageType} from '@shopify/hydrogen';
+import { defer } from '@shopify/remix-oxygen';
+import { Suspense } from 'react';
+import { Await, useLoaderData } from '@remix-run/react';
+import { AnalyticsPageType } from '@shopify/hydrogen';
 
-import {ProductSwimlane, FeaturedCollections, Hero} from '~/components';
-import {MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {getHeroPlaceholder} from '~/lib/placeholders';
-import {seoPayload} from '~/lib/seo.server';
-import {routeHeaders} from '~/data/cache';
+import { ProductSwimlane, FeaturedCollections, Hero } from '~/components';
+import { MEDIA_FRAGMENT, PRODUCT_CARD_FRAGMENT } from '~/data/fragments';
+import { getHeroPlaceholder } from '~/lib/placeholders';
+import { seoPayload } from '~/lib/seo.server';
+import { routeHeaders } from '~/data/cache';
+
+import { NostoHome, NostoPlacement } from '@nosto/shopify-hydrogen';
 
 export const headers = routeHeaders;
 
-export async function loader({params, context}) {
-  const {language, country} = context.storefront.i18n;
+export async function loader({ params, context }) {
+  const { language, country } = context.storefront.i18n;
 
   if (
     params.locale &&
@@ -20,11 +22,11 @@ export async function loader({params, context}) {
   ) {
     // If the locale URL param is defined, yet we still are on `EN-US`
     // the the locale param must be invalid, send to the 404 page
-    throw new Response(null, {status: 404});
+    throw new Response(null, { status: 404 });
   }
 
-  const {shop, hero} = await context.storefront.query(HOMEPAGE_SEO_QUERY, {
-    variables: {handle: 'freestyle'},
+  const { shop, hero } = await context.storefront.query(HOMEPAGE_SEO_QUERY, {
+    variables: { handle: 'freestyle' },
   });
 
   const seo = seoPayload.home();
@@ -93,10 +95,14 @@ export default function Homepage() {
         <Hero {...primaryHero} height="full" top loading="eager" />
       )}
 
+      <NostoPlacement id="frontpage-nosto-1" />
+      <NostoPlacement id="frontpage-nosto-2" />
+      <NostoHome />
+
       {featuredProducts && (
         <Suspense>
           <Await resolve={featuredProducts}>
-            {({products}) => {
+            {({ products }) => {
               if (!products?.nodes) return <></>;
               return (
                 <ProductSwimlane
@@ -113,7 +119,7 @@ export default function Homepage() {
       {secondaryHero && (
         <Suspense fallback={<Hero {...skeletons[1]} />}>
           <Await resolve={secondaryHero}>
-            {({hero}) => {
+            {({ hero }) => {
               if (!hero) return <></>;
               return <Hero {...hero} />;
             }}
@@ -124,7 +130,7 @@ export default function Homepage() {
       {featuredCollections && (
         <Suspense>
           <Await resolve={featuredCollections}>
-            {({collections}) => {
+            {({ collections }) => {
               if (!collections?.nodes) return <></>;
               return (
                 <FeaturedCollections
@@ -140,7 +146,7 @@ export default function Homepage() {
       {tertiaryHero && (
         <Suspense fallback={<Hero {...skeletons[2]} />}>
           <Await resolve={tertiaryHero}>
-            {({hero}) => {
+            {({ hero }) => {
               if (!hero) return <></>;
               return <Hero {...hero} />;
             }}
