@@ -25,10 +25,11 @@ import { DEFAULT_LOCALE, parseMenu, getCartId } from './lib/utils';
 import { useAnalytics } from './hooks/useAnalytics';
 
 import { NostoProvider, NostoSession, getNostoData } from '@nosto/shopify-hydrogen'
-import { NostoSlot } from '~/components/nosto/NostoSlot.client';
+import { NostoSlot, links as nostoSlotLinks } from '~/components/nosto/NostoSlot';
 
 export const links = () => {
   return [
+    ...nostoSlotLinks(),
     { rel: 'stylesheet', href: styles },
     {
       rel: 'preconnect',
