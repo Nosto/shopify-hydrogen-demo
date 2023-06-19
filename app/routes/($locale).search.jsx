@@ -1,6 +1,6 @@
-import {defer} from '@shopify/remix-oxygen';
-import {Await, Form, useLoaderData} from '@remix-run/react';
-import {Suspense} from 'react';
+import { defer } from '@shopify/remix-oxygen';
+import { Await, Form, useLoaderData } from '@remix-run/react';
+import { Suspense } from 'react';
 import {
   Pagination__unstable as Pagination,
   getPaginationVariables__unstable as getPaginationVariables,
@@ -17,19 +17,21 @@ import {
   Section,
   Text,
 } from '~/components';
-import {PAGINATION_SIZE} from '~/lib/const';
-import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {getImageLoadingPriority} from '~/lib/const';
-import {seoPayload} from '~/lib/seo.server';
+import { PAGINATION_SIZE } from '~/lib/const';
+import { PRODUCT_CARD_FRAGMENT } from '~/data/fragments';
+import { getImageLoadingPriority } from '~/lib/const';
+import { seoPayload } from '~/lib/seo.server';
 
-import {getFeaturedData} from './($locale).featured-products';
+import { getFeaturedData } from './($locale).featured-products';
 
-export async function loader({request, context: {storefront}}) {
+import { NostoSearch, NostoPlacement } from '@nosto/shopify-hydrogen';
+
+export async function loader({ request, context: { storefront } }) {
   const searchParams = new URL(request.url).searchParams;
   const searchTerm = searchParams.get('q');
-  const variables = getPaginationVariables(request, {pageBy: 8});
+  const variables = getPaginationVariables(request, { pageBy: 8 });
 
-  const {products} = await storefront.query(SEARCH_QUERY, {
+  const { products } = await storefront.query(SEARCH_QUERY, {
     variables: {
       searchTerm,
       ...variables,
@@ -69,7 +71,7 @@ export async function loader({request, context: {storefront}}) {
 }
 
 export default function Search() {
-  const {searchTerm, products, noResultRecommendations} = useLoaderData();
+  const { searchTerm, products, noResultRecommendations } = useLoaderData();
   const noResults = products?.nodes?.length === 0;
 
   return (
@@ -98,8 +100,10 @@ export default function Search() {
         />
       ) : (
         <Section>
+          <NostoPlacement id="searchpage-nosto-1" />
+          <NostoSearch query={searchTerm ? decodeURI(searchTerm) : ''} />
           <Pagination connection={products}>
-            {({nodes, isLoading, NextLink, PreviousLink}) => {
+            {({ nodes, isLoading, NextLink, PreviousLink }) => {
               const itemsMarkup = nodes.map((product, i) => (
                 <ProductCard
                   key={product.id}
@@ -131,16 +135,21 @@ export default function Search() {
   );
 }
 
-function NoResults({noResults, recommendations}) {
+function NoResults({ noResults, recommendations }) {
+  const { searchTerm } = useLoaderData()
   return (
     <>
       {noResults && (
-        <Section padding="x">
-          <Text className="opacity-50">
-            No results, try a different search.
-          </Text>
-        </Section>
+        <>
+          <Section padding="x">
+            <Text className="opacity-50">
+              No results, try a different search.
+            </Text>
+          </Section>
+        </>
       )}
+      <NostoPlacement id="searchpage-nosto-1" />
+      <NostoSearch query={searchTerm ? decodeURI(searchTerm) : ''} />
       <Suspense>
         <Await
           errorElement="There was a problem loading related products"
@@ -148,7 +157,7 @@ function NoResults({noResults, recommendations}) {
         >
           {(result) => {
             if (!result) return null;
-            const {featuredCollections, featuredProducts} = result;
+            const { featuredCollections, featuredProducts } = result;
 
             return (
               <>
@@ -170,7 +179,7 @@ function NoResults({noResults, recommendations}) {
 }
 
 export function getNoResultRecommendations(storefront) {
-  return getFeaturedData(storefront, {pageBy: PAGINATION_SIZE});
+  return getFeaturedData(storefront, { pageBy: PAGINATION_SIZE });
 }
 
 const SEARCH_QUERY = `#graphql
