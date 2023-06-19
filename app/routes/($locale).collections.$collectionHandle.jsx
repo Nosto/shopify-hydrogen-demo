@@ -1,5 +1,5 @@
-import {json} from '@shopify/remix-oxygen';
-import {useLoaderData} from '@remix-run/react';
+import { json } from '@shopify/remix-oxygen';
+import { useLoaderData } from '@remix-run/react';
 import {
   flattenConnection,
   AnalyticsPageType,
@@ -17,18 +17,20 @@ import {
   ProductCard,
   Button,
 } from '~/components';
-import {PRODUCT_CARD_FRAGMENT} from '~/data/fragments';
-import {routeHeaders} from '~/data/cache';
-import {seoPayload} from '~/lib/seo.server';
-import {getImageLoadingPriority} from '~/lib/const';
+import { PRODUCT_CARD_FRAGMENT } from '~/data/fragments';
+import { routeHeaders } from '~/data/cache';
+import { seoPayload } from '~/lib/seo.server';
+import { getImageLoadingPriority } from '~/lib/const';
+
+import { NostoCategory, NostoPlacement } from '@nosto/shopify-hydrogen';
 
 export const headers = routeHeaders;
 
-export async function loader({params, request, context}) {
+export async function loader({ params, request, context }) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
-  const {collectionHandle} = params;
+  const { collectionHandle } = params;
 
   invariant(collectionHandle, 'Missing collectionHandle param');
 
@@ -36,13 +38,13 @@ export async function loader({params, request, context}) {
   const knownFilters = ['productVendor', 'productType'];
   const available = 'available';
   const variantOption = 'variantOption';
-  const {sortKey, reverse} = getSortValuesFromParam(searchParams.get('sort'));
+  const { sortKey, reverse } = getSortValuesFromParam(searchParams.get('sort'));
   const filters = [];
   const appliedFilters = [];
 
   for (const [key, value] of searchParams.entries()) {
     if (available === key) {
-      filters.push({available: value === 'true'});
+      filters.push({ available: value === 'true' });
       appliedFilters.push({
         label: value === 'true' ? 'In stock' : 'Out of stock',
         urlParam: {
@@ -51,12 +53,12 @@ export async function loader({params, request, context}) {
         },
       });
     } else if (knownFilters.includes(key)) {
-      filters.push({[key]: value});
-      appliedFilters.push({label: value, urlParam: {key, value}});
+      filters.push({ [key]: value });
+      appliedFilters.push({ label: value, urlParam: { key, value } });
     } else if (key.includes(variantOption)) {
       const [name, val] = value.split(':');
-      filters.push({variantOption: {name, value: val}});
-      appliedFilters.push({label: val, urlParam: {key, value}});
+      filters.push({ variantOption: { name, value: val } });
+      appliedFilters.push({ label: val, urlParam: { key, value } });
     }
   }
 
@@ -69,14 +71,14 @@ export async function loader({params, request, context}) {
       price.min = Number(searchParams.get('minPrice')) || 0;
       appliedFilters.push({
         label: `Min: $${price.min}`,
-        urlParam: {key: 'minPrice', value: searchParams.get('minPrice')},
+        urlParam: { key: 'minPrice', value: searchParams.get('minPrice') },
       });
     }
     if (searchParams.has('maxPrice')) {
       price.max = Number(searchParams.get('maxPrice')) || 0;
       appliedFilters.push({
         label: `Max: $${price.max}`,
-        urlParam: {key: 'maxPrice', value: searchParams.get('maxPrice')},
+        urlParam: { key: 'maxPrice', value: searchParams.get('maxPrice') },
       });
     }
     filters.push({
@@ -84,7 +86,7 @@ export async function loader({params, request, context}) {
     });
   }
 
-  const {collection, collections} = await context.storefront.query(
+  const { collection, collections } = await context.storefront.query(
     COLLECTION_QUERY,
     {
       variables: {
@@ -100,10 +102,10 @@ export async function loader({params, request, context}) {
   );
 
   if (!collection) {
-    throw new Response('collection', {status: 404});
+    throw new Response('collection', { status: 404 });
   }
 
-  const seo = seoPayload.collection({collection, url: request.url});
+  const seo = seoPayload.collection({ collection, url: request.url });
 
   return json({
     collection,
@@ -119,7 +121,9 @@ export async function loader({params, request, context}) {
 }
 
 export default function Collection() {
-  const {collection, collections, appliedFilters} = useLoaderData();
+  const { collection, collections, appliedFilters } = useLoaderData();
+
+  console.log({ collection })
 
   return (
     <>
@@ -134,6 +138,10 @@ export default function Collection() {
           </div>
         )}
       </PageHeader>
+
+      <NostoPlacement id="categorypage-nosto-1" />
+      <NostoCategory category={collection.title} />
+
       <Section>
         <SortFilter
           filters={collection.products.filters}
@@ -141,7 +149,7 @@ export default function Collection() {
           collections={collections}
         >
           <Pagination connection={collection.products}>
-            {({nodes, isLoading, PreviousLink, NextLink}) => (
+            {({ nodes, isLoading, PreviousLink, NextLink }) => (
               <>
                 <div className="flex items-center justify-center mb-6">
                   <Button as={PreviousLink} variant="secondary" width="full">
