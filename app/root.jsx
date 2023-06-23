@@ -24,7 +24,7 @@ import styles from './styles/app.css';
 import { DEFAULT_LOCALE, parseMenu, getCartId } from './lib/utils';
 import { useAnalytics } from './hooks/useAnalytics';
 
-import { NostoProvider, NostoSession, getNostoData } from '@nosto/shopify-hydrogen'
+import { NostoProvider, getNostoData } from '@nosto/shopify-hydrogen'
 import { NostoSlot, links as nostoSlotLinks } from '~/components/nosto/NostoSlot';
 
 export const links = () => {
