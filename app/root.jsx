@@ -27,6 +27,8 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { NostoProvider, NostoSession, getNostoData } from '@nosto/shopify-hydrogen'
 import { NostoSlot, links as nostoSlotLinks } from '~/components/nosto/NostoSlot';
 
+const nostoProviderProps = { account: "shopify-11368366139", recommendationComponent: <NostoSlot /> }
+
 export const links = () => {
   return [
     ...nostoSlotLinks(),
@@ -83,7 +85,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NostoProvider account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+        <NostoProvider {...nostoProviderProps}>
           <NostoSession />
           <Layout
             key={`${locale.language}-${locale.country}`}

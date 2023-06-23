@@ -98,7 +98,6 @@ export default function Product() {
   const { media, title, vendor, descriptionHtml } = product;
   const { shippingPolicy, refundPolicy } = shop;
 
-  console.log(product)
   let nostoProductId = product?.id?.split('/');
   nostoProductId && (nostoProductId = nostoProductId[nostoProductId.length - 1]);
 
