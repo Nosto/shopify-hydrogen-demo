@@ -27,8 +27,6 @@ import { useAnalytics } from './hooks/useAnalytics';
 import { NostoProvider, NostoSession, getNostoData } from '@nosto/shopify-hydrogen'
 import { NostoSlot, links as nostoSlotLinks } from '~/components/nosto/NostoSlot';
 
-const nostoProviderProps = { account: "shopify-11368366139", recommendationComponent: <NostoSlot /> }
-
 export const links = () => {
   return [
     ...nostoSlotLinks(),
@@ -85,8 +83,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NostoProvider {...nostoProviderProps}>
-          <NostoSession />
+        <NostoProvider currentVariation={locale.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
           <Layout
             key={`${locale.language}-${locale.country}`}
             layout={data.layout}
@@ -125,24 +122,26 @@ export function ErrorBoundary({ error }) {
         <Links />
       </head>
       <body>
-        <Layout
-          layout={root?.data?.layout}
-          key={`${locale.language}-${locale.country}`}
-        >
-          {isRouteError ? (
-            <>
-              {routeError.status === 404 ? (
-                <NotFound type={pageType} />
-              ) : (
-                <GenericError
-                  error={{ message: `${routeError.status} ${routeError.data}` }}
-                />
-              )}
-            </>
-          ) : (
-            <GenericError error={error instanceof Error ? error : undefined} />
-          )}
-        </Layout>
+        <NostoProvider currentVariation={locale.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+          <Layout
+            layout={root?.data?.layout}
+            key={`${locale.language}-${locale.country}`}
+          >
+            {isRouteError ? (
+              <>
+                {routeError.status === 404 ? (
+                  <NotFound type={pageType} />
+                ) : (
+                  <GenericError
+                    error={{ message: `${routeError.status} ${routeError.data}` }}
+                  />
+                )}
+              </>
+            ) : (
+              <GenericError error={error instanceof Error ? error : undefined} />
+            )}
+          </Layout>
+        </NostoProvider>
         <Scripts />
       </body>
     </html>
