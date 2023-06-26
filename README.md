@@ -1,4 +1,4 @@
-# Nosto Hydrogen Demo Storefront
+# Nosto Hydrogen V2 Demo Storefront
 
 - This is a demo of Nosto within a [Shopify Hydrogen](https://github.com/Shopify/hydrogen) storefront deployed with Oxygen. 
 - Nosto is implemented by usage of [@nosto/shopify-hydrogen](https://github.com/Nosto/shopify-hydrogen)
