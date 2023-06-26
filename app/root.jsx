@@ -71,6 +71,8 @@ export default function App() {
   const locale = data.selectedLocale ?? DEFAULT_LOCALE;
   const hasUserConsent = true;
 
+  console.log(locale)
+
   useAnalytics(hasUserConsent, locale);
 
   return (
@@ -83,7 +85,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NostoProvider currentVariation={locale.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+        <NostoProvider currentVariation={locale?.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
           <Layout
             key={`${locale.language}-${locale.country}`}
             layout={data.layout}
@@ -122,7 +124,7 @@ export function ErrorBoundary({ error }) {
         <Links />
       </head>
       <body>
-        <NostoProvider currentVariation={locale.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+        <NostoProvider currentVariation={locale?.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
           <Layout
             layout={root?.data?.layout}
             key={`${locale.language}-${locale.country}`}
