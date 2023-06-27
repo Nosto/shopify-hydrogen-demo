@@ -2,7 +2,7 @@
   "name": "demo-store",
   "private": true,
   "sideEffects": false,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "scripts": {
     "dev": "shopify hydrogen dev --codegen-unstable",
     "build": "shopify hydrogen build",
