@@ -148,7 +148,7 @@ export function ErrorBoundary({ error }) {
   );
 }
 
-//////
+////////
 
 const LAYOUT_QUERY = `#graphql
   query layout(
