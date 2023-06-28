@@ -83,7 +83,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NostoProvider currentVariation={locale?.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+        <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
           <Layout
             key={`${locale.language}-${locale.country}`}
             layout={data.layout}
