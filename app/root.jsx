@@ -111,7 +111,7 @@ export function ErrorBoundary({ error }) {
     title = 'Not found';
     if (routeError.status === 404) pageType = routeError.data || pageType;
   }
-
+  //
   return (
     <html lang={locale.language}>
       <head>
