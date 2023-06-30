@@ -42,7 +42,7 @@ export const links = () => {
     { rel: 'icon', type: 'image/svg+xml', href: favicon },
   ];
 };
-//
+
 export async function loader({ request, context }) {
   const cartId = getCartId(request);
   const [customerAccessToken, layout] = await Promise.all([
