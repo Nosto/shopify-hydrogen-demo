@@ -53,7 +53,7 @@ export async function loader({ request, context }) {
   const seo = seoPayload.root({ shop: layout.shop, url: request.url });
 
   return defer({
-    nostoData: getNostoData({ context, cartId }),
+    ...(await getNostoData({ context, cartId })),
     isLoggedIn: Boolean(customerAccessToken),
     layout,
     selectedLocale: context.storefront.i18n,
@@ -122,7 +122,7 @@ export function ErrorBoundary({ error }) {
         <Links />
       </head>
       <body>
-        <NostoProvider currentVariation={locale?.currency} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+        <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
           <Layout
             layout={root?.data?.layout}
             key={`${locale.language}-${locale.country}`}
@@ -360,6 +360,13 @@ export async function getCart({ storefront }, cartId) {
     },
     cache: storefront.CacheNone(),
   });
+
+  function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // const prom = await delay(5000);
+  //
 
   return cart;
 }
