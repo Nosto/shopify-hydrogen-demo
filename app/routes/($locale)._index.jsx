@@ -91,9 +91,13 @@ export default function Homepage() {
 
   return (
     <>
-      {primaryHero && (
+      {/* {primaryHero && (
         <Hero {...primaryHero} height="full" top loading="eager" />
-      )}
+      )} */}
+
+      <div >
+        <img src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" style={{ width: '100%' }} />
+      </div>
 
       <NostoPlacement id="frontpage-nosto-1" />
       <NostoPlacement id="frontpage-nosto-2" />
