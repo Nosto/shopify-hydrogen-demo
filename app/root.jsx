@@ -362,12 +362,5 @@ export async function getCart({ storefront }, cartId) {
     cache: storefront.CacheNone(),
   });
 
-  function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  // const prom = await delay(5000);
-  //
-
   return cart;
 }
