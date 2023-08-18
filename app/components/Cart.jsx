@@ -28,7 +28,7 @@ export function Cart({ layout, onClose, cart }) {
       {/* Render specific Nosto slot when there are items in cart: */}
       {linesCount && (<NostoPlacement id="cartpage-nosto-1" />)}
 
-      <NostoCheckout />
+      <NostoOther placements={['cartpage-nosto-1', 'cartpage-nosto-2']}/>
     </>
   );
 }
