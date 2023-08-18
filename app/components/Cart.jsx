@@ -15,7 +15,7 @@ import {
 import { getInputStyleClasses } from '~/lib/utils';
 import { CartAction } from '~/lib/type';
 
-import { NostoCheckout, NostoPlacement } from '@nosto/shopify-hydrogen';
+import { NostoOther, NostoPlacement } from '@nosto/shopify-hydrogen';
 
 export function Cart({ layout, onClose, cart }) {
   const linesCount = Boolean(cart?.lines?.edges?.length || 0);
