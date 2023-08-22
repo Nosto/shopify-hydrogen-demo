@@ -15,7 +15,7 @@ import {
 import { getInputStyleClasses } from '~/lib/utils';
 import { CartAction } from '~/lib/type';
 
-import { NostoCheckout, NostoPlacement } from '@nosto/shopify-hydrogen';
+import {NostoCheckout, NostoPlacement} from '@nosto/shopify-hydrogen';
 
 export function Cart({ layout, onClose, cart }) {
   const linesCount = Boolean(cart?.lines?.edges?.length || 0);
@@ -28,7 +28,7 @@ export function Cart({ layout, onClose, cart }) {
       {/* Render specific Nosto slot when there are items in cart: */}
       {linesCount && (<NostoPlacement id="cartpage-nosto-1" />)}
 
-      <NostoCheckout />
+      <NostoCheckout placements={['cartpage-nosto-1', 'cartpage-nosto-2']} />
     </>
   );
 }

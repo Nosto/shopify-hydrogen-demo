@@ -2,8 +2,8 @@ import { defer } from '@shopify/remix-oxygen';
 import { Await, Form, useLoaderData } from '@remix-run/react';
 import { Suspense } from 'react';
 import {
-  Pagination__unstable as Pagination,
-  getPaginationVariables__unstable as getPaginationVariables,
+  Pagination,
+  getPaginationVariables,
 } from '@shopify/hydrogen';
 
 import {

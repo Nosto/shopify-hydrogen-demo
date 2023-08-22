@@ -17,7 +17,7 @@
   "prettier": "@shopify/prettier-config",
   "dependencies": {
     "@headlessui/react": "^1.7.2",
-    "@nosto/shopify-hydrogen": "^2.1.0",
+    "@nosto/shopify-hydrogen": "^2.2.0",
     "@remix-run/react": "1.17.1",
     "@shopify/cli": "3.45.0",
     "@shopify/cli-hydrogen": "^5.0.1",
