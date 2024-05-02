@@ -527,14 +527,7 @@
     "@babel/helper-validator-identifier" "^7.24.5"
     to-fast-properties "^2.0.0"
 
-"@bugsnag/browser@^7.16.7":
-  version "7.21.0"
-  resolved "https://registry.npmjs.org/@bugsnag/browser/-/browser-7.21.0.tgz"
-  integrity sha512-mJ6r6SXpts+hdSnDNmTR35lZ+95BthqXpgBrDwquDCoY++zQ4OuzrkA/HZYD/rfpdSpgb7lO+AAlD7qrd9IylA==
-  dependencies:
-    "@bugsnag/core" "^7.19.0"
-
-"@bugsnag/browser@^7.21.0", "@bugsnag/browser@^7.22.7":
+"@bugsnag/browser@^7.16.7", "@bugsnag/browser@^7.21.0", "@bugsnag/browser@^7.22.7":
   version "7.22.7"
   resolved "https://registry.npmjs.org/@bugsnag/browser/-/browser-7.22.7.tgz"
   integrity sha512-70jFkWKscK2osm7bnFbPLevrzHClrygM3UcKetKs/l81Xuzlxnu1SS3onN5OUl9kd9RN4XMFr46Pv5jSqWqImQ==
@@ -1434,7 +1427,7 @@
 
 "@nosto/shopify-hydrogen@github:Nosto/shopify-hydrogen#ads-4544-upgrade-major-version":
   version "2.2.1"
-  resolved "git+ssh://git@github.com/Nosto/shopify-hydrogen.git#f90257698f7b279aa0987df8a0bd0592453d56fd"
+  resolved "git+ssh://git@github.com/Nosto/shopify-hydrogen.git#2bf88848719fbd387304faf89df47e237e0cd3e1"
   dependencies:
     "@nosto/nosto-react" "^0.4.1"
     js-sha256 "^0.2.0"
@@ -3371,9 +3364,9 @@ camelcase-css@^2.0.1:
   integrity sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==
 
 caniuse-lite@^1.0.30001517, caniuse-lite@^1.0.30001520:
-  version "1.0.30001522"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001522.tgz"
-  integrity sha512-TKiyTVZxJGhsTszLuzb+6vUZSjVOAhClszBr2Ta2k9IwtNBT/4dzmL6aywt0HCgEZlmwJzXJd8yNiob6HgwTRg==
+  version "1.0.30001615"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001615.tgz"
+  integrity sha512-1IpazM5G3r38meiae0bHRnPhz+CBQ3ZLqbQMtrg+AsTPKAXgW38JNsXkyZ+v8waCsDmPq87lmfun5Q2AGysNEQ==
 
 capital-case@^1.0.4:
   version "1.0.4"
@@ -4184,7 +4177,7 @@ dot-prop@^7.2.0:
   dependencies:
     type-fest "^2.11.2"
 
-dotenv@16.4.5:
+dotenv@16.4.5, dotenv@^16.0.0:
   version "16.4.5"
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.4.5.tgz"
   integrity sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==
@@ -4193,11 +4186,6 @@ dotenv@^10.0.0:
   version "10.0.0"
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-10.0.0.tgz"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
-
-dotenv@^16.0.0:
-  version "16.3.1"
-  resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.3.1.tgz"
-  integrity sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==
 
 duplexify@^3.5.0, duplexify@^3.6.0:
   version "3.7.1"
