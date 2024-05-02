@@ -1425,9 +1425,9 @@
   resolved "https://registry.npmjs.org/@nosto/nosto-react/-/nosto-react-0.4.1.tgz"
   integrity sha512-vNlOCf1IZDX2gNUz4vcGP040Leyazqw6jNSiqY2txiuB/jMnz9f3ruDEPAiY6gjx3uOaItZFsDPoXUbffGCDtg==
 
-"@nosto/shopify-hydrogen@github:Nosto/shopify-hydrogen#ads-4544-upgrade-major-version":
+"@nosto/shopify-hydrogen@https://github.com/Nosto/shopify-hydrogen.git#ads-4544-upgrade-major-version":
   version "2.2.1"
-  resolved "git+ssh://git@github.com/Nosto/shopify-hydrogen.git#2bf88848719fbd387304faf89df47e237e0cd3e1"
+  resolved "https://github.com/Nosto/shopify-hydrogen.git#2bf88848719fbd387304faf89df47e237e0cd3e1"
   dependencies:
     "@nosto/nosto-react" "^0.4.1"
     js-sha256 "^0.2.0"
