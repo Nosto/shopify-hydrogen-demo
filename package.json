@@ -17,7 +17,7 @@
   "prettier": "@shopify/prettier-config",
   "dependencies": {
     "@headlessui/react": "^1.7.2",
-    "@nosto/shopify-hydrogen": "github:Nosto/shopify-hydrogen#ads-4544-upgrade-major-version",
+    "@nosto/shopify-hydrogen": "https://github.com/Nosto/shopify-hydrogen.git#ads-4544-upgrade-major-version",
     "@remix-run/react": "^2.9.1",
     "@shopify/cli": "3.45.0",
     "@shopify/cli-hydrogen": "^8.0.3",
