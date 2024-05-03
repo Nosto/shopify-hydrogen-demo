@@ -14,12 +14,12 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '16'
+          node-version: '18'
           check-latest: true
 
       - name: Get yarn cache directory
@@ -32,10 +32,9 @@ jobs:
 
       - name: Build and Publish to Oxygen
         id: deploy
-        uses: shopify/oxygenctl-action@v4
-        with:
-          oxygen_deployment_token: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1343547 }}
-          build_command: "HYDROGEN_ASSET_BASE_URL=$OXYGEN_ASSET_BASE_URL yarn build"
+        run: npx shopify hydrogen deploy --build-command "yarn build"
+        env:
+          SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: "${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1343547 }}"
 
       # Create GitHub Deployment
       - name: Create GitHub Deployment
