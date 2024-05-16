@@ -1,18 +1,30 @@
+// @ts-ignore
 // Virtual entry point for the app
-import * as remixBuild from '@remix-run/dev/server-build';
+import * as remixBuild from 'virtual:remix/server-build';
+import {
+  cartGetIdDefault,
+  cartSetIdDefault,
+  createCartHandler,
+  createStorefrontClient,
+  storefrontRedirect,
+  createCustomerAccountClient,
+} from '@shopify/hydrogen';
 import {
   createRequestHandler,
   getStorefrontHeaders,
 } from '@shopify/remix-oxygen';
-import {createStorefrontClient, storefrontRedirect} from '@shopify/hydrogen';
-
-import {HydrogenSession} from '~/lib/session.server';
-import {getLocaleFromRequest} from '~/lib/utils';
+import {AppSession} from '~/lib/session';
+import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 
 /**
  * Export a fetch handler in module format.
  */
 export default {
+  /**
+   * @param {Request} request
+   * @param {Env} env
+   * @param {ExecutionContext} executionContext
+   */
   async fetch(request, env, executionContext) {
     try {
       /**
@@ -22,10 +34,10 @@ export default {
         throw new Error('SESSION_SECRET environment variable is not set');
       }
 
-      const waitUntil = (p) => executionContext.waitUntil(p);
+      const waitUntil = executionContext.waitUntil.bind(executionContext);
       const [cache, session] = await Promise.all([
         caches.open('hydrogen'),
-        HydrogenSession.init(request, [env.SESSION_SECRET]),
+        AppSession.init(request, [env.SESSION_SECRET]),
       ]);
 
       /**
@@ -43,6 +55,29 @@ export default {
       });
 
       /**
+       * Create a client for Customer Account API.
+       */
+      const customerAccount = createCustomerAccountClient({
+        waitUntil,
+        request,
+        session,
+        customerAccountId: env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID,
+        customerAccountUrl: env.PUBLIC_CUSTOMER_ACCOUNT_API_URL,
+      });
+
+      /*
+       * Create a cart handler that will be used to
+       * create and update the cart in the session.
+       */
+      const cart = createCartHandler({
+        storefront,
+        customerAccount,
+        getCartId: cartGetIdDefault(request.headers),
+        setCartId: cartSetIdDefault(),
+        cartQueryFragment: CART_QUERY_FRAGMENT,
+      });
+
+      /**
        * Create a Remix request handler and pass
        * Hydrogen's Storefront client to the loader context.
        */
@@ -51,9 +86,11 @@ export default {
         mode: process.env.NODE_ENV,
         getLoadContext: () => ({
           session,
-          waitUntil,
           storefront,
+          customerAccount,
+          cart,
           env,
+          waitUntil,
         }),
       });
 
@@ -76,3 +113,24 @@ export default {
     }
   },
 };
+
+/**
+ * @returns {I18nLocale}
+ * @param {Request} request
+ */
+function getLocaleFromRequest(request) {
+  const url = new URL(request.url);
+  const firstPathPart = url.pathname.split('/')[1]?.toUpperCase() ?? '';
+
+  let pathPrefix = '';
+  let [language, country] = ['EN', 'US'];
+
+  if (/^[A-Z]{2}-[A-Z]{2}$/i.test(firstPathPart)) {
+    pathPrefix = '/' + firstPathPart;
+    [language, country] = firstPathPart.split('-');
+  }
+
+  return {language, country, pathPrefix};
+}
+
+/** @typedef {import('@shopify/remix-oxygen').AppLoadContext} AppLoadContext */

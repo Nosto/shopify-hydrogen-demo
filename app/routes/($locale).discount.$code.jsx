@@ -1,66 +1,51 @@
 import {redirect} from '@shopify/remix-oxygen';
 
-import {getCartId} from '~/lib/utils';
-
-import {cartCreate, cartDiscountCodesUpdate} from './($locale).cart';
-
 /**
  * Automatically applies a discount found on the url
  * If a cart exists it's updated with the discount, otherwise a cart is created with the discount already applied
- * @param ?redirect an optional path to return to otherwise return to the home page
+ *
  * @example
- * Example path applying a discount and redirecting
- * ```ts
+ * Example path applying a discount and optional redirecting (defaults to the home page)
+ * ```js
  * /discount/FREESHIPPING?redirect=/products
  *
  * ```
- * @preserve
+ * @param {LoaderFunctionArgs}
  */
 export async function loader({request, context, params}) {
-  const {storefront} = context;
-  // N.B. This route will probably be removed in the future.
-  const session = context.session;
+  const {cart} = context;
   const {code} = params;
 
   const url = new URL(request.url);
   const searchParams = new URLSearchParams(url.search);
-  const redirectParam =
+  let redirectParam =
     searchParams.get('redirect') || searchParams.get('return_to') || '/';
+
+  if (redirectParam.includes('//')) {
+    // Avoid redirecting to external URLs to prevent phishing attacks
+    redirectParam = '/';
+  }
 
   searchParams.delete('redirect');
   searchParams.delete('return_to');
 
   const redirectUrl = `${redirectParam}?${searchParams}`;
-  const headers = new Headers();
 
   if (!code) {
     return redirect(redirectUrl);
   }
 
-  let cartId = getCartId(request);
+  const result = await cart.updateDiscountCodes([code]);
+  const headers = cart.setCartId(result.cart.id);
 
-  //! if no existing cart, create one
-  if (!cartId) {
-    const {cart, errors: graphqlCartErrors} = await cartCreate({
-      input: {},
-      storefront,
-    });
-
-    if (graphqlCartErrors?.length) {
-      return redirect(redirectUrl);
-    }
-
-    //! cart created - we only need a Set-Cookie header if we're creating
-    cartId = cart.id;
-    headers.append('Set-Cookie', `cart=${cartId.split('/').pop()}`);
-  }
-
-  //! apply discount to the cart
-  await cartDiscountCodesUpdate({
-    cartId,
-    discountCodes: [code],
-    storefront,
+  // Using set-cookie on a 303 redirect will not work if the domain origin have port number (:3000)
+  // If there is no cart id and a new cart id is created in the progress, it will not be set in the cookie
+  // on localhost:3000
+  return redirect(redirectUrl, {
+    status: 303,
+    headers,
   });
-
-  return redirect(redirectUrl, {headers});
 }
+
+/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
+/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
