@@ -3,6 +3,8 @@ import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 
+import { NostoHome, NostoPlacement } from '@nosto/shopify-hydrogen';
+
 /**
  * @type {MetaFunction}
  */
@@ -27,8 +29,15 @@ export default function Homepage() {
   const data = useLoaderData();
   return (
     <div className="home">
-      <FeaturedCollection collection={data.featuredCollection} />
-      <RecommendedProducts products={data.recommendedProducts} />
+      <div>
+        <img src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" style={{width: '100%'}}/>
+      </div>
+
+      <NostoPlacement id="frontpage-nosto-1"/>
+      <NostoPlacement id="frontpage-nosto-2"/>
+      <NostoHome/>
+      <FeaturedCollection collection={data.featuredCollection}/>
+      <RecommendedProducts products={data.recommendedProducts}/>
     </div>
   );
 }

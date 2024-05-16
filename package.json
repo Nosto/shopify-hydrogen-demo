@@ -15,6 +15,7 @@
   "dependencies": {
     "@remix-run/react": "^2.8.0",
     "@remix-run/server-runtime": "^2.8.0",
+    "@nosto/shopify-hydrogen": "https://github.com/Nosto/shopify-hydrogen#ads-4544-upgrade-major-version",
     "@shopify/cli": "3.59.2",
     "@shopify/cli-hydrogen": "^8.0.4",
     "@shopify/hydrogen": "2024.4.2",

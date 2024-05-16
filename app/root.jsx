@@ -15,6 +15,9 @@ import resetStyles from './styles/reset.css?url';
 import appStyles from './styles/app.css?url';
 import {Layout} from '~/components/Layout';
 
+import { NostoProvider, getNostoData} from "@nosto/shopify-hydrogen";
+import { NostoSlot, links as nostoSlotLinks } from '~/components/nosto/NostoSlot';
+
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
  * @type {ShouldRevalidateFunction}
@@ -35,6 +38,7 @@ export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
 
 export function links() {
   return [
+    ...nostoSlotLinks(),
     {rel: 'stylesheet', href: resetStyles},
     {rel: 'stylesheet', href: appStyles},
     {
@@ -77,6 +81,7 @@ export async function loader({context}) {
 
   return defer(
     {
+      ...(await getNostoData({context, cartId: cartPromise?.id})), //todo check if cartPromise?.id is correct or we should get the cart from the cookie
       cart: cartPromise,
       footer: footerPromise,
       header: await headerPromise,
@@ -105,9 +110,11 @@ export default function App() {
         <Links />
       </head>
       <body>
+      <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
         <Layout {...data}>
           <Outlet />
         </Layout>
+        </NostoProvider>
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>
