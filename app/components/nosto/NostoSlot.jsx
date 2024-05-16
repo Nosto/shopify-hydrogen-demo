@@ -1,8 +1,7 @@
 import { NostoItem } from './NostoItem';
-import styles from './nostoSlot.css';
 
 export function links() {
-  return [{ rel: 'stylesheet', href: styles }]
+  return [{ rel: 'stylesheet', href: './nostoSlot.css' }]
 }
 
 export function NostoSlot({ nostoRecommendation }) {
