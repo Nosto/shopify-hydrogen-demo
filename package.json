@@ -1,8 +1,9 @@
 {
-  "name": "shopify-hydrogen-demo",
+  "name": "nosto-hydrogen-demo",
   "private": true,
   "sideEffects": false,
   "version": "2024.4.4",
+  "type": "module",
   "scripts": {
     "build": "shopify hydrogen build --codegen",
     "dev": "shopify hydrogen dev --codegen",
@@ -12,10 +13,9 @@
   },
   "prettier": "@shopify/prettier-config",
   "dependencies": {
-    "@nosto/shopify-hydrogen": "https://github.com/Nosto/shopify-hydrogen#ads-4544-upgrade-major-version",
     "@remix-run/react": "^2.8.0",
     "@remix-run/server-runtime": "^2.8.0",
-    "@shopify/cli": "3.60.1",
+    "@shopify/cli": "3.59.2",
     "@shopify/cli-hydrogen": "^8.0.4",
     "@shopify/hydrogen": "2024.4.2",
     "@shopify/remix-oxygen": "^2.0.4",
@@ -40,7 +40,6 @@
     "eslint": "^8.20.0",
     "eslint-plugin-hydrogen": "0.12.2",
     "prettier": "^2.8.4",
-    "ts-node": "^10.9.2",
     "typescript": "^5.2.2",
     "vite": "^5.1.0",
     "vite-tsconfig-paths": "^4.3.1"
