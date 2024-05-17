@@ -3,6 +3,7 @@ import {hydrogen} from '@shopify/hydrogen/vite';
 import {oxygen} from '@shopify/mini-oxygen/vite';
 import {vitePlugin as remix} from '@remix-run/dev';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import commonjs from "vite-plugin-commonjs";
 
 export default defineConfig({
   plugins: [
@@ -17,6 +18,13 @@ export default defineConfig({
       },
     }),
     tsconfigPaths(),
+    commonjs({
+      filter(id) {
+        if (id.includes('node_modules/react-dom')) {
+          return true
+        }
+      }
+    }),
   ],
   build: {
     // Allow a strict Content-Security-Policy
