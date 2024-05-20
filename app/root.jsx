@@ -38,7 +38,7 @@ export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
 
 export function links() {
   return [
-    ...nostoSlotLinks(),
+    //...nostoSlotLinks(),
     {rel: 'stylesheet', href: resetStyles},
     {rel: 'stylesheet', href: appStyles},
     {
@@ -110,7 +110,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-      <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot />}>
+      <NostoProvider shopifyMarkets={false} account="shopify-11368366139">
         <Layout {...data}>
           <Outlet />
         </Layout>

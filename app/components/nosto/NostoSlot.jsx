@@ -1,7 +1,7 @@
 import { NostoItem } from './NostoItem';
 
 export function links() {
-  return [{ rel: 'stylesheet', href: './nostoSlot.css' }]
+  return [{ rel: 'stylesheet', href: "%PUBLIC_URL%/nostoSlot.css" }]
 }
 
 export function NostoSlot({ nostoRecommendation }) {
