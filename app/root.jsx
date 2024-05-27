@@ -16,7 +16,8 @@ import appStyles from './styles/app.css?url';
 import {Layout} from '~/components/Layout';
 
 import { NostoProvider, getNostoData} from "@nosto/shopify-hydrogen";
-import { NostoSlot, links as nostoSlotLinks } from '~/components/nosto/NostoSlot';
+import { NostoSlot } from '~/components/nosto/NostoSlot';
+import nostoStyles from '~/components/nosto/nostoSlot.css?url';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
@@ -38,7 +39,10 @@ export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
 
 export function links() {
   return [
-    //...nostoSlotLinks(),
+    {
+      rel: 'stylesheet',
+      href: nostoStyles
+    },
     {rel: 'stylesheet', href: resetStyles},
     {rel: 'stylesheet', href: appStyles},
     {
@@ -110,13 +114,13 @@ export default function App() {
         <Links />
       </head>
       <body>
-      <NostoProvider shopifyMarkets={false} account="shopify-11368366139">
-        <Layout {...data}>
-          <Outlet />
-        </Layout>
+        <NostoProvider shopifyMarkets={false} account="shopify-11368366139" RecommendationComponent={<NostoSlot />}>
+          <Layout {...data}>
+            <Outlet />
+          </Layout>
+          <ScrollRestoration nonce={nonce} />
+          <Scripts nonce={nonce} />
         </NostoProvider>
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
       </body>
     </html>
   );
