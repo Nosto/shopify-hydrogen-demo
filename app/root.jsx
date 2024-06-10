@@ -1,4 +1,4 @@
-import {useNonce} from '@shopify/hydrogen';
+import {useNonce, Script} from '@shopify/hydrogen';
 import {defer} from '@shopify/remix-oxygen';
 import {
   Links,
@@ -150,6 +150,7 @@ export function ErrorBoundary() {
         <Links />
       </head>
       <body>
+      {/*<NostoProvider shopifyMarkets={false} account="shopify-11368366139" RecommendationComponent={<NostoSlot />}>*/}
         <Layout {...rootData}>
           <div className="route-error">
             <h1>Oops</h1>
@@ -163,6 +164,7 @@ export function ErrorBoundary() {
         </Layout>
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
+      {/*</NostoProvider>*/}
       </body>
     </html>
   );
