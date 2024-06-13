@@ -32,10 +32,10 @@ jobs:
 
       - name: Build and Publish to Oxygen
         id: deploy
-        run: shopify hydrogen build --codegen && shopify oxygen deploy
+        run: shopify/oxygenctl-action@v4
         with:
           oxygen_deployment_token: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1343547 }}
-          #build_command: "HYDROGEN_ASSET_BASE_URL=$OXYGEN_ASSET_BASE_URL npm run build"
+          build_command: "HYDROGEN_ASSET_BASE_URL=$OXYGEN_ASSET_BASE_URL npm run build"
 
       # Create GitHub Deployment
       - name: Create GitHub Deployment
