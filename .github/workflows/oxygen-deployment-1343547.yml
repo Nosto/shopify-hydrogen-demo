@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         id: 'install-dependencies'
-        run: npm install
+        run: npm ci
 
       - name: Set deployment environment
         id: set-env
