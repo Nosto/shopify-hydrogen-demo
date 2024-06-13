@@ -30,7 +30,7 @@ export default function Homepage() {
   return (
     <div className="home">
       <div>
-        <img src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" style={{width: '100%'}}/>
+        {/*<Image src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" width={100} height={100}/>*/}
       </div>
 
       <NostoPlacement id="frontpage-nosto-1"/>
