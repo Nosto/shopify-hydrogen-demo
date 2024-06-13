@@ -50,7 +50,7 @@ jobs:
           fi
 
       - name: Build and Publish to Oxygen
-        run: npx shopify hydrogen deploy --env ${{ env.env }}
+        run: npx shopify hydrogen deploy
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1343547 }}
           #build_command: "HYDROGEN_ASSET_BASE_URL=$OXYGEN_ASSET_BASE_URL npm run build"
