@@ -15,7 +15,7 @@ export default async function handleRequest(
   responseHeaders,
   remixContext,
 ) {
-  const {nonce, header, NonceProvider} = createContentSecurityPolicy({scriptSrc: ["'self'", "https://connect.nosto.com", "nosto.js"], connectSrc: ["'self'", "https://connect.nosto.com"], defaultSrc: ["'self'", "https://connect.nosto.com", "nosto"]});
+  const {nonce, header, NonceProvider} = createContentSecurityPolicy({scriptSrc: ["'self'", "https://connect.nosto.com", 'https://cdn.shopify.com'], connectSrc: ["'self'", "https://connect.nosto.com"], defaultSrc: ["'self'", "https://connect.nosto.com", 'https://cdn.shopify.com']});
 
   const body = await renderToReadableStream(
     <NonceProvider>
