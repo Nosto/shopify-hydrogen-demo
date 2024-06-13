@@ -28,7 +28,7 @@ jobs:
 
       - name: Install dependencies
         id: 'install-dependencies'
-        run: yarn install
+        run: npm install
 
       - name: Build and Publish to Oxygen
         id: deploy
