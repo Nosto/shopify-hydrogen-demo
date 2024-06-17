@@ -38,6 +38,7 @@ export default async function handleRequest(
 
   responseHeaders.set('Content-Type', 'text/html');
   responseHeaders.set('Content-Security-Policy', header);
+  responseHeaders.set('Access-Control-Allow-Origin', '22e5233b4cfb.ngrok.app');
 
   return new Response(body, {
     headers: responseHeaders,

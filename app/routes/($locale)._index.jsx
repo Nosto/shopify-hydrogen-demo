@@ -34,7 +34,7 @@ export default function Homepage() {
       </div>
 
       <NostoPlacement id="frontpage-nosto-1"/>
-      <NostoPlacement id="frontpage-nosto-2"/>
+      <NostoPlacement id="frontpage-nosto-3"/>
       <NostoHome/>
       <FeaturedCollection collection={data.featuredCollection}/>
       <RecommendedProducts products={data.recommendedProducts}/>

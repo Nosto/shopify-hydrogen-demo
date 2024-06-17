@@ -9,6 +9,7 @@ import {
   CartForm,
 } from '@shopify/hydrogen';
 import {getVariantUrl} from '~/lib/variants';
+import {NostoProduct, NostoPlacement} from "@nosto/shopify-hydrogen";
 
 /**
  * @type {MetaFunction<typeof loader>}
@@ -101,6 +102,8 @@ export default function Product() {
         product={product}
         variants={variants}
       />
+      <NostoPlacement id="productpage-nosto-3"/>
+      <NostoProduct />
     </div>
   );
 }
