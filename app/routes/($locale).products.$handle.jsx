@@ -94,6 +94,10 @@ export default function Product() {
   /** @type {LoaderReturnData} */
   const {product, variants} = useLoaderData();
   const {selectedVariant} = product;
+
+  let nostoProductId = product?.id?.split('/');
+  nostoProductId && (nostoProductId = nostoProductId[nostoProductId.length - 1]);
+
   return (
     <div className="product">
       <ProductImage image={selectedVariant?.image} />
@@ -102,8 +106,8 @@ export default function Product() {
         product={product}
         variants={variants}
       />
-      <NostoPlacement id="productpage-nosto-3"/>
-      <NostoProduct />
+      <NostoPlacement id="productpage-nosto-1"/>
+      <NostoProduct product={nostoProductId} tagging={product}/>
     </div>
   );
 }
