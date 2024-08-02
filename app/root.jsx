@@ -114,13 +114,15 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NostoProvider shopifyMarkets={false} account="shopify-11368366139" RecommendationComponent={<NostoSlot />}>
+        <NostoProvider shopifyMarkets={true} account="shopify-11368366139" RecommendationComponent={<NostoSlot />}>
           <Layout {...data}>
             <Outlet />
           </Layout>
-          <ScrollRestoration nonce={nonce} />
-          <Scripts nonce={nonce} />
+          {/*<ScrollRestoration nonce={nonce} />*/}
+          {/*<Scripts nonce={nonce} />*/}
         </NostoProvider>
+        <ScrollRestoration nonce={nonce}/>
+        <Scripts nonce={nonce}/>
       </body>
     </html>
   );
