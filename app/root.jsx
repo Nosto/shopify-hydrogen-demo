@@ -114,7 +114,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <NostoProvider shopifyMarkets={true} account="shopify-11368366139" RecommendationComponent={<NostoSlot />}>
+        <NostoProvider shopifyMarkets={true} account="shopify-11368366139" RecommendationComponent={<NostoSlot />} nonce={nonce}>
           <Layout {...data}>
             <Outlet />
           </Layout>
