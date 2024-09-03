@@ -1,22 +1,22 @@
-import {useNonce, Script} from '@shopify/hydrogen';
+import {useNonce} from '@shopify/hydrogen';
 import {defer} from '@shopify/remix-oxygen';
 import {
+  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
   Scripts,
-  useRouteError,
-  useLoaderData,
   ScrollRestoration,
-  isRouteErrorResponse,
+  useLoaderData,
+  useRouteError,
 } from '@remix-run/react';
 import favicon from './assets/favicon.svg';
 import resetStyles from './styles/reset.css?url';
 import appStyles from './styles/app.css?url';
 import {Layout} from '~/components/Layout';
 
-import { NostoProvider, getNostoData} from "@nosto/shopify-hydrogen";
-import { NostoSlot } from '~/components/nosto/NostoSlot';
+import {getNostoData, NostoProvider} from "@nosto/shopify-hydrogen";
+import {NostoSlot} from '~/components/nosto/NostoSlot';
 import nostoStyles from '~/components/nosto/nostoSlot.css?url';
 
 /**
@@ -104,26 +104,24 @@ export default function App() {
   const nonce = useNonce();
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
-
   return (
     <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <NostoProvider shopifyMarkets={true} account="shopify-11368366139" RecommendationComponent={<NostoSlot />} nonce={nonce}>
-          <Layout {...data}>
-            <Outlet />
-          </Layout>
-          {/*<ScrollRestoration nonce={nonce} />*/}
-          {/*<Scripts nonce={nonce} />*/}
-        </NostoProvider>
-        <ScrollRestoration nonce={nonce}/>
-        <Scripts nonce={nonce}/>
-      </body>
+    <head>
+      <meta charSet="utf-8"/>
+      <meta name="viewport" content="width=device-width,initial-scale=1"/>
+      <Meta/>
+      <Links/>
+    </head>
+    <body>
+    <NostoProvider shopifyMarkets={true} account="shopify-11368366139" RecommendationComponent={<NostoSlot/>}
+                   nonce={nonce}>
+      <Layout {...data}>
+        <Outlet/>
+      </Layout>
+    </NostoProvider>
+    <ScrollRestoration nonce={nonce}/>
+    <Scripts nonce={nonce}/>
+    </body>
     </html>
   );
 }
@@ -142,104 +140,104 @@ export function ErrorBoundary() {
   } else if (error instanceof Error) {
     errorMessage = error.message;
   }
-
   return (
     <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-      <NostoProvider shopifyMarkets={false} account="shopify-11368366139" RecommendationComponent={<NostoSlot />}>
-        <Layout {...rootData}>
-          <div className="route-error">
-            <h1>Oops</h1>
-            <h2>{errorStatus}</h2>
-            {errorMessage && (
-              <fieldset>
-                <pre>{errorMessage}</pre>
-              </fieldset>
-            )}
-          </div>
-        </Layout>
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
-      </NostoProvider>
-      </body>
+    <head>
+      <meta charSet="utf-8"/>
+      <meta name="viewport" content="width=device-width,initial-scale=1"/>
+      <Meta/>
+      <Links/>
+    </head>
+    <body>
+    <NostoProvider shopifyMarkets={false} account="shopify-11368366139" nonce={nonce}
+                   RecommendationComponent={<NostoSlot/>}>
+      <Layout {...rootData}>
+        <div className="route-error">
+          <h1>Oops</h1>
+          <h2>{errorStatus}</h2>
+          {errorMessage && (
+            <fieldset>
+              <pre>{errorMessage}</pre>
+            </fieldset>
+          )}
+        </div>
+      </Layout>
+      <ScrollRestoration nonce={nonce}/>
+      <Scripts nonce={nonce}/>
+    </NostoProvider>
+    </body>
     </html>
   );
 }
 
 const MENU_FRAGMENT = `#graphql
-  fragment MenuItem on MenuItem {
-    id
-    resourceId
-    tags
-    title
-    type
-    url
+fragment MenuItem on MenuItem {
+  id
+  resourceId
+  tags
+  title
+  type
+  url
+}
+fragment ChildMenuItem on MenuItem {
+  ...MenuItem
+}
+fragment ParentMenuItem on MenuItem {
+  ...MenuItem
+  items {
+    ...ChildMenuItem
   }
-  fragment ChildMenuItem on MenuItem {
-    ...MenuItem
+}
+fragment Menu on Menu {
+  id
+  items {
+    ...ParentMenuItem
   }
-  fragment ParentMenuItem on MenuItem {
-    ...MenuItem
-    items {
-      ...ChildMenuItem
-    }
-  }
-  fragment Menu on Menu {
-    id
-    items {
-      ...ParentMenuItem
-    }
-  }
+}
 `;
 
 const HEADER_QUERY = `#graphql
-  fragment Shop on Shop {
-    id
-    name
-    description
-    primaryDomain {
-      url
-    }
-    brand {
-      logo {
-        image {
-          url
-        }
+fragment Shop on Shop {
+  id
+  name
+  description
+  primaryDomain {
+    url
+  }
+  brand {
+    logo {
+      image {
+        url
       }
     }
   }
-  query Header(
-    $country: CountryCode
-    $headerMenuHandle: String!
-    $language: LanguageCode
-  ) @inContext(language: $language, country: $country) {
-    shop {
-      ...Shop
-    }
-    menu(handle: $headerMenuHandle) {
-      ...Menu
-    }
+}
+query Header(
+  $country: CountryCode
+  $headerMenuHandle: String!
+  $language: LanguageCode
+) @inContext(language: $language, country: $country) {
+  shop {
+    ...Shop
   }
-  ${MENU_FRAGMENT}
+  menu(handle: $headerMenuHandle) {
+    ...Menu
+  }
+}
+${MENU_FRAGMENT}
 `;
 
 const FOOTER_QUERY = `#graphql
-  query Footer(
-    $country: CountryCode
-    $footerMenuHandle: String!
-    $language: LanguageCode
-  ) @inContext(language: $language, country: $country) {
-    menu(handle: $footerMenuHandle) {
-      ...Menu
-    }
+query Footer(
+  $country: CountryCode
+  $footerMenuHandle: String!
+  $language: LanguageCode
+) @inContext(language: $language, country: $country) {
+  menu(handle: $footerMenuHandle) {
+    ...Menu
   }
-  ${MENU_FRAGMENT}
+}
+${MENU_FRAGMENT}
 `;
 
 /** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
