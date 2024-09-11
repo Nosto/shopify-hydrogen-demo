@@ -5,16 +5,13 @@ import {
   cartGetIdDefault,
   cartSetIdDefault,
   createCartHandler,
+  createCustomerAccountClient,
   createStorefrontClient,
   storefrontRedirect,
-  createCustomerAccountClient,
 } from '@shopify/hydrogen';
-import {
-  createRequestHandler,
-  getStorefrontHeaders,
-} from '@shopify/remix-oxygen';
-import {AppSession} from '~/lib/session';
-import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
+import { createRequestHandler, getStorefrontHeaders, } from '@shopify/remix-oxygen';
+import { AppSession } from '~/lib/session';
+import { CART_QUERY_FRAGMENT } from '~/lib/fragments';
 
 /**
  * Export a fetch handler in module format.
@@ -43,7 +40,7 @@ export default {
       /**
        * Create Hydrogen's Storefront client.
        */
-      const {storefront} = createStorefrontClient({
+      const { storefront } = createStorefrontClient({
         cache,
         waitUntil,
         i18n: getLocaleFromRequest(request),
@@ -73,7 +70,9 @@ export default {
         storefront,
         customerAccount,
         getCartId: cartGetIdDefault(request.headers),
-        setCartId: cartSetIdDefault(),
+        setCartId: cartSetIdDefault({
+          maxage: 60 * 60 * 24 * 7
+        }),
         cartQueryFragment: CART_QUERY_FRAGMENT,
       });
 
@@ -102,14 +101,14 @@ export default {
          * If the redirect doesn't exist, then `storefrontRedirect`
          * will pass through the 404 response.
          */
-        return storefrontRedirect({request, response, storefront});
+        return storefrontRedirect({ request, response, storefront });
       }
 
       return response;
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(error);
-      return new Response('An unexpected error occurred', {status: 500});
+      return new Response('An unexpected error occurred', { status: 500 });
     }
   },
 };
@@ -130,7 +129,7 @@ function getLocaleFromRequest(request) {
     [language, country] = firstPathPart.split('-');
   }
 
-  return {language, country, pathPrefix};
+  return { language, country, pathPrefix };
 }
 
 /** @typedef {import('@shopify/remix-oxygen').AppLoadContext} AppLoadContext */

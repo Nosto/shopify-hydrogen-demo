@@ -1,5 +1,5 @@
-import {useNonce} from '@shopify/hydrogen';
-import {defer} from '@shopify/remix-oxygen';
+import { useNonce } from '@shopify/hydrogen';
+import { defer } from '@shopify/remix-oxygen';
 import {
   isRouteErrorResponse,
   Links,
@@ -13,17 +13,17 @@ import {
 import favicon from './assets/favicon.svg';
 import resetStyles from './styles/reset.css?url';
 import appStyles from './styles/app.css?url';
-import {Layout} from '~/components/Layout';
+import { Layout } from '~/components/Layout';
 
-import {getNostoData, NostoProvider} from "@nosto/shopify-hydrogen";
-import {NostoSlot} from '~/components/nosto/NostoSlot';
+import { getNostoData, NostoProvider } from "@nosto/shopify-hydrogen";
+import { NostoSlot } from '~/components/nosto/NostoSlot';
 import nostoStyles from '~/components/nosto/nostoSlot.css?url';
 
 /**
  * This is important to avoid re-fetching root queries on sub-navigations
  * @type {ShouldRevalidateFunction}
  */
-export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
+export const shouldRevalidate = ({ formMethod, currentUrl, nextUrl }) => {
   // revalidate when a mutation is performed e.g add to cart, login...
   if (formMethod && formMethod !== 'GET') {
     return true;
@@ -43,8 +43,8 @@ export function links() {
       rel: 'stylesheet',
       href: nostoStyles
     },
-    {rel: 'stylesheet', href: resetStyles},
-    {rel: 'stylesheet', href: appStyles},
+    { rel: 'stylesheet', href: resetStyles },
+    { rel: 'stylesheet', href: appStyles },
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -53,19 +53,18 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    { rel: 'icon', type: 'image/svg+xml', href: favicon },
   ];
 }
 
 /**
  * @param {LoaderFunctionArgs}
  */
-export async function loader({context}) {
-  const {storefront, customerAccount, cart} = context;
+export async function loader({ context }) {
+  const { storefront, customerAccount, cart } = context;
   const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
 
   const isLoggedInPromise = customerAccount.isLoggedIn();
-  const cartPromise = cart.get();
 
   // defer the footer query (below the fold)
   const footerPromise = storefront.query(FOOTER_QUERY, {
@@ -82,11 +81,11 @@ export async function loader({context}) {
       headerMenuHandle: 'main-menu', // Adjust to your header menu handle
     },
   });
-
+  const cartData = await cart.get();
   return defer(
     {
-      ...(await getNostoData({context, cartId: cartPromise?.id})), //todo check if cartPromise?.id is correct or we should get the cart from the cookie
-      cart: cartPromise,
+      ...(await getNostoData({ context, cartId: cartData?.id })),
+      cart: cart.get(),
       footer: footerPromise,
       header: await headerPromise,
       isLoggedIn: isLoggedInPromise,
@@ -113,7 +112,7 @@ export default function App() {
       <Links/>
     </head>
     <body>
-    <NostoProvider shopifyMarkets={true} account="shopify-11368366139" RecommendationComponent={<NostoSlot/>}
+    <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot/>}
                    nonce={nonce}>
       <Layout {...data}>
         <Outlet/>
@@ -150,7 +149,7 @@ export function ErrorBoundary() {
     </head>
     <body>
     <NostoProvider shopifyMarkets={false} account="shopify-11368366139" nonce={nonce}
-                   RecommendationComponent={<NostoSlot/>}>
+                   recommendationComponent={<NostoSlot/>}>
       <Layout {...rootData}>
         <div className="route-error">
           <h1>Oops</h1>

@@ -1,26 +1,26 @@
-import {Await} from '@remix-run/react';
-import {Suspense} from 'react';
-import {CartForm} from '@shopify/hydrogen';
-import {json} from '@shopify/remix-oxygen';
-import {CartMain} from '~/components/Cart';
-import {useRootLoaderData} from '~/lib/root-data';
+import { Await } from '@remix-run/react';
+import { Suspense } from 'react';
+import { CartForm } from '@shopify/hydrogen';
+import { json } from '@shopify/remix-oxygen';
+import { CartMain } from '~/components/Cart';
+import { useRootLoaderData } from '~/lib/root-data';
 
 /**
  * @type {MetaFunction}
  */
 export const meta = () => {
-  return [{title: `Hydrogen | Cart`}];
+  return [{ title: `Hydrogen | Cart` }];
 };
 
 /**
  * @param {ActionFunctionArgs}
  */
-export async function action({request, context}) {
-  const {cart} = context;
+export async function action({ request, context }) {
+  const { cart } = context;
 
   const formData = await request.formData();
 
-  const {action, inputs} = CartForm.getFormInput(formData);
+  const { action, inputs } = CartForm.getFormInput(formData);
 
   if (!action) {
     throw new Error('No action provided');
@@ -63,7 +63,7 @@ export async function action({request, context}) {
 
   const cartId = result.cart.id;
   const headers = cart.setCartId(result.cart.id);
-  const {cart: cartResult, errors} = result;
+  const { cart: cartResult, errors } = result;
 
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
@@ -81,7 +81,7 @@ export async function action({request, context}) {
         cartId,
       },
     },
-    {status, headers},
+    { status, headers },
   );
 }
 
@@ -98,7 +98,7 @@ export default function Cart() {
           errorElement={<div>An error occurred</div>}
         >
           {(cart) => {
-            return <CartMain layout="page" cart={cart} />;
+            return <CartMain layout="page" cart={cart}/>;
           }}
         </Await>
       </Suspense>
