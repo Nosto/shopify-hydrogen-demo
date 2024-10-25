@@ -2,7 +2,7 @@
 #! oxygen_storefront_id: 1343547
 
 name: Storefront 1343547
-on: [push]
+on: [ push ]
 
 permissions:
   contents: read
@@ -19,7 +19,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '18.19.*'
           check-latest: true
 
       - name: Cache node modules
