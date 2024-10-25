@@ -14,7 +14,7 @@
   "prettier": "@shopify/prettier-config",
   "dependencies": {
     "@esm-bundle/react-dom": "^17.0.2-fix.0",
-    "@nosto/shopify-hydrogen": "github:Nosto/shopify-hydrogen#update_hydrogen",
+    "@nosto/shopify-hydrogen": "^2.2.4",
     "@remix-run/react": "^2.10.3",
     "@remix-run/server-runtime": "^2.10.3",
     "@shopify/cli": "3.59.2",
