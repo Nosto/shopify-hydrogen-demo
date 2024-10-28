@@ -1,431 +1,529 @@
-# demo-store
+# skeleton
+
+## 2024.4.4
+
+### Patch Changes
+
+- Add JSdoc to `getSelectedProductOptions` utility and cleanup the skeleton implementation ([#2089](https://github.com/Shopify/hydrogen/pull/2089)) by [@juanpprieto](https://github.com/juanpprieto)
+
+- Updated dependencies [[`286589ee`](https://github.com/Shopify/hydrogen/commit/286589ee281c161ad323e3d45a8b9b859aa5b11f), [`6f5061d9`](https://github.com/Shopify/hydrogen/commit/6f5061d9432f749fde7902548894e98c0d3f899c), [`ae262b61`](https://github.com/Shopify/hydrogen/commit/ae262b616127a7173d23a1a38a6e658af3105ce8), [`2c11ca3b`](https://github.com/Shopify/hydrogen/commit/2c11ca3b7a00ccca2b621dbc29abd319f9598cc8), [`b70f9c2c`](https://github.com/Shopify/hydrogen/commit/b70f9c2c3db8e863c65509097454b9ad7c81cd52), [`17528db1`](https://github.com/Shopify/hydrogen/commit/17528db1eb3d1baa001bafe0684b4bce28d2e271), [`58ea9bb0`](https://github.com/Shopify/hydrogen/commit/58ea9bb0f0eee83ff89e34e2f1f6ac3c4999e213)]:
+  - @shopify/cli-hydrogen@8.0.4
+  - @shopify/hydrogen@2024.4.2
+
+## 1.0.10
+
+### Patch Changes
+
+- Update `@shopify/cli` dependency to avoid React version mismatches in your project: ([#2059](https://github.com/Shopify/hydrogen/pull/2059)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+    "dependencies": {
+      ...
+  -   "@shopify/cli": "3.58.0",
+  +   "@shopify/cli": "3.59.2",
+      ...
+    }
+  ```
+
+- Updated dependencies [[`d2bc720b`](https://github.com/Shopify/hydrogen/commit/d2bc720bb5f7cfb5f42617f98ad2dfcd29891f4b)]:
+  - @shopify/cli-hydrogen@8.0.3
+
+## 1.0.9
+
+### Patch Changes
+
+- Pin React dependency to 18.2.0 to avoid mismatches. ([#2051](https://github.com/Shopify/hydrogen/pull/2051)) by [@frandiox](https://github.com/frandiox)
+
+- Updated dependencies [[`9c36c8a5`](https://github.com/Shopify/hydrogen/commit/9c36c8a566b1ae2ceac4846c4c9fe4f63f6f4ab3)]:
+  - @shopify/cli-hydrogen@8.0.2
+
+## 1.0.8
+
+### Patch Changes
+
+- Stop inlining the favicon in base64 to avoid issues with the Content-Security-Policy. In `vite.config.js`: ([#2006](https://github.com/Shopify/hydrogen/pull/2006)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  export default defineConfig({
+    plugins: [
+      ...
+    ],
+  + build: {
+  +   assetsInlineLimit: 0,
+  + },
+  });
+  ```
+
+- To improve HMR in Vite, move the `useRootLoaderData` function from `app/root.tsx` to a separate file like `app/lib/root-data.ts`. This change avoids circular imports: ([#2014](https://github.com/Shopify/hydrogen/pull/2014)) by [@frandiox](https://github.com/frandiox)
+
+  ```tsx
+  // app/lib/root-data.ts
+  import {useMatches} from '@remix-run/react';
+  import type {SerializeFrom} from '@shopify/remix-oxygen';
+  import type {loader} from '~/root';
+
+  /**
+   * Access the result of the root loader from a React component.
+   */
+  export const useRootLoaderData = () => {
+    const [root] = useMatches();
+    return root?.data as SerializeFrom<typeof loader>;
+  };
+  ```
+
+  Import this hook from `~/lib/root-data` instead of `~/root` in your components.
+
+- Updated dependencies [[`b4dfda32`](https://github.com/Shopify/hydrogen/commit/b4dfda320ca52855b2d4493a4306d15a883ca843), [`ffa57bdb`](https://github.com/Shopify/hydrogen/commit/ffa57bdbcdf51e03d565736f9388b5bb4f46292c), [`ac4e1670`](https://github.com/Shopify/hydrogen/commit/ac4e1670f0361a2cd2c6827e4162bbbee0ca37f3), [`0af624d5`](https://github.com/Shopify/hydrogen/commit/0af624d51afc7250db889ba5e736c85a6070c8b2), [`9723eaf3`](https://github.com/Shopify/hydrogen/commit/9723eaf3e5a42c30e657d1cadb123ed775d620e4), [`e842f68c`](https://github.com/Shopify/hydrogen/commit/e842f68c8e879d4c54e0730f3cb55214a760d7f5)]:
+  - @shopify/cli-hydrogen@8.0.1
+  - @shopify/hydrogen@2024.4.1
+
+## 1.0.7
+
+### Patch Changes
+
+- Update internal libraries for parsing `.env` files. ([#1946](https://github.com/Shopify/hydrogen/pull/1946)) by [@aswamy](https://github.com/aswamy)
+
+  Please update the `@shopify/cli` dependency in your app to avoid duplicated subdependencies:
+
+  ```diff
+  "dependencies": {
+  -   "@shopify/cli": "3.56.3",
+  +   "@shopify/cli": "3.58.0",
+  }
+  ```
+
+- Add Adds magic Catalog route ([#1967](https://github.com/Shopify/hydrogen/pull/1967)) by [@juanpprieto](https://github.com/juanpprieto)
+
+- Update Vite plugin imports, and how their options are passed to Remix: ([#1935](https://github.com/Shopify/hydrogen/pull/1935)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  -import {hydrogen, oxygen} from '@shopify/cli-hydrogen/experimental-vite';
+  +import {hydrogen} from '@shopify/hydrogen/vite';
+  +import {oxygen} from '@shopify/mini-oxygen/vite';
+  import {vitePlugin as remix} from '@remix-run/dev';
+
+  export default defineConfig({
+      hydrogen(),
+      oxygen(),
+      remix({
+  -     buildDirectory: 'dist',
+  +     presets: [hydrogen.preset()],
+        future: {
+  ```
+
+- Add `@shopify/mini-oxygen` as a dev dependency for local development: ([#1891](https://github.com/Shopify/hydrogen/pull/1891)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+    "devDependencies": {
+      "@remix-run/dev": "^2.8.0",
+      "@remix-run/eslint-config": "^2.8.0",
+  +   "@shopify/mini-oxygen": "^3.0.0",
+      "@shopify/oxygen-workers-types": "^4.0.0",
+      ...
+    },
+  ```
+
+- Add the `customer-account push` command to the Hydrogen CLI. This allows you to push the current `--dev-origin` URL to the Shopify admin to enable secure connection to the Customer Account API for local development. ([#1804](https://github.com/Shopify/hydrogen/pull/1804)) by [@michenly](https://github.com/michenly)
+
+- Fix types returned by the `session` object. ([#1869](https://github.com/Shopify/hydrogen/pull/1869)) by [@frandiox](https://github.com/frandiox)
+
+  In `remix.env.d.ts` or `env.d.ts`, add the following types:
+
+  ```diff
+  import type {
+    // ...
+    HydrogenCart,
+  + HydrogenSessionData,
+  } from '@shopify/hydrogen';
+
+  // ...
+
+  declare module '@shopify/remix-oxygen' {
+    // ...
+
+  + interface SessionData extends HydrogenSessionData {}
+  }
+  ```
+
+- Codegen dependencies must be now listed explicitly in `package.json`: ([#1962](https://github.com/Shopify/hydrogen/pull/1962)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  {
+    "devDependencies": {
+  +   "@graphql-codegen/cli": "5.0.2",
+      "@remix-run/dev": "^2.8.0",
+      "@remix-run/eslint-config": "^2.8.0",
+  +   "@shopify/hydrogen-codegen": "^0.3.0",
+      "@shopify/mini-oxygen": "^2.2.5",
+      "@shopify/oxygen-workers-types": "^4.0.0",
+      ...
+    }
+  }
+  ```
+
+- Updated dependencies [[`4eaec272`](https://github.com/Shopify/hydrogen/commit/4eaec272696f1a718aa7cab1070a54385ebc3686), [`14bb5df1`](https://github.com/Shopify/hydrogen/commit/14bb5df1c1513a7991183d34e72220cb2b139cf5), [`646b78d4`](https://github.com/Shopify/hydrogen/commit/646b78d4bc26310121b16000ed4d1c5d5e63957d), [`87072950`](https://github.com/Shopify/hydrogen/commit/870729505f7eb1f1c709799dd036ad02fd94be95), [`5f1295fe`](https://github.com/Shopify/hydrogen/commit/5f1295fe60b86396f364fefef339248a444c988a), [`3c8a7313`](https://github.com/Shopify/hydrogen/commit/3c8a7313cafb0ca21bbca19ac0b3f8ef4ab12655), [`ca1dcbb7`](https://github.com/Shopify/hydrogen/commit/ca1dcbb7d69c458006e25892c86c4478d394a428), [`11879b17`](https://github.com/Shopify/hydrogen/commit/11879b175d78e3326de090a56a044d1e55d0bae8), [`f4d6e5b0`](https://github.com/Shopify/hydrogen/commit/f4d6e5b0244392a7c13b9fa51c5046fd103c3e4f), [`788d86b3`](https://github.com/Shopify/hydrogen/commit/788d86b3a737bff53b4ec3aa9667458b2d45ade7), [`ebaf5529`](https://github.com/Shopify/hydrogen/commit/ebaf5529287b24a70b3146444b18f95b64f9f336), [`da95bb1c`](https://github.com/Shopify/hydrogen/commit/da95bb1c8c644f450053ce649b40dc380e7375dc), [`5bb43304`](https://github.com/Shopify/hydrogen/commit/5bb43304c08427786cfd4f2529e59bd38f593252), [`140e4768`](https://github.com/Shopify/hydrogen/commit/140e4768c880aaed4ba95b1d4c707df6963e011c), [`062d6be7`](https://github.com/Shopify/hydrogen/commit/062d6be7e031c388498ec3d359de51a4bfdfdfd8), [`b3323e59`](https://github.com/Shopify/hydrogen/commit/b3323e59a4381647f1df797c5dc54793f6e0a29a), [`ab0df5a5`](https://github.com/Shopify/hydrogen/commit/ab0df5a52bc587515880ae26f4edd18ba2be83cd), [`ebaf5529`](https://github.com/Shopify/hydrogen/commit/ebaf5529287b24a70b3146444b18f95b64f9f336), [`ebaf5529`](https://github.com/Shopify/hydrogen/commit/ebaf5529287b24a70b3146444b18f95b64f9f336), [`9e899218`](https://github.com/Shopify/hydrogen/commit/9e8992181ce7d27548d35f98b5a4f78b80795ce8), [`a209019f`](https://github.com/Shopify/hydrogen/commit/a209019f722ece4b65f8d5f37c8018c949956b1e), [`d007b7bc`](https://github.com/Shopify/hydrogen/commit/d007b7bc6f6c36e984d937108230ecc7c202fa42), [`a5511cd7`](https://github.com/Shopify/hydrogen/commit/a5511cd7bf9b0f0c4ef0e52cd72418f78c04785b), [`4afedb4d`](https://github.com/Shopify/hydrogen/commit/4afedb4d7202715df9a153e877e8eb281cc3e928), [`34fbae23`](https://github.com/Shopify/hydrogen/commit/34fbae23999eefbd1af1dff44816a52813d75b44), [`e3baaba5`](https://github.com/Shopify/hydrogen/commit/e3baaba54c701a48923ab3fe8078278f2db2c53f), [`99d72f7a`](https://github.com/Shopify/hydrogen/commit/99d72f7afc354abb66ed0e4ffb020bede2781286), [`9351f9f5`](https://github.com/Shopify/hydrogen/commit/9351f9f564267124bcbf986f5550a542c4bf1e30)]:
+  - @shopify/cli-hydrogen@8.0.0
+  - @shopify/hydrogen@2024.4.0
+  - @shopify/remix-oxygen@2.0.4
+
+## 1.0.6
+
+### Patch Changes
+
+- Improve performance of predictive search: ([#1823](https://github.com/Shopify/hydrogen/pull/1823)) by [@frandiox](https://github.com/frandiox)
+
+  - Change the request to be GET instead of POST to avoid Remix route revalidations.
+  - Add Cache-Control headers to the response to get quicker results when typing.
+
+  Aside from that, it now shows a loading state when fetching the results instead of "No results found.".
+
+- Updated dependencies [[`351b3c1b`](https://github.com/Shopify/hydrogen/commit/351b3c1b7768870793ff072ba91426107ba0180c), [`5060cf57`](https://github.com/Shopify/hydrogen/commit/5060cf57f69d8391b425b54acaa487af1f7405ae), [`2888014e`](https://github.com/Shopify/hydrogen/commit/2888014e54fab72c150e9eca55df3c6dd789503e)]:
+  - @shopify/hydrogen@2024.1.4
+  - @shopify/cli-hydrogen@7.1.2
+
+## 1.0.5
+
+### Patch Changes
+
+- Update the `@shopify/cli` dependency: ([#1786](https://github.com/Shopify/hydrogen/pull/1786)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  - "@shopify/cli": "3.52.0",
+  + "@shopify/cli": "3.56.3",
+  ```
+
+- Update Remix and associated packages to 2.8.0. ([#1781](https://github.com/Shopify/hydrogen/pull/1781)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  "dependencies": {
+  -  "@remix-run/react": "^2.6.0",
+  -  "@remix-run/server-runtime": "^2.6.0",
+  +  "@remix-run/react": "^2.8.0",
+  +  "@remix-run/server-runtime": "^2.8.0",
+      //...
+    },
+    "devDependencies": {
+  -   "@remix-run/dev": "^2.6.0",
+  -   "@remix-run/eslint-config": "^2.6.0",
+  +  "@remix-run/dev": "^2.8.0",
+  +  "@remix-run/eslint-config": "^2.8.0",
+      //...
+    },
+  ```
+
+- Updated dependencies [[`ced1d4cb`](https://github.com/Shopify/hydrogen/commit/ced1d4cb5b1eeeb4303449eb1d60aac44f33480e), [`fc013401`](https://github.com/Shopify/hydrogen/commit/fc013401c5727948b602c9c6b6963a2df21cbd38), [`e641255e`](https://github.com/Shopify/hydrogen/commit/e641255eccc5783b41c8fabbc88313a610f539d0), [`d7e04cb6`](https://github.com/Shopify/hydrogen/commit/d7e04cb6a33d40ea86fa8ac2712d7a5ea785de2d), [`eedd9c49`](https://github.com/Shopify/hydrogen/commit/eedd9c497b36aba47a641cecbc710e18f5b14e46)]:
+  - @shopify/cli-hydrogen@7.1.1
+  - @shopify/hydrogen@2024.1.3
 
 ## 1.0.4
 
 ### Patch Changes
 
-- Update Remix to the latest version (`1.17.1`). ([#852](https://github.com/Shopify/hydrogen/pull/852)) by [@frandiox](https://github.com/frandiox)
+- This is an important fix to a bug with 404 routes and path-based i18n projects where some unknown routes would not properly render a 404. This fixes all new projects, but to fix existing projects, add a `($locale).tsx` route with the following contents: ([#1732](https://github.com/Shopify/hydrogen/pull/1732)) by [@blittle](https://github.com/blittle)
 
-  When updating your app, remember to also update your Remix dependencies to `1.17.1` in your `package.json` file:
+  ```ts
+  import {type LoaderFunctionArgs} from '@remix-run/server-runtime';
 
-  ```diff
-  -"@remix-run/react": "1.15.0",
-  +"@remix-run/react": "1.17.1",
+  export async function loader({params, context}: LoaderFunctionArgs) {
+    const {language, country} = context.storefront.i18n;
 
-  -"@remix-run/dev": "1.15.0",
-  -"@remix-run/eslint-config": "1.15.0",
-  +"@remix-run/dev": "1.17.1",
-  +"@remix-run/eslint-config": "1.17.1",
+    if (
+      params.locale &&
+      params.locale.toLowerCase() !== `${language}-${country}`.toLowerCase()
+    ) {
+      // If the locale URL param is defined, yet we still are still at the default locale
+      // then the the locale param must be invalid, send to the 404 page
+      throw new Response(null, {status: 404});
+    }
+
+    return null;
+  }
   ```
 
-- Updated dependencies [[`f29e178a`](https://github.com/Shopify/hydrogen/commit/f29e178ada608ef3797c5049fd498afeed272152)]:
-  - @shopify/remix-oxygen@1.1.1
-  - @shopify/hydrogen@2023.4.5
-  - @shopify/cli-hydrogen@5.0.1
+- Add defensive null checks to the default cart implementation in the starter template ([#1746](https://github.com/Shopify/hydrogen/pull/1746)) by [@blittle](https://github.com/blittle)
+
+- 🐛 Fix issue where customer login does not persist to checkout ([#1719](https://github.com/Shopify/hydrogen/pull/1719)) by [@michenly](https://github.com/michenly)
+
+  ✨ Add `customerAccount` option to `createCartHandler`. Where a `?logged_in=true` will be added to the checkoutUrl for cart query if a customer is logged in.
+
+- Updated dependencies [[`faeba9f8`](https://github.com/Shopify/hydrogen/commit/faeba9f8947d6b9420b33274a0f39b62418ff2e5), [`6d585026`](https://github.com/Shopify/hydrogen/commit/6d585026623204e99d54a5f2efa3d1c74f690bb6), [`fcecfb23`](https://github.com/Shopify/hydrogen/commit/fcecfb2307210b9d73a7cc90ba865508937217ba), [`28864d6f`](https://github.com/Shopify/hydrogen/commit/28864d6ffbb19b62a5fb8f4c9bbe27568de62411), [`c0ec7714`](https://github.com/Shopify/hydrogen/commit/c0ec77141fb1d7a713d91219b8777bc541780ae8), [`226cf478`](https://github.com/Shopify/hydrogen/commit/226cf478a5bdef1cca33fe8f69832ae0e557d9d9), [`06d9fd91`](https://github.com/Shopify/hydrogen/commit/06d9fd91140bd52a8ee41a20bc114ce2e7fb67dc)]:
+  - @shopify/cli-hydrogen@7.1.0
+  - @shopify/hydrogen@2024.1.2
 
 ## 1.0.3
 
 ### Patch Changes
 
-- A default `https://` protocol is now added automatically to `storeDomain` if missing. ([#985](https://github.com/Shopify/hydrogen/pull/985)) by [@frandiox](https://github.com/frandiox)
+- ♻️ `CustomerClient` type is deprecated and replaced by `CustomerAccount` ([#1692](https://github.com/Shopify/hydrogen/pull/1692)) by [@michenly](https://github.com/michenly)
 
-- Start using GraphQL code generation. This allows us to have full-stack type-safety and better developer experience. ([#937](https://github.com/Shopify/hydrogen/pull/937)) by [@frandiox](https://github.com/frandiox)
-
-  As a result of the above, we've fixed issues where the frontend was accessing data that was not correctly fetched from the Storefront API. For example, missing `product.vendor` or accessing `totalPrice` instead of `totalPriceV2`.
-
-  To enable the unstable codegen feature in your project, run your dev command as `shopify hydrogen dev --codegen-unstable`. See the [changes associated here](https://github.com/Shopify/hydrogen/pull/937/files) for examples.
-
-- Update the demostore to not cache the customer query. This is important to update in your app if you copied the logic from the demo store. ([#950](https://github.com/Shopify/hydrogen/pull/950)) by [@blittle](https://github.com/blittle)
-
-- Remove wrong cache control headers from route. Demo store is setting `cache-control` header when it is not suppose to. The demo store server renders cart information. Cart information is consider personalized content and should never be cached in any way. ([#991](https://github.com/Shopify/hydrogen/pull/991)) by [@wizardlyhel](https://github.com/wizardlyhel)
-
-  Route `($locale).api.countries.tsx` can have cache control header because it is an API endpoint that doesn't render the cart.
-
-- Make `storefrontApiVersion` parameter optional. By default, it will use the current version of Hydrogen as the Storefront API version. ([#984](https://github.com/Shopify/hydrogen/pull/984)) by [@frandiox](https://github.com/frandiox)
-
-- Updated dependencies [[`b2195520`](https://github.com/Shopify/hydrogen/commit/b219552030ed9cdb3fcd3343deaf5c502d12411b), [`4c5cdfd6`](https://github.com/Shopify/hydrogen/commit/4c5cdfd61b4634c76db7ecca05972102071109f9), [`7b4afea2`](https://github.com/Shopify/hydrogen/commit/7b4afea29a050f9c77482540e321d9bc60351b2e), [`42683d0a`](https://github.com/Shopify/hydrogen/commit/42683d0a1b6288d8f6a6e58bfbf2e2650f0d82d2), [`7d6a1a7c`](https://github.com/Shopify/hydrogen/commit/7d6a1a7cd3adb6ee0cf4cf242b72d5650509639b), [`808ceb51`](https://github.com/Shopify/hydrogen/commit/808ceb518a30389d0df4226bed23aead65ccd11f), [`442f602a`](https://github.com/Shopify/hydrogen/commit/442f602a45902beeb188575a85151f45b8be23ca), [`be912b2f`](https://github.com/Shopify/hydrogen/commit/be912b2ff7f4bc7a45688ff96d76f482b164efe5), [`8ccf6dbe`](https://github.com/Shopify/hydrogen/commit/8ccf6dbe7fb9cb2dec161dea2653c4ef6ba212c4), [`428c78dc`](https://github.com/Shopify/hydrogen/commit/428c78dcb6005c369c0c60e4c4cffb869afa7eb1), [`93a7c3c6`](https://github.com/Shopify/hydrogen/commit/93a7c3c65fc10c8b1a16cee5fa57ad932d278dc8), [`5124d618`](https://github.com/Shopify/hydrogen/commit/5124d6189ccfc208b65d4e8894be1a9a2bfb7db9)]:
-  - @shopify/cli-hydrogen@5.0.0
-  - @shopify/hydrogen@2023.4.4
-  - @shopify/remix-oxygen@1.1.0
+- Updated dependencies [[`02798786`](https://github.com/Shopify/hydrogen/commit/02798786bf8ae5c53f6430723a86d62b8e94d120), [`52b15df4`](https://github.com/Shopify/hydrogen/commit/52b15df457ce723bbc83ad594ded73a7b06447d6), [`a2664362`](https://github.com/Shopify/hydrogen/commit/a2664362a7d89b34835553a9b0eb7af55ca70ae4), [`eee5d927`](https://github.com/Shopify/hydrogen/commit/eee5d9274b72404dfb0ffef30d5503fd553be5fe), [`c7b2017f`](https://github.com/Shopify/hydrogen/commit/c7b2017f11a2cb4d280dfd8f170e65a908b9ea02), [`06320ee4`](https://github.com/Shopify/hydrogen/commit/06320ee48b94dbfece945461031a252f454fd0a3)]:
+  - @shopify/hydrogen@2024.1.1
+  - @shopify/cli-hydrogen@7.0.1
 
 ## 1.0.2
 
 ### Patch Changes
 
-- Fix release ([#926](https://github.com/Shopify/hydrogen/pull/926)) by [@blittle](https://github.com/blittle)
+- Use new parameters introduced in Storefront API v2024-01 to fix redirection to the product's default variant when there are unknown query params in the URL. ([#1642](https://github.com/Shopify/hydrogen/pull/1642)) by [@wizardlyhel](https://github.com/wizardlyhel)
 
-- Updated dependencies [[`7aaa4e86`](https://github.com/Shopify/hydrogen/commit/7aaa4e86739e22b2d9a517e2b2cfc20110c87acd)]:
-  - @shopify/cli-hydrogen@4.2.1
-  - @shopify/hydrogen@2023.4.3
-  - @shopify/remix-oxygen@1.0.7
+  ```diff
+  -   selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions) {
+  +   selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
+        ...ProductVariant
+      }
+  ```
+
+- Update the GraphQL config in `.graphqlrc.yml` to use the more modern `projects` structure: ([#1577](https://github.com/Shopify/hydrogen/pull/1577)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  -schema: node_modules/@shopify/hydrogen/storefront.schema.json
+  +projects:
+  + default:
+  +    schema: 'node_modules/@shopify/hydrogen/storefront.schema.json'
+  ```
+
+  This allows you to add additional projects to the GraphQL config, such as third party CMS schemas.
+
+  Also, you can modify the document paths used for the Storefront API queries. This is useful if you have a large codebase and want to exclude certain files from being used for codegen or other GraphQL utilities:
+
+  ```yaml
+  projects:
+    default:
+      schema: 'node_modules/@shopify/hydrogen/storefront.schema.json'
+      documents:
+        - '!*.d.ts'
+        - '*.{ts,tsx,js,jsx}'
+        - 'app/**/*.{ts,tsx,js,jsx}'
+  ```
+
+- Improve resiliency of `HydrogenSession` ([#1583](https://github.com/Shopify/hydrogen/pull/1583)) by [@blittle](https://github.com/blittle)
+
+- Update `@shopify/cli` dependency in `package.json`: ([#1579](https://github.com/Shopify/hydrogen/pull/1579)) by [@frandiox](https://github.com/frandiox)
+
+  ```diff
+  -   "@shopify/cli": "3.51.0",
+  +   "@shopify/cli": "3.52.0",
+  ```
+
+- - Update example and template Remix versions to `^2.5.1` ([#1639](https://github.com/Shopify/hydrogen/pull/1639)) by [@wizardlyhel](https://github.com/wizardlyhel)
+
+  - Enable Remix future flags:
+    - [`v3_fetcherPersist`](https://remix.run/docs/en/main/hooks/use-fetchers#additional-resources)
+    - [`v3_relativeSplatpath`](https://remix.run/docs/en/main/hooks/use-resolved-path#splat-paths)
+
+- Updated dependencies [[`810f48cf`](https://github.com/Shopify/hydrogen/commit/810f48cf5d55f0cfcac6e01fe481db8c76e77cd2), [`8c477cb5`](https://github.com/Shopify/hydrogen/commit/8c477cb565c3e018bf4e13bad01804c21611fb8a), [`42ac4138`](https://github.com/Shopify/hydrogen/commit/42ac4138553c7e1a438b075c4f9cb781edffebc4), [`0241b7d2`](https://github.com/Shopify/hydrogen/commit/0241b7d2dcb887d259ce9033aca356d391bc07df), [`6a897586`](https://github.com/Shopify/hydrogen/commit/6a897586bd0908db90736921d11e4b6bdf29c912), [`0ff63bed`](https://github.com/Shopify/hydrogen/commit/0ff63bed840f5b8a5eb9968b67bd9a5a57099253), [`6bc1d61c`](https://github.com/Shopify/hydrogen/commit/6bc1d61c17a9c9be13f52338d2ab940e64e73495), [`eb0f4bcc`](https://github.com/Shopify/hydrogen/commit/eb0f4bccb57966a00ecb2b88d17dd694599da340), [`400bfee6`](https://github.com/Shopify/hydrogen/commit/400bfee6836a51c6ab5e4804e8b1e9ad48856dcb), [`a69c21ca`](https://github.com/Shopify/hydrogen/commit/a69c21caa15dfedb88afd50f262f17bf86f74836), [`970073e7`](https://github.com/Shopify/hydrogen/commit/970073e78258880505e0de563136b5379d5d24af), [`772118ca`](https://github.com/Shopify/hydrogen/commit/772118ca6aefbd47841fffc6ce42856c2dc779bd), [`335375a6`](https://github.com/Shopify/hydrogen/commit/335375a6b1a512f70e169a82bc87a8392dc8c92c), [`335371ce`](https://github.com/Shopify/hydrogen/commit/335371ceb6e1bd5aebb6104f131d3f22798a245f), [`94509b75`](https://github.com/Shopify/hydrogen/commit/94509b750afefd686971198ed86277e2c70f3176), [`36d6fa2c`](https://github.com/Shopify/hydrogen/commit/36d6fa2c4fa54ff79f06ef17aa41f60478977bc0), [`3e7b6e8a`](https://github.com/Shopify/hydrogen/commit/3e7b6e8a3bf66bad7fc0f9c224f1c163dbe3e288), [`cce65795`](https://github.com/Shopify/hydrogen/commit/cce6579580f849bec9a28cf575f7130ba3627f6b), [`9e3d88d4`](https://github.com/Shopify/hydrogen/commit/9e3d88d498efaa20fe23de9837e0f444180bc787), [`ca1161b2`](https://github.com/Shopify/hydrogen/commit/ca1161b29ad7b4d0838953782fb114d5fe82193a), [`92840e51`](https://github.com/Shopify/hydrogen/commit/92840e51820e5c7822f731affd3f591c0099be10), [`952fedf2`](https://github.com/Shopify/hydrogen/commit/952fedf27b869164550954d1c15f53b32ec02675), [`1bc053c9`](https://github.com/Shopify/hydrogen/commit/1bc053c94ba1be14ddc28be9eb70be7219b295d1)]:
+  - @shopify/hydrogen@2024.1.0
+  - @shopify/cli-hydrogen@7.0.0
+  - @shopify/remix-oxygen@2.0.3
 
 ## 1.0.1
 
 ### Patch Changes
 
-- Fix the load more results button on the /search route ([#909](https://github.com/Shopify/hydrogen/pull/909)) by [@juanpprieto](https://github.com/juanpprieto)
+- Sync up environment variable names across all example & type files. ([#1542](https://github.com/Shopify/hydrogen/pull/1542)) by [@michenly](https://github.com/michenly)
 
-- Adds pagination support on /search results ([#918](https://github.com/Shopify/hydrogen/pull/918)) by [@juanpprieto](https://github.com/juanpprieto)
+- Remove error boundary from robots.txt file in the Skeleton template ([#1492](https://github.com/Shopify/hydrogen/pull/1492)) by [@andrewcohen](https://github.com/andrewcohen)
 
-- Added import/order ESLint rule and @remix-run/eslint plugin to demo-store template eslint configuration. ([#895](https://github.com/Shopify/hydrogen/pull/895)) by [@QuintonC](https://github.com/QuintonC)
+- Use the worker runtime by default when running the `dev` or `preview` commands. ([#1525](https://github.com/Shopify/hydrogen/pull/1525)) by [@frandiox](https://github.com/frandiox)
 
-- Updated dependencies [[`1a9f4025`](https://github.com/Shopify/hydrogen/commit/1a9f4025d765bff672cf3c02d87c5303e8b027f9), [`112ac42a`](https://github.com/Shopify/hydrogen/commit/112ac42a095afc5269ae75ff15828f27b90c9687), [`a8d5fefe`](https://github.com/Shopify/hydrogen/commit/a8d5fefe79140c09a58e77aae329e5034d030a93), [`24b82fcf`](https://github.com/Shopify/hydrogen/commit/24b82fcf457d82f456d9661b8a44e4f51b5fbdf5), [`3cc6d751`](https://github.com/Shopify/hydrogen/commit/3cc6d75194df4007ebc2f023c46086f093482a87), [`112ac42a`](https://github.com/Shopify/hydrogen/commit/112ac42a095afc5269ae75ff15828f27b90c9687), [`ba54a3b6`](https://github.com/Shopify/hydrogen/commit/ba54a3b650b85191d3417647f08a6fb932f20d44)]:
-  - @shopify/cli-hydrogen@4.2.0
-  - @shopify/hydrogen@2023.4.2
+  Enable it in your project by adding the `--worker` flag to your package.json scripts:
+
+  ```diff
+  "scripts": {
+    "build": "shopify hydrogen build",
+  - "dev": "shopify hydrogen dev --codegen",
+  + "dev": "shopify hydrogen dev --worker --codegen",
+  - "preview": "npm run build && shopify hydrogen preview",
+  + "preview": "npm run build && shopify hydrogen preview --worker",
+    ...
+  }
+  ```
+
+- Update to the latest version of `@shopify/oxygen-workers-types`. ([#1494](https://github.com/Shopify/hydrogen/pull/1494)) by [@frandiox](https://github.com/frandiox)
+
+  In TypeScript projects, when updating to the latest `@shopify/remix-oxygen` adapter release, you should also update to the latest version of `@shopify/oxygen-workers-types`:
+
+  ```diff
+  "devDependencies": {
+    "@remix-run/dev": "2.1.0",
+    "@remix-run/eslint-config": "2.1.0",
+  - "@shopify/oxygen-workers-types": "^3.17.3",
+  + "@shopify/oxygen-workers-types": "^4.0.0",
+    "@shopify/prettier-config": "^1.1.2",
+    ...
+  },
+  ```
+
+- Update internal dependencies for bug resolution. ([#1496](https://github.com/Shopify/hydrogen/pull/1496)) by [@vincentezw](https://github.com/vincentezw)
+
+  Update your `@shopify/cli` dependency to avoid duplicated sub-dependencies:
+
+  ```diff
+    "dependencies": {
+  -   "@shopify/cli": "3.50.2",
+  +   "@shopify/cli": "3.51.0",
+    }
+  ```
+
+- Update all Node.js dependencies to version 18. (Not a breaking change, since Node.js 18 is already required by Remix v2.) ([#1543](https://github.com/Shopify/hydrogen/pull/1543)) by [@michenly](https://github.com/michenly)
+
+- 🐛 fix undefined menu error ([#1533](https://github.com/Shopify/hydrogen/pull/1533)) by [@michenly](https://github.com/michenly)
+
+- Add `@remix-run/server-runtime` dependency. ([#1489](https://github.com/Shopify/hydrogen/pull/1489)) by [@frandiox](https://github.com/frandiox)
+
+  Since Remix is now a peer dependency of `@shopify/remix-oxygen`, you need to add `@remix-run/server-runtime` to your dependencies, with the same version as the rest of your Remix dependencies.
+
+  ```diff
+  "dependencies": {
+    "@remix-run/react": "2.1.0"
+  + "@remix-run/server-runtime": "2.1.0"
+    ...
+  }
+  ```
+
+- Updated dependencies [[`b2a350a7`](https://github.com/Shopify/hydrogen/commit/b2a350a754ea2d29bc267c260dc298a02f8f4470), [`9b4f4534`](https://github.com/Shopify/hydrogen/commit/9b4f453407338874bd8f1a1f619b607670e021d0), [`74ea1dba`](https://github.com/Shopify/hydrogen/commit/74ea1dba9af37a146882df7ed9674be5659862b5), [`2be9ce82`](https://github.com/Shopify/hydrogen/commit/2be9ce82fd4a5121f1772bbb7349e96ed530e84e), [`a9b8bcde`](https://github.com/Shopify/hydrogen/commit/a9b8bcde96c22cedef7d87631d429199810b4a7a), [`bca112ed`](https://github.com/Shopify/hydrogen/commit/bca112ed7db49e533fe49898b663fa0dd318e6ba), [`848c6260`](https://github.com/Shopify/hydrogen/commit/848c6260a2db3a9cb0c86351f0f7128f61e028f0), [`d53b4ed7`](https://github.com/Shopify/hydrogen/commit/d53b4ed752eb0530622a666ea7dcf4b40239cafa), [`961fd8c6`](https://github.com/Shopify/hydrogen/commit/961fd8c630727784f77b9f693d2e8ff8601969fc), [`2bff9fc7`](https://github.com/Shopify/hydrogen/commit/2bff9fc75916fa95f9a9279d069408fb7a33755c), [`c8e8f6fd`](https://github.com/Shopify/hydrogen/commit/c8e8f6fd233e52cf5570b1904af710d6b907aae5), [`8fce70de`](https://github.com/Shopify/hydrogen/commit/8fce70de32bd61ee86a6d895ac43cc1f78f1bf49), [`f90e4d47`](https://github.com/Shopify/hydrogen/commit/f90e4d4713c6c1fc1e921a7ecd08e95fe5da1744), [`e8cc49fe`](https://github.com/Shopify/hydrogen/commit/e8cc49feff18f5ee72d5f6965ff2094addc23466)]:
+  - @shopify/cli-hydrogen@6.1.0
+  - @shopify/remix-oxygen@2.0.2
+  - @shopify/hydrogen@2023.10.3
 
 ## 1.0.0
 
 ### Major Changes
 
-- All routes were changed from having a `$lang` path parameter to having a `$locale` path parameter. See #860 for more details. ([#864](https://github.com/Shopify/hydrogen/pull/864)) by [@frehner](https://github.com/frehner)
+- The Storefront API 2023-10 now returns menu item URLs that include the `primaryDomainUrl`, instead of defaulting to the Shopify store ID URL (example.myshopify.com). The skeleton template requires changes to check for the `primaryDomainUrl`: by [@blittle](https://github.com/blittle)
 
-### Patch Changes
-
-- Add `.shopify` to the .gitignore file to support upcoming CLI changes ([#784](https://github.com/Shopify/hydrogen/pull/784)) by [@graygilmore](https://github.com/graygilmore)
-
-- Move GraphQL fragments from the beginning of the template literal to the end of it, so that we don't get the EOF error in VSCode. ([#833](https://github.com/Shopify/hydrogen/pull/833)) by [@frehner](https://github.com/frehner)
-
-- Updated Tailwind configuration file with a new dynamic opacity placeholder for colors ([#851](https://github.com/Shopify/hydrogen/pull/851)) by [@blanklob](https://github.com/blanklob)
-
-- Updated dependencies [[`685bb696`](https://github.com/Shopify/hydrogen/commit/685bb696a9bd03b8a7fe8bcefa3630d6ba0c99c8), [`025385b6`](https://github.com/Shopify/hydrogen/commit/025385b6f9f58a76ffb15d9f505dfbf2b5e21427), [`35a87107`](https://github.com/Shopify/hydrogen/commit/35a871073941e008e104e9c491719d4cade8b49a), [`33f33edd`](https://github.com/Shopify/hydrogen/commit/33f33edd205bbc113047533c71c71ad53bc91b3e), [`0a009a3b`](https://github.com/Shopify/hydrogen/commit/0a009a3ba06dadd8f9d799575d7f88590f82a966), [`9c2e67c5`](https://github.com/Shopify/hydrogen/commit/9c2e67c52ec1c77062cb667505560afb757372a9), [`9c2e67c5`](https://github.com/Shopify/hydrogen/commit/9c2e67c52ec1c77062cb667505560afb757372a9), [`3d458e2b`](https://github.com/Shopify/hydrogen/commit/3d458e2b3c66a4daac798598cadba38b9ecd8a1e)]:
-  - @shopify/cli-hydrogen@4.1.2
-  - @shopify/remix-oxygen@1.0.6
-  - @shopify/hydrogen@2023.4.1
-
-## 0.2.1
-
-### Patch Changes
-
-- Updated dependencies [[`2039a4a`](https://github.com/Shopify/hydrogen/commit/2039a4a534cf75ebcf39bab6d2f95a535bb5d390), [`82b6af7`](https://github.com/Shopify/hydrogen/commit/82b6af71cafe1f88c24630178e61cd09e5a59f5e), [`361879e`](https://github.com/Shopify/hydrogen/commit/361879ee11dfe8f1ee916b022165b1e7f0e45964)]:
-  - @shopify/cli-hydrogen@4.1.1
-  - @shopify/hydrogen@2023.4.0
-
-## 0.2.0
-
-### Minor Changes
-
-- Fix scroll issues on Product Detail Page for small screens ([#782](https://github.com/Shopify/hydrogen/pull/782)) by [@lifeiscontent](https://github.com/lifeiscontent)
-
-- Fix Layout title on mobile when title is long ([#781](https://github.com/Shopify/hydrogen/pull/781)) by [@lifeiscontent](https://github.com/lifeiscontent)
-
-### Patch Changes
-
-- Adopt Remix [`v2_meta`](https://remix.run/docs/en/main/route/meta#metav2) future flag ([#738](https://github.com/Shopify/hydrogen/pull/738)) by [@wizardlyhel](https://github.com/wizardlyhel)
-
-  ### `v2_meta` migration steps
-
-  1. For any routes that you used `meta` route export, convert it to the `V2_MetaFunction` equivalent. Notice that the package name in the import statement has also changed to `'@remix-run/react'`:
-
-     ```diff
-     - import {type MetaFunction} from '@shopify/remix-oxygen';
-     + import {type V2_MetaFunction} from '@remix-run/react';
-
-     - export const meta: MetaFunction = () => {
-     + export const meta: V2_MetaFunction = () => {
-     -   return {title: 'Login'};
-     +   return [{title: 'Login'}];
-       };
-     ```
-
-  2. If you are using data from loaders, pass the loader type to the `V2_MetaFunction` generic:
-
-     ```diff
-     - export const meta: MetaFunction = ({data}) => {
-     + export const meta: V2_MetaFunction<typeof loader> = ({data}) => {
-     -   return {title: `Order ${data?.order?.name}`};
-     +   return [{title: `Order ${data?.order?.name}`}];
-       };
-     ```
-
-  3. If you are using `meta` route export in `root`, convert it to [Global Meta](https://remix.run/docs/en/main/route/meta#global-meta)
-
-     ```diff
-     // app/root.tsx
-
-     - export const meta: MetaFunction = () => ({
-     -   charset: 'utf-8',
-     -   viewport: 'width=device-width,initial-scale=1',
-     - });
-
-     export default function App() {
-
-       return (
-         <html lang={locale.language}>
-           <head>
-     +       <meta charSet="utf-8" />
-     +       <meta name="viewport" content="width=device-width,initial-scale=1" />
-             <Seo />
-             <Meta />
-     ```
-
-- Adopt `v2_routeConvention` future flag ([#747](https://github.com/Shopify/hydrogen/pull/747)) by [@wizardlyhel](https://github.com/wizardlyhel)
-
-  ## `v2_routeConventions` migration steps
-
-  Remix v2 route conventions are just file renames. We just need to ensure when changing file name and file location, the import paths of other files are also updated.
-
-  Go to Remix docs for more details on the [V2 route convention](https://remix.run/docs/en/main/file-conventions/route-files-v2).
-
-  Rename and move the following files in the `routes` folder to adopt to V2 route convention.
-
-  <table>
-  <tr>
-  <th>Before</th>
-  <th>After (V2 route convention)</th>
-  </tr>
-  <tr>
-  <td>
-
-  ```txt
-  app/routes/
-    ├─ [sitemap.xml].tsx
-    ├─ [robots.txt].tsx
-    └─ ($lang)/
-        ├─ $shopid/orders/$token/
-        │   └─ authenticate.tsx
-        ├─ account/
-        │   ├─ __private/
-        │   │   ├─ address/
-        │   │   │   └─ $id.tsx
-        │   │   ├─ orders.$id.tsx
-        │   │   ├─ edit.tsx
-        │   │   └─ logout.ts
-        │   └─ __public/
-        │       ├─ recover.tsx
-        │       ├─ login.tsx
-        │       ├─ register.tsx
-        │       ├─ activate.$id.$activationToken.tsx
-        │       └─ reset.$id.$resetToken.tsx
-        ├─ api/
-        │   ├─ countries.tsx
-        │   └─ products.tsx
-        ├─ collections/
-        │   ├─ index.tsx
-        │   ├─ $collectionHandle.tsx
-        │   └─ all.tsx
-        ├─ journal/
-        │   ├─ index.tsx
-        │   └─ $journalHandle.tsx
-        ├─ pages
-        │   └─ $pageHandle.tsx
-        ├─ policies/
-        │   ├─ index.tsx
-        │   └─ $policyHandle.tsx
-        ├─ products/
-        │   ├─ index.tsx
-        │   └─ $productHandle.tsx
-        ├─ $.tsx
-        ├─ account.tsx
-        ├─ cart.tsx
-        ├─ cart.$lines.tsx
-        ├─ discount.$code.tsx
-        ├─ featured-products.tsx
-        ├─ index.tsx
-        └─ search.tsx
-  ```
-
-  </td>
-  <td valign="top">
-
-  ```txt
-  app/routes/
-    ├─ [sitemap.xml].tsx
-    ├─ [robots.txt].tsx
-    ├─ ($lang).$shopid.orders.$token.authenticate.tsx
-    ├─ ($lang).account.address.$id.tsx
-    ├─ ($lang).account.orders.$id.tsx
-    ├─ ($lang).account.edit.tsx
-    ├─ ($lang).account.logout.ts
-    ├─ ($lang).account.recover.tsx
-    ├─ ($lang).account.login.tsx
-    ├─ ($lang).account.register.tsx
-    ├─ ($lang).account.activate.$id.$activationToken.tsx
-    ├─ ($lang).account.reset.$id.$resetToken.tsx
-    ├─ ($lang).api.countries.tsx
-    ├─ ($lang).api.products.tsx
-    ├─ ($lang).collections._index.tsx
-    ├─ ($lang).collections.$collectionHandle.tsx
-    ├─ ($lang).collections.all.tsx
-    ├─ ($lang).journal._index.tsx
-    ├─ ($lang).journal.$journalHandle.tsx
-    ├─ ($lang).pages.$pageHandle.tsx
-    ├─ ($lang).policies._index.tsx
-    ├─ ($lang).policies.$policyHandle.tsx
-    ├─ ($lang).products._index.tsx
-    ├─ ($lang).products.$productHandle.tsx
-    ├─ $.tsx
-    ├─ ($lang)._index.tsx
-    ├─ ($lang).account.tsx
-    ├─ ($lang).cart.tsx
-    ├─ ($lang).cart.$lines.tsx
-    ├─ ($lang).discount.$code.tsx
-    ├─ ($lang).featured-products.tsx
-    └─ ($lang).search.tsx
-  ```
-
-  </td>
-  </tr>
-  </table>
-
-  ### Optional
-
-  If you want to continue using nested folder routes but have the `v2_routeConvention` flag turned on, you may consider using the npm package [`@remix-run/v1-route-convention`](https://www.npmjs.com/package/@remix-run/v1-route-convention).
-
-  If you like the flat route convention but still wants a hybrid style of nested route folder, you may consider using the npm package [`remix-flat-routes`](https://www.npmjs.com/package/remix-flat-routes)
-
-- Adopt Remix [`unstable_tailwind`](https://remix.run/docs/en/1.15.0/guides/styling#built-in-tailwind-support) and [`unstable_postcss`](https://remix.run/docs/en/1.15.0/guides/styling#built-in-postcss-support) future flags for the Demo Store template. ([#751](https://github.com/Shopify/hydrogen/pull/751)) by [@frandiox](https://github.com/frandiox)
-
-  ### `unstable_tailwind` and `unstable_postcss` migration steps
-
-  1. Move the file `<root>/styles/app.css` to `<root>/app/styles/app.css`, and remove it from `.gitignore`.
-
-  2. Add `"browserslist": ["defaults"]` to your `package.json`, or your preferred [value from Browserslist](https://browsersl.ist/).
-
-  3. Replace the `build` and `dev` scripts in your `package.json` with the following:
-
-     **Before**
-
-     ```json
-      "scripts": {
-        "build": "npm run build:css && shopify hydrogen build",
-        "build:css": "postcss styles --base styles --dir app/styles --env production",
-        "dev": "npm run build:css && concurrently -g --kill-others-on-fail -r npm:dev:css \"shopify hydrogen dev\"",
-        "dev:css": "postcss styles --base styles --dir app/styles -w",
-        ...
-      }
-     ```
-
-     **After**
-
-     ```json
-      "scripts": {
-        "dev": "shopify hydrogen dev",
-        "build": "shopify hydrogen build",
-        ...
-      }
-     ```
-
-  You can also remove dependencies like `concurrently` if you don't use them anywhere else.
-
-- Forwards search params of `/discount/<code>` route to a redirect route. ([#766](https://github.com/Shopify/hydrogen/pull/766)) by [@lneicelis](https://github.com/lneicelis)
-
-- Carts created in liquid will soon be compatible with the Storefront API and vice versa, making it possible to share carts between channels. ([#721](https://github.com/Shopify/hydrogen/pull/721)) by [@scottdixon](https://github.com/scottdixon)
-
-  This change updates the Demo Store to use Online Store's `cart` cookie (instead of sessions) which prevents customers from losing carts when merchants migrate to/from Hydrogen.
-
-- Bump internal Remix dependencies to 1.15.0. ([#728](https://github.com/Shopify/hydrogen/pull/728)) by [@wizardlyhel](https://github.com/wizardlyhel)
-
-  Recommendations to follow:
-
-  - Upgrade all the Remix packages in your app to 1.15.0.
-  - Enable Remix v2 future flags at your earliest convenience following [the official guide](https://remix.run/docs/en/1.15.0/pages/v2).
-
-- Updated CLI prompts. It's recommended to update your version of `@shopify/cli` to `3.45.0` when updating `@shopify/cli-hydrogen`. ([#733](https://github.com/Shopify/hydrogen/pull/733)) by [@frandiox](https://github.com/frandiox)
+  1. Update the `HeaderMenu` component to accept a `primaryDomainUrl` and include
+     it in the internal url check
 
   ```diff
-  "dependencies": {
-  -  "@shopify/cli": "3.x.x",
-  +  "@shopify/cli": "3.45.0",
+  // app/components/Header.tsx
+
+  + import type {HeaderQuery} from 'storefrontapi.generated';
+
+  export function HeaderMenu({
+    menu,
+  +  primaryDomainUrl,
+    viewport,
+  }: {
+    menu: HeaderProps['header']['menu'];
+  +  primaryDomainUrl: HeaderQuery['shop']['primaryDomain']['url'];
+    viewport: Viewport;
+  }) {
+
+    // ...code
+
+    // if the url is internal, we strip the domain
+    const url =
+      item.url.includes('myshopify.com') ||
+      item.url.includes(publicStoreDomain) ||
+  +   item.url.includes(primaryDomainUrl)
+        ? new URL(item.url).pathname
+        : item.url;
+
+     // ...code
+
   }
   ```
 
-- Adopt Remix [`v2_errorBoundary`](https://remix.run/docs/en/release-next/route/error-boundary-v2) future flag ([#729](https://github.com/Shopify/hydrogen/pull/729)) by [@wizardlyhel](https://github.com/wizardlyhel)
+  2. Update the `FooterMenu` component to accept a `primaryDomainUrl` prop and include
+     it in the internal url check
 
-  ### `v2_errorBoundary` migration steps
+  ```diff
+  // app/components/Footer.tsx
 
-  1. Remove all `CatchBoundary` route exports
+  - import type {FooterQuery} from 'storefrontapi.generated';
+  + import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 
-  2. Handle route level errors with `ErrorBoundary`
+  function FooterMenu({
+    menu,
+  +  primaryDomainUrl,
+  }: {
+    menu: FooterQuery['menu'];
+  +  primaryDomainUrl: HeaderQuery['shop']['primaryDomain']['url'];
+  }) {
+    // code...
 
-     Before:
+    // if the url is internal, we strip the domain
+    const url =
+      item.url.includes('myshopify.com') ||
+      item.url.includes(publicStoreDomain) ||
+  +   item.url.includes(primaryDomainUrl)
+        ? new URL(item.url).pathname
+        : item.url;
 
-     ```jsx
-     // app/root.tsx
-     export function ErrorBoundary({error}: {error: Error}) {
-       const [root] = useMatches();
-       const locale = root?.data?.selectedLocale ?? DEFAULT_LOCALE;
+     // ...code
 
-       return (
-         <html lang={locale.language}>
-           <head>
-             <title>Error</title>
-             <Meta />
-             <Links />
-           </head>
-           <body>
-             <Layout layout={root?.data?.layout}>
-               <GenericError error={error} />
-             </Layout>
-             <Scripts />
-           </body>
-         </html>
-       );
-     }
-     ```
+    );
+  }
+  ```
 
-     After:
+  3. Update the `Footer` component to accept a `shop` prop
 
-     ```jsx
-     // app/root.tsx
-     import {isRouteErrorResponse, useRouteError} from '@remix-run/react';
+  ```diff
+  export function Footer({
+    menu,
+  + shop,
+  }: FooterQuery & {shop: HeaderQuery['shop']}) {
+    return (
+      <footer className="footer">
+  -      <FooterMenu menu={menu} />
+  +      <FooterMenu menu={menu} primaryDomainUrl={shop.primaryDomain.url} />
+      </footer>
+    );
+  }
+  ```
 
-     export function ErrorBoundary({error}: {error: Error}) {
-       const [root] = useMatches();
-       const locale = root?.data?.selectedLocale ?? DEFAULT_LOCALE;
-       const routeError = useRouteError();
-       const isRouteError = isRouteErrorResponse(routeError);
+  4. Update `Layout.tsx` to pass the `shop` prop
 
-       let title = 'Error';
-       let pageType = 'page';
+  ```diff
+  export function Layout({
+    cart,
+    children = null,
+    footer,
+    header,
+    isLoggedIn,
+  }: LayoutProps) {
+    return (
+      <>
+        <CartAside cart={cart} />
+        <SearchAside />
+        <MobileMenuAside menu={header.menu} shop={header.shop} />
+        <Header header={header} cart={cart} isLoggedIn={isLoggedIn} />
+        <main>{children}</main>
+        <Suspense>
+          <Await resolve={footer}>
+  -          {(footer) => <Footer menu={footer.menu}  />}
+  +          {(footer) => <Footer menu={footer.menu} shop={header.shop} />}
+          </Await>
+        </Suspense>
+      </>
+    );
+  }
+  ```
 
-       // We have an route error
-       if (isRouteError) {
-         title = 'Not found';
+### Patch Changes
 
-         // We have a page not found error
-         if (routeError.status === 404) {
-           pageType = routeError.data || pageType;
-         }
-       }
+- If you are calling `useMatches()` in different places of your app to access the data returned by the root loader, you may want to update it to the following pattern to enhance types: ([#1289](https://github.com/Shopify/hydrogen/pull/1289)) by [@frandiox](https://github.com/frandiox)
 
-       return (
-         <html lang={locale.language}>
-           <head>
-             <title>{title}</title>
-             <Meta />
-             <Links />
-           </head>
-           <body>
-             <Layout
-               layout={root?.data?.layout}
-               key={`${locale.language}-${locale.country}`}
-             >
-               {isRouteError ? (
-                 <>
-                   {routeError.status === 404 ? (
-                     <NotFound type={pageType} />
-                   ) : (
-                     <GenericError
-                       error={{
-                         message: `${routeError.status} ${routeError.data}`,
-                       }}
-                     />
-                   )}
-                 </>
-               ) : (
-                 <GenericError
-                   error={error instanceof Error ? error : undefined}
-                 />
-               )}
-             </Layout>
-             <Scripts />
-           </body>
-         </html>
-       );
-     }
-     ```
+  ```ts
+  // root.tsx
 
-- Updated dependencies [[`e6e6c2d`](https://github.com/Shopify/hydrogen/commit/e6e6c2da274d0582c6b3b9f298dfd2e86dd4bfbe), [`475a39c`](https://github.com/Shopify/hydrogen/commit/475a39c867b0851bba0358b6db9208b664aec68c), [`1f8526c`](https://github.com/Shopify/hydrogen/commit/1f8526c750dc1d5aa7ea02e196fffdd14d17a536), [`0f4d562`](https://github.com/Shopify/hydrogen/commit/0f4d562a2129e8e03ed123dc572a14a72e487a1b), [`737f83e`](https://github.com/Shopify/hydrogen/commit/737f83ebb72fccc2f367532ebaa19ea00b1b3436), [`2d4c5d9`](https://github.com/Shopify/hydrogen/commit/2d4c5d9340c5a2458c682aa3f9b12352dacdd759), [`68a6028`](https://github.com/Shopify/hydrogen/commit/68a60285a3d563d6e98fb79c3ba6d98eb4ee6be0)]:
-  - @shopify/cli-hydrogen@4.1.0
-  - @shopify/hydrogen@2023.1.7
-  - @shopify/remix-oxygen@1.0.5
+  import {useMatches} from '@remix-run/react';
+  import {type SerializeFrom} from '@shopify/remix-oxygen';
+
+  export const useRootLoaderData = () => {
+    const [root] = useMatches();
+    return root?.data as SerializeFrom<typeof loader>;
+  };
+
+  export function loader(context) {
+    // ...
+  }
+  ```
+
+  This way, you can import `useRootLoaderData()` anywhere in your app and get the correct type for the data returned by the root loader.
+
+- Updated dependencies [[`81400439`](https://github.com/Shopify/hydrogen/commit/814004397c1d17ef0a53a425ed28a42cf67765cf), [`a6f397b6`](https://github.com/Shopify/hydrogen/commit/a6f397b64dc6a0d856cb7961731ee1f86bf80292), [`3464ec04`](https://github.com/Shopify/hydrogen/commit/3464ec04a084e1ceb30ee19874dc1b9171ce2b34), [`7fc088e2`](https://github.com/Shopify/hydrogen/commit/7fc088e21bea47840788cb7c60f873ce1f253128), [`867e0b03`](https://github.com/Shopify/hydrogen/commit/867e0b033fc9eb04b7250baea97d8fd49d26ccca), [`ad45656c`](https://github.com/Shopify/hydrogen/commit/ad45656c5f663cc1a60eab5daab4da1dfd0e6cc3), [`f24e3424`](https://github.com/Shopify/hydrogen/commit/f24e3424c8e2b363b181b71fcbd3e45f696fdd3f), [`66a48573`](https://github.com/Shopify/hydrogen/commit/66a4857387148b6a104df5783314c74aca8aada0), [`0ae7cbe2`](https://github.com/Shopify/hydrogen/commit/0ae7cbe280d8351126e11dc13f35d7277d9b2d86), [`8198c1be`](https://github.com/Shopify/hydrogen/commit/8198c1befdfafb39fbcc88d71f91d21eae252973), [`ad45656c`](https://github.com/Shopify/hydrogen/commit/ad45656c5f663cc1a60eab5daab4da1dfd0e6cc3)]:
+  - @shopify/hydrogen@2023.10.0
+  - @shopify/remix-oxygen@2.0.0
+  - @shopify/cli-hydrogen@6.0.0
