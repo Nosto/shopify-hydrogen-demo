@@ -23,7 +23,7 @@ import nostoStyles from '~/components/nosto/nostoSlot.css?url';
  * This is important to avoid re-fetching root queries on sub-navigations
  * @type {ShouldRevalidateFunction}
  */
-export const shouldRevalidate = ({ formMethod, currentUrl, nextUrl }) => {
+export const shouldRevalidate = ({formMethod, currentUrl, nextUrl}) => {
   // revalidate when a mutation is performed e.g add to cart, login...
   if (formMethod && formMethod !== 'GET') {
     return true;
@@ -43,8 +43,8 @@ export function links() {
       rel: 'stylesheet',
       href: nostoStyles
     },
-    { rel: 'stylesheet', href: resetStyles },
-    { rel: 'stylesheet', href: appStyles },
+    {rel: 'stylesheet', href: resetStyles},
+    {rel: 'stylesheet', href: appStyles},
     {
       rel: 'preconnect',
       href: 'https://cdn.shopify.com',
@@ -53,15 +53,15 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    { rel: 'icon', type: 'image/svg+xml', href: favicon },
+    {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }
 
 /**
  * @param {LoaderFunctionArgs}
  */
-export async function loader({ context }) {
-  const { storefront, customerAccount, cart } = context;
+export async function loader({context, request}) {
+  const {storefront, customerAccount, cart} = context;
   const publicStoreDomain = context.env.PUBLIC_STORE_DOMAIN;
 
   const isLoggedInPromise = customerAccount.isLoggedIn();
@@ -73,7 +73,36 @@ export async function loader({ context }) {
       footerMenuHandle: 'footer', // Adjust to your footer menu handle
     },
   });
+  const cookies = request.headers.get("Cookie") || "";
+  const existingCookie = cookies
+    .split(";")
+    .find((cookie) => cookie.trim().startsWith("2c.cId"));
 
+
+  // Set the cookie with a clear name and value
+  let cookieValue = "";
+
+  if (!existingCookie) {
+    const nostoResponse = await fetch('https://api.nosto.com/v1/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${btoa(":8NJ2zK7ZZWT9eoYjaF2bGP6tJKGVGiXhK3QdoZeC96cYevAkeq62MO7ZKCELUjQy")}`, // Replace with your API key if required
+      },
+      body: JSON.stringify({
+        query: `
+        mutation {
+          newSession
+        }
+      `,
+      }),
+    });
+
+    const nostoData = await nostoResponse.json();
+    cookieValue = nostoData.data.newSession;
+  } else {
+    cookieValue = existingCookie.split("=")[1]
+  }
   // await the header query (above the fold)
   const headerPromise = storefront.query(HEADER_QUERY, {
     cache: storefront.CacheLong(),
@@ -81,10 +110,11 @@ export async function loader({ context }) {
       headerMenuHandle: 'main-menu', // Adjust to your header menu handle
     },
   });
+
   const cartData = await cart.get();
   return defer(
     {
-      ...(await getNostoData({ context, cartId: cartData?.id })),
+      ...(await getNostoData({context, cartId: cartData?.id})),
       cart: cart.get(),
       footer: footerPromise,
       header: await headerPromise,
@@ -93,7 +123,7 @@ export async function loader({ context }) {
     },
     {
       headers: {
-        'Set-Cookie': await context.session.commit(),
+        'Set-Cookie': [`2c.cId=${cookieValue}; Path=/; Max-Age=60; HttpOnly=false; SameSite=Lax; Secure=false`, await context.session.commit()],
       },
     },
   );
