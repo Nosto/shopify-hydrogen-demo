@@ -112,6 +112,14 @@ export async function loader({context, request}) {
   });
 
   const cartData = await cart.get();
+  const maxAge = 3600 * 365 * 1000
+  const expiryDate = new Date(Date.now() + maxAge).toUTCString();
+
+  const setCookies = [
+    `2c.cId=${cookieValue}; Path=/; Max-Age=${maxAge}; Expires=${expiryDate}; SameSite=Lax;`,
+    await context.session.commit()
+  ];
+
   return defer(
     {
       ...(await getNostoData({context, cartId: cartData?.id})),
@@ -123,7 +131,7 @@ export async function loader({context, request}) {
     },
     {
       headers: {
-        'Set-Cookie': [`2c.cId=${cookieValue}; Path=/; Max-Age=60; HttpOnly=false; SameSite=Lax; Secure=false`, await context.session.commit()],
+        'Set-Cookie': setCookies,
       },
     },
   );
