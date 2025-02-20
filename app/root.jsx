@@ -150,12 +150,12 @@ export default function App() {
       <Links/>
     </head>
     <body>
-    <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot/>}
-                   nonce={nonce}>
-      <Layout {...data}>
+    <Layout {...data}>
+      <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot/>}
+                     nonce={nonce}>
         <Outlet/>
-      </Layout>
-    </NostoProvider>
+      </NostoProvider>
+    </Layout>
     <ScrollRestoration nonce={nonce}/>
     <Scripts nonce={nonce}/>
     </body>
@@ -186,9 +186,9 @@ export function ErrorBoundary() {
       <Links/>
     </head>
     <body>
-    <NostoProvider shopifyMarkets={false} account="shopify-11368366139" nonce={nonce}
-                   recommendationComponent={<NostoSlot/>}>
       <Layout {...rootData}>
+        <NostoProvider shopifyMarkets={false} account="shopify-11368366139" nonce={nonce}
+                       recommendationComponent={<NostoSlot/>}>
         <div className="route-error">
           <h1>Oops</h1>
           <h2>{errorStatus}</h2>
@@ -198,10 +198,10 @@ export function ErrorBoundary() {
             </fieldset>
           )}
         </div>
+        </NostoProvider>
       </Layout>
       <ScrollRestoration nonce={nonce}/>
       <Scripts nonce={nonce}/>
-    </NostoProvider>
     </body>
     </html>
   );

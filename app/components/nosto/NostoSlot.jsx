@@ -7,8 +7,8 @@ export function links() {
 }
 */
 
-export function NostoSlot({ nostoRecommendation }) {
-  let { title, products, result_id } = nostoRecommendation;
+export function NostoSlot({nostoRecommendation}) {
+  let {title, products, result_id} = nostoRecommendation;
 
   function reportClick(productId) {
     window?.nostojs(function (api) {
