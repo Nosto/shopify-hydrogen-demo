@@ -9,18 +9,18 @@ import { useRootLoaderData } from '~/lib/root-data';
  * @type {MetaFunction}
  */
 export const meta = () => {
-  return [{ title: `Hydrogen | Cart` }];
+  return [{title: `Hydrogen | Cart`}];
 };
 
 /**
  * @param {ActionFunctionArgs}
  */
-export async function action({ request, context }) {
-  const { cart } = context;
+export async function action({request, context}) {
+  const {cart} = context;
 
   const formData = await request.formData();
 
-  const { action, inputs } = CartForm.getFormInput(formData);
+  const {action, inputs} = CartForm.getFormInput(formData);
 
   if (!action) {
     throw new Error('No action provided');
@@ -28,7 +28,12 @@ export async function action({ request, context }) {
 
   let status = 200;
   let result;
-
+  const cookies = request.headers.get('Cookie') || '';
+  const sessionId = cookies
+    .split(';')
+    .find((cookie) => cookie.trim().startsWith('2c.cId='))
+    ?.split('=')[1] || null;
+  result = await cart.updateAttributes([{key: "2c.cId", value: sessionId}])
   switch (action) {
     case CartForm.ACTIONS.LinesAdd:
       result = await cart.addLines(inputs.lines);
@@ -62,9 +67,9 @@ export async function action({ request, context }) {
   }
 
   const cartId = result.cart.id;
+  console.log(cartId)
   const headers = cart.setCartId(result.cart.id);
-  const { cart: cartResult, errors } = result;
-
+  const {cart: cartResult, errors} = result;
   const redirectTo = formData.get('redirectTo') ?? null;
   if (typeof redirectTo === 'string') {
     status = 303;
@@ -72,7 +77,6 @@ export async function action({ request, context }) {
   }
 
   headers.append('Set-Cookie', await context.session.commit());
-
   return json(
     {
       cart: cartResult,
@@ -81,7 +85,7 @@ export async function action({ request, context }) {
         cartId,
       },
     },
-    { status, headers },
+    {status, headers},
   );
 }
 
