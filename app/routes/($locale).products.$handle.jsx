@@ -97,8 +97,11 @@ export async function clientLoader({serverLoader}) {
     nostojs(async (api) => {
       const result = await api
         .defaultSession()
-        .viewProduct(serverData.product)
-        .setPlacements(api.placements.getPlacements())
+        .viewProduct({
+          product_id: serverData.product?.id,
+          selected_sku_id: serverData.product?.selectedVariant?.sku,
+        })
+        .setPlacements(['productpage-nosto-1'])
         .load();
       resolve({
         nostoRecommendations: result.campaigns?.recommendations || {},
@@ -109,7 +112,9 @@ export async function clientLoader({serverLoader}) {
   return {...serverData, ...clientData};
 }
 
-clientLoader.hydrate = true;
+export function HydrateFallback() {
+  return <p>Loading Game...</p>;
+}
 
 export default function Product() {
   /** @type {LoaderReturnData} */

@@ -36,7 +36,7 @@ export async function clientLoader({serverLoader}) {
         const data = await api
           .defaultSession()
           .viewFrontPage()
-          .setPlacements(api.placements.getPlacements())
+          .setPlacements(['frontpage-nosto-1', 'frontpage-nosto-3'])
           .load();
 
         resolve({
