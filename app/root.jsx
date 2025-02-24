@@ -1,5 +1,5 @@
-import { useNonce } from '@shopify/hydrogen';
-import { defer } from '@shopify/remix-oxygen';
+import {useNonce} from '@shopify/hydrogen';
+import {defer} from '@shopify/remix-oxygen';
 import {
   isRouteErrorResponse,
   Links,
@@ -13,10 +13,10 @@ import {
 import favicon from './assets/favicon.svg';
 import resetStyles from './styles/reset.css?url';
 import appStyles from './styles/app.css?url';
-import { Layout } from '~/components/Layout';
+import {Layout} from '~/components/Layout';
 
-import { getNostoData, NostoProvider } from "@nosto/shopify-hydrogen";
-import { NostoSlot } from '~/components/nosto/NostoSlot';
+import {getNostoData, NostoProvider} from '@nosto/shopify-hydrogen';
+import {NostoSlot} from '~/components/nosto/NostoSlot';
 import nostoStyles from '~/components/nosto/nostoSlot.css?url';
 
 /**
@@ -41,7 +41,7 @@ export function links() {
   return [
     {
       rel: 'stylesheet',
-      href: nostoStyles
+      href: nostoStyles,
     },
     {rel: 'stylesheet', href: resetStyles},
     {rel: 'stylesheet', href: appStyles},
@@ -73,21 +73,22 @@ export async function loader({context, request}) {
       footerMenuHandle: 'footer', // Adjust to your footer menu handle
     },
   });
-  const cookies = request.headers.get("Cookie") || "";
+  const cookies = request.headers.get('Cookie') || '';
   const existingCookie = cookies
-    .split(";")
-    .find((cookie) => cookie.trim().startsWith("2c.cId"));
-
+    .split(';')
+    .find((cookie) => cookie.trim().startsWith('2c.cId'));
 
   // Set the cookie with a clear name and value
-  let cookieValue = "";
+  let cookieValue = '';
 
   if (!existingCookie) {
     const nostoResponse = await fetch('https://api.nosto.com/v1/graphql', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Basic ${btoa(":8NJ2zK7ZZWT9eoYjaF2bGP6tJKGVGiXhK3QdoZeC96cYevAkeq62MO7ZKCELUjQy")}`, // Replace with your API key if required
+        Authorization: `Basic ${btoa(
+          ':8NJ2zK7ZZWT9eoYjaF2bGP6tJKGVGiXhK3QdoZeC96cYevAkeq62MO7ZKCELUjQy',
+        )}`, // Replace with your API key if required
       },
       body: JSON.stringify({
         query: `
@@ -101,7 +102,7 @@ export async function loader({context, request}) {
     const nostoData = await nostoResponse.json();
     cookieValue = nostoData.data.newSession;
   } else {
-    cookieValue = existingCookie.split("=")[1]
+    cookieValue = existingCookie.split('=')[1];
   }
   // await the header query (above the fold)
   const headerPromise = storefront.query(HEADER_QUERY, {
@@ -112,12 +113,12 @@ export async function loader({context, request}) {
   });
 
   const cartData = await cart.get();
-  const maxAge = 3600 * 365 * 1000
+  const maxAge = 3600 * 365 * 1000;
   const expiryDate = new Date(Date.now() + maxAge).toUTCString();
 
   const setCookies = [
     `2c.cId=${cookieValue}; Path=/; Max-Age=${maxAge}; Expires=${expiryDate}; SameSite=Lax;`,
-    await context.session.commit()
+    await context.session.commit(),
   ];
 
   return defer(
@@ -143,22 +144,26 @@ export default function App() {
   const data = useLoaderData();
   return (
     <html lang="en">
-    <head>
-      <meta charSet="utf-8"/>
-      <meta name="viewport" content="width=device-width,initial-scale=1"/>
-      <Meta/>
-      <Links/>
-    </head>
-    <body>
-    <Layout {...data}>
-      <NostoProvider shopifyMarkets={true} account="shopify-11368366139" recommendationComponent={<NostoSlot/>}
-                     nonce={nonce}>
-        <Outlet/>
-      </NostoProvider>
-    </Layout>
-    <ScrollRestoration nonce={nonce}/>
-    <Scripts nonce={nonce}/>
-    </body>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <Layout {...data}>
+          <NostoProvider
+            shopifyMarkets={true}
+            account="shopify-11368366139"
+            nonce={nonce}
+            renderMode="JSON_ORIGINAL"
+          >
+            <Outlet />
+          </NostoProvider>
+        </Layout>
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+      </body>
     </html>
   );
 }
@@ -179,30 +184,34 @@ export function ErrorBoundary() {
   }
   return (
     <html lang="en">
-    <head>
-      <meta charSet="utf-8"/>
-      <meta name="viewport" content="width=device-width,initial-scale=1"/>
-      <Meta/>
-      <Links/>
-    </head>
-    <body>
-      <Layout {...rootData}>
-        <NostoProvider shopifyMarkets={false} account="shopify-11368366139" nonce={nonce}
-                       recommendationComponent={<NostoSlot/>}>
-        <div className="route-error">
-          <h1>Oops</h1>
-          <h2>{errorStatus}</h2>
-          {errorMessage && (
-            <fieldset>
-              <pre>{errorMessage}</pre>
-            </fieldset>
-          )}
-        </div>
-        </NostoProvider>
-      </Layout>
-      <ScrollRestoration nonce={nonce}/>
-      <Scripts nonce={nonce}/>
-    </body>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <Layout {...rootData}>
+          <NostoProvider
+            shopifyMarkets={false}
+            account="shopify-11368366139"
+            nonce={nonce}
+            renderMode="JSON_ORIGINAL"
+          >
+            <div className="route-error">
+              <h1>Oops</h1>
+              <h2>{errorStatus}</h2>
+              {errorMessage && (
+                <fieldset>
+                  <pre>{errorMessage}</pre>
+                </fieldset>
+              )}
+            </div>
+          </NostoProvider>
+        </Layout>
+        <ScrollRestoration nonce={nonce} />
+        <Scripts nonce={nonce} />
+      </body>
     </html>
   );
 }

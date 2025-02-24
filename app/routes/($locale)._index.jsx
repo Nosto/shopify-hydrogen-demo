@@ -3,7 +3,8 @@ import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 
-import { NostoHome, NostoPlacement } from '@nosto/shopify-hydrogen';
+import {NostoHome, NostoPlacement} from '@nosto/shopify-hydrogen';
+import {NostoSlot} from '~/components/nosto/NostoSlot';
 
 /**
  * @type {MetaFunction}
@@ -21,23 +22,59 @@ export async function loader({context}) {
   const featuredCollection = collections.nodes[0];
   const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
 
-  return defer({featuredCollection, recommendedProducts});
+  return defer({
+    featuredCollection,
+    recommendedProducts,
+    nostoRecommendations: {},
+  });
 }
+
+export async function clientLoader({serverLoader}) {
+  const recoLoader = () =>
+    new Promise(async (resolve) => {
+      window?.nostojs(async (api) => {
+        const data = await api
+          .defaultSession()
+          .viewFrontPage()
+          .setPlacements(api.placements.getPlacements())
+          .load();
+
+        resolve({
+          nostoRecommendations: data.campaigns?.recommendations || {},
+        });
+      });
+    });
+
+  const [serverData, clientData] = await Promise.all([
+    serverLoader(),
+    recoLoader(),
+  ]);
+  return {...serverData, ...clientData};
+}
+
+clientLoader.hydrate = true;
 
 export default function Homepage() {
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
+
   return (
     <div className="home">
       <div>
         {/*<Image src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" width={100} height={100}/>*/}
       </div>
-
-      <NostoPlacement id="frontpage-nosto-1"/>
-      <NostoPlacement id="frontpage-nosto-3"/>
-      <NostoHome/>
-      <FeaturedCollection collection={data.featuredCollection}/>
-      <RecommendedProducts products={data.recommendedProducts}/>
+      <NostoPlacement id="frontpage-nosto-3">
+        <NostoSlot
+          nostoRecommendation={data.nostoRecommendations['frontpage-nosto-3']}
+        />
+      </NostoPlacement>
+      <FeaturedCollection collection={data.featuredCollection} />
+      <RecommendedProducts products={data.recommendedProducts} />
+      <NostoPlacement id="frontpage-nosto-1">
+        <NostoSlot
+          nostoRecommendation={data.nostoRecommendations['frontpage-nosto-1']}
+        />
+      </NostoPlacement>
     </div>
   );
 }

@@ -1,10 +1,13 @@
-import { Await } from '@remix-run/react';
-import { Suspense } from 'react';
-import { Aside } from '~/components/Aside';
-import { Footer } from '~/components/Footer';
-import { Header, HeaderMenu } from '~/components/Header';
-import { CartMain } from '~/components/Cart';
-import { PredictiveSearchForm, PredictiveSearchResults, } from '~/components/Search';
+import {Await} from '@remix-run/react';
+import {Suspense} from 'react';
+import {Aside} from '~/components/Aside';
+import {Footer} from '~/components/Footer';
+import {Header, HeaderMenu} from '~/components/Header';
+import {CartMain} from '~/components/Cart';
+import {
+  PredictiveSearchForm,
+  PredictiveSearchResults,
+} from '~/components/Search';
 
 /**
  * @param {LayoutProps}
@@ -12,14 +15,14 @@ import { PredictiveSearchForm, PredictiveSearchResults, } from '~/components/Sea
 export function Layout({cart, children = null, footer, header, isLoggedIn}) {
   return (
     <>
-      <CartAside cart={cart}/>
-      <SearchAside/>
-      <MobileMenuAside menu={header?.menu} shop={header?.shop}/>
-      {header && <Header header={header} cart={cart} isLoggedIn={isLoggedIn}/>}
+      <CartAside cart={cart} />
+      <SearchAside />
+      <MobileMenuAside menu={header?.menu} shop={header?.shop} />
+      {header && <Header header={header} cart={cart} isLoggedIn={isLoggedIn} />}
       <main>{children}</main>
       <Suspense>
         <Await resolve={footer}>
-          {(footer) => <Footer menu={footer?.menu} shop={header?.shop}/>}
+          {(footer) => <Footer menu={footer?.menu} shop={header?.shop} />}
         </Await>
       </Suspense>
     </>
@@ -35,7 +38,7 @@ function CartAside({cart}) {
       <Suspense fallback={<p>Loading cart ...</p>}>
         <Await resolve={cart}>
           {(cart) => {
-            return <CartMain cart={cart} layout="aside"/>;
+            return <CartMain cart={cart} layout="aside" />;
           }}
         </Await>
       </Suspense>
@@ -47,7 +50,7 @@ function SearchAside() {
   return (
     <Aside id="search-aside" heading="SEARCH">
       <div className="predictive-search">
-        <br/>
+        <br />
         <PredictiveSearchForm>
           {({fetchResults, inputRef}) => (
             <div>
@@ -72,7 +75,7 @@ function SearchAside() {
             </div>
           )}
         </PredictiveSearchForm>
-        <PredictiveSearchResults/>
+        <PredictiveSearchResults />
       </div>
     </Aside>
   );

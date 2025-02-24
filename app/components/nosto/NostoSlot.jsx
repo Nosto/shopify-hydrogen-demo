@@ -1,4 +1,6 @@
-import { NostoItem } from './NostoItem';
+import {useEffect} from 'react';
+import {NostoItem} from './NostoItem';
+import {useLoaderData} from '@remix-run/react';
 //import styles from './nostoSlot.css';
 
 /*
@@ -7,9 +9,7 @@ export function links() {
 }
 */
 
-export function NostoSlot({nostoRecommendation}) {
-  let {title, products, result_id} = nostoRecommendation;
-
+export function NostoSlot({name, nostoRecommendation}) {
   function reportClick(productId) {
     window?.nostojs(function (api) {
       api.defaultSession().recordAttribution('vp', productId, result_id).done();
@@ -18,9 +18,9 @@ export function NostoSlot({nostoRecommendation}) {
 
   return (
     <div className="nosto-container">
-      <h2 className="nosto-title">{title}</h2>
+      <h2 className="nosto-title">{nostoRecommendation?.title}</h2>
       <div className="nosto-list">
-        {products.map((product) => (
+        {nostoRecommendation?.products.map((product) => (
           <NostoItem
             product={product}
             key={product.product_id}

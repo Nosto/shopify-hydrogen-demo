@@ -1,9 +1,9 @@
-import { CartForm } from "@shopify/hydrogen";
-import { Link } from "@remix-run/react";
+import {CartForm} from '@shopify/hydrogen';
+import {Link, useFetcher} from '@remix-run/react';
 
 export function NostoItem({product, onClick}) {
   console.log(product);
-  let selectedVariant = product.skus[0].id
+  const selectedVariant = product.skus[0];
 
   return (
     <div className="nosto-item" onClick={onClick}>
@@ -11,7 +11,7 @@ export function NostoItem({product, onClick}) {
         <>
           <div className="nosto-image-container">
             <div className="nosto-image">
-              <img src={product.thumb_url} alt={product.name}/>
+              <img src={product.thumb_url} alt={product.name} />
             </div>
             <div className="nosto-product-details">
               <div className="nosto-product-name">{product.name}</div>
@@ -19,7 +19,7 @@ export function NostoItem({product, onClick}) {
             </div>
           </div>
           <div className="product-form">
-            <br/>
+            <br />
             <AddToCartButton
               disabled={!selectedVariant || !selectedVariant.availableForSale}
               onClick={() => {
@@ -28,11 +28,11 @@ export function NostoItem({product, onClick}) {
               lines={
                 selectedVariant
                   ? [
-                    {
-                      merchandiseId: selectedVariant.id,
-                      quantity: 1,
-                    },
-                  ]
+                      {
+                        merchandiseId: selectedVariant.id,
+                        quantity: 1,
+                      },
+                    ]
                   : []
               }
             >
@@ -43,56 +43,31 @@ export function NostoItem({product, onClick}) {
       </a>
     </div>
   );
+}
 
-  function AddToCartButton({analytics, children, disabled, lines, onClick}) {
-    return (
-      <CartForm route="/cart" inputs={{lines: lines, other: "data"}} action={CartForm.ACTIONS.LinesAdd}>
-        {(fetcher) => (
-          <>
-            <input
-              name="analytics"
-              type="hidden"
-              value={JSON.stringify(analytics)}
-            />
-            <button
-              type="submit"
-              onClick={onClick}
-              disabled={disabled ?? fetcher.state !== 'idle'}
-            >
-              {children}
-            </button>
-          </>
-        )}
-      </CartForm>
-    );
-  }
-
-  function ProductOptions({option}) {
-    return (
-      <div className="product-options" key={option.name}>
-        <h5>{option.name}</h5>
-        <div className="product-options-grid">
-          {option.values.map(({value, isAvailable, isActive, to}) => {
-            return (
-              <Link
-                className="product-options-item"
-                key={option.name + value}
-                prefetch="intent"
-                preventScrollReset
-                replace
-                to={to}
-                style={{
-                  border: isActive ? '1px solid black' : '1px solid transparent',
-                  opacity: isAvailable ? 1 : 0.3,
-                }}
-              >
-                {value}
-              </Link>
-            );
-          })}
-        </div>
-        <br/>
-      </div>
-    );
-  }
+function AddToCartButton({analytics, children, disabled, lines, onClick}) {
+  return (
+    <CartForm
+      route="/cart"
+      inputs={{lines: lines, other: 'data'}}
+      action={CartForm.ACTIONS.LinesAdd}
+    >
+      {(fetcher) => (
+        <>
+          <input
+            name="analytics"
+            type="hidden"
+            value={JSON.stringify(analytics)}
+          />
+          <button
+            type="submit"
+            onClick={onClick}
+            disabled={disabled ?? fetcher.state !== 'idle'}
+          >
+            {children}
+          </button>
+        </>
+      )}
+    </CartForm>
+  );
 }
