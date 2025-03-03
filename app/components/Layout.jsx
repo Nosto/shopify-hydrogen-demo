@@ -1,5 +1,5 @@
 import {Await} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Suspense, useEffect} from 'react';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
@@ -13,6 +13,19 @@ import {
  * @param {LayoutProps}
  */
 export function Layout({cart, children = null, footer, header, isLoggedIn}) {
+  useEffect(() => {
+    const customerId = getCookie('2c.cId');
+    const cartToken = cart?._data?.id?.replace('gid://shopify/Cart/', '');
+    const shopId = header?.shop?.id?.replace('gid://shopify/Shop/', 'shopify-');
+    if (!customerId || !cartToken || !shopId) return;
+
+    const NOSTO_URL = `https://connect.nosto.com/token/${shopId}/${customerId}/${cartToken}`;
+
+    fetch(NOSTO_URL).catch((err) => {
+      // handle errors if need
+    });
+  }, [cart?._data?.id]);
+
   return (
     <>
       <CartAside cart={cart} />
@@ -27,6 +40,12 @@ export function Layout({cart, children = null, footer, header, isLoggedIn}) {
       </Suspense>
     </>
   );
+}
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  return parts.length === 2 ? parts.pop().split(';').shift() : null;
 }
 
 /**
