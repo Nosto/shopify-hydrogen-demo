@@ -22,7 +22,7 @@ export function Layout({cart, children = null, footer, header, isLoggedIn}) {
     const NOSTO_URL = `https://connect.nosto.com/token/${shopId}/${customerId}/${cartToken}`;
 
     fetch(NOSTO_URL).catch((err) => {
-      // handle errors if need
+      console.error('Nosto: error updating cart:', err);
     });
   }, [cart?._data?.id]);
 
