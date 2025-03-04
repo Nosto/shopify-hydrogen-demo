@@ -110,7 +110,7 @@ Disallow: /.well-known/shopify/monorail
 ${sitemapUrl ? `Sitemap: ${sitemapUrl}` : ''}`;
 }
 
-const ROBOTS_QUERY = `#graphql
+export const ROBOTS_QUERY = `#graphql
   query StoreRobots($country: CountryCode, $language: LanguageCode)
    @inContext(country: $country, language: $language) {
     shop {

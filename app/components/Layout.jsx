@@ -8,22 +8,14 @@ import {
   PredictiveSearchForm,
   PredictiveSearchResults,
 } from '~/components/Search';
+import {checkTokenToCustomer} from '~/utils/checkTokenToNostoCustomer';
 
 /**
  * @param {LayoutProps}
  */
 export function Layout({cart, children = null, footer, header, isLoggedIn}) {
   useEffect(() => {
-    const customerId = getCookie('2c.cId');
-    const cartToken = cart?._data?.id?.replace('gid://shopify/Cart/', '');
-    const shopId = header?.shop?.id?.replace('gid://shopify/Shop/', 'shopify-');
-    if (!customerId || !cartToken || !shopId) return;
-
-    const NOSTO_URL = `https://connect.nosto.com/token/${shopId}/${customerId}/${cartToken}`;
-
-    fetch(NOSTO_URL).catch((err) => {
-      console.error('Nosto: error updating cart:', err);
-    });
+    checkTokenToCustomer(cart?._data?.id, header?.shop?.id);
   }, [cart?._data?.id]);
 
   return (
@@ -40,12 +32,6 @@ export function Layout({cart, children = null, footer, header, isLoggedIn}) {
       </Suspense>
     </>
   );
-}
-
-function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  return parts.length === 2 ? parts.pop().split(';').shift() : null;
 }
 
 /**
