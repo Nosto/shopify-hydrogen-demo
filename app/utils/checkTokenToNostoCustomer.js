@@ -8,7 +8,7 @@ export async function checkTokenToCustomer(cartIdGid, shopIdGid, providedCustome
 
   if (!customerId || !cartToken || !shopId) return;
 
-  const NOSTO_URL = `https://connect.nosto.com/token/${shopId}/${customerId || providedCustomerId}/${cartToken}`;
+  const NOSTO_URL = `https://connect.nosto.com/token/${shopId}/${customerId}/${cartToken}`;
 
   try {
     await fetch(NOSTO_URL);
