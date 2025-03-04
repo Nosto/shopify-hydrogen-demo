@@ -1,7 +1,7 @@
 export async function checkTokenToCustomer(cartIdGid, shopIdGid, providedCustomerId) {
   let customerId = providedCustomerId
   if (!customerId) {
-    let customerId = getCookie('2c.cId');
+    customerId = getCookie('2c.cId');
   }
   const cartToken = cartIdGid?.replace('gid://shopify/Cart/', '');
   const shopId = shopIdGid?.replace('gid://shopify/Shop/', 'shopify-');
