@@ -4,9 +4,9 @@
 - Nosto is implemented by usage of [@nosto/shopify-hydrogen](https://github.com/Nosto/shopify-hydrogen)
 - The deployment can be seen [here](https://nosto-hydrogen-demo-5bba196044d0453163cc.o2.myshopify.dev/)
 
-## Implementing Nosto Extensions Without Pixel
+## Using Nosto Checkout Extensions Without Pixel
 
-To integrate Nosto without using the pixel, it is necessary to track the cart token as soon as a product is added to the cart. This can be achieved on the frontend using `useEffect` in React:
+To integrate Nosto checkout extensions without using the pixel, it is necessary to track the cart token as soon as a product is added to the cart. This can be achieved on the frontend using `useEffect` in React:
 
 ```javascript
 useEffect(() => {
@@ -15,7 +15,7 @@ useEffect(() => {
 ```
 
 - `cart?._data?.id` represents the cart token.
-- `header?.shop?.id` represents the shop ID.
+- `header?.shop?.id` represents the shop ID. If you want to use this on markets, you also need to get the market and locale information. The format should be: shopify-{shop_id}-{market_id}-{locale}.
 
 ### Updating the Cart Token with the Session ID
 
@@ -29,6 +29,7 @@ export async function checkTokenToCustomer(
 ) {
   let customerId = providedCustomerId || getCookie('2c.cId');
   const cartToken = cartIdGid?.replace('gid://shopify/Cart/', '');
+  //For market shopId should be different and should contain market and locale info mentioned below
   const shopId = shopIdGid?.replace('gid://shopify/Shop/', 'shopify-');
 
   if (!customerId || !cartToken || !shopId) return;
