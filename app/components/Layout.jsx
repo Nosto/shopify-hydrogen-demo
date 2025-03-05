@@ -1,5 +1,5 @@
 import {Await} from '@remix-run/react';
-import {Suspense} from 'react';
+import {Suspense, useEffect} from 'react';
 import {Aside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
 import {Header, HeaderMenu} from '~/components/Header';
@@ -8,11 +8,16 @@ import {
   PredictiveSearchForm,
   PredictiveSearchResults,
 } from '~/components/Search';
+import {checkTokenToCustomer} from '~/utils/checkTokenToNostoCustomer';
 
 /**
  * @param {LayoutProps}
  */
 export function Layout({cart, children = null, footer, header, isLoggedIn}) {
+  useEffect(() => {
+    checkTokenToCustomer(cart?._data?.id, header?.shop?.id);
+  }, [cart?._data?.id]);
+
   return (
     <>
       <CartAside cart={cart} />
