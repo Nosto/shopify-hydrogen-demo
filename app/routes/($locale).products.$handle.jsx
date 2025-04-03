@@ -113,7 +113,7 @@ export async function clientLoader({serverLoader}) {
 }
 
 export function HydrateFallback() {
-  return <p>Loading Game...</p>;
+  return <p>Loading...</p>;
 }
 
 clientLoader.hydrate = true;

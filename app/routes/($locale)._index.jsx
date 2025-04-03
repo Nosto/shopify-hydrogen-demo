@@ -52,6 +52,10 @@ export async function clientLoader({serverLoader}) {
   return {...serverData, ...clientData};
 }
 
+export function HydrateFallback() {
+  return <p>Loading...</p>;
+}
+
 clientLoader.hydrate = true;
 
 export default function Homepage() {
