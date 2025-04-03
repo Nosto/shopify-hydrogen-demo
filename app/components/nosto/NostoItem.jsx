@@ -1,5 +1,4 @@
 import {CartForm} from '@shopify/hydrogen';
-import {Link, useFetcher} from '@remix-run/react';
 
 export function NostoItem({product, onClick}) {
   console.log(product);

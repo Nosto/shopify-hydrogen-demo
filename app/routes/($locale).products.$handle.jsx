@@ -318,28 +318,40 @@ function ProductOptions({option}) {
  */
 function AddToCartButton({analytics, children, disabled, lines, onClick}) {
   return (
-    <CartForm
-      route="/cart"
-      inputs={{lines: lines, other: 'data'}}
-      action={CartForm.ACTIONS.LinesAdd}
-    >
-      {(fetcher) => (
-        <>
-          <input
-            name="analytics"
-            type="hidden"
-            value={JSON.stringify(analytics)}
-          />
-          <button
-            type="submit"
-            onClick={onClick}
-            disabled={disabled ?? fetcher.state !== 'idle'}
-          >
-            {children}
-          </button>
-        </>
-      )}
-    </CartForm>
+    <>
+      <CartForm
+        route="/cart"
+        inputs={{lines: lines, other: 'data'}}
+        action={CartForm.ACTIONS.LinesAdd}
+      >
+        {(fetcher) => (
+          <>
+            <input
+              name="analytics"
+              type="hidden"
+              value={JSON.stringify(analytics)}
+            />
+            <button
+              type="submit"
+              onClick={onClick}
+              disabled={disabled ?? fetcher.state !== 'idle'}
+            >
+              {children}
+            </button>
+          </>
+        )}
+      </CartForm>
+      <CartForm
+        route="/cart"
+        action={CartForm.ACTIONS.LinesAdd}
+        inputs={{
+          lines,
+          redirectToCheckout: true,
+        }}
+      >
+        <button disabled={disabled ?? fetcher.state !== 'idle'}>Buy Now</button>
+      </CartForm>
+    </>
   );
 }
 

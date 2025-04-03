@@ -3,7 +3,7 @@ import {Await, useLoaderData, Link} from '@remix-run/react';
 import {Suspense} from 'react';
 import {Image, Money} from '@shopify/hydrogen';
 
-import {NostoHome, NostoPlacement} from '@nosto/shopify-hydrogen';
+import {NostoPlacement} from '@nosto/shopify-hydrogen';
 import {NostoSlot} from '~/components/nosto/NostoSlot';
 
 /**

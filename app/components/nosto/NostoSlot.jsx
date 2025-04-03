@@ -1,6 +1,4 @@
-import {useEffect} from 'react';
-import {NostoItem} from './NostoItem';
-import {useLoaderData} from '@remix-run/react';
+import { NostoItem } from './NostoItem';
 //import styles from './nostoSlot.css';
 
 /*

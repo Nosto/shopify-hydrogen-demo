@@ -11,7 +11,7 @@ import {
 } from '@shopify/hydrogen';
 import { createRequestHandler, getStorefrontHeaders, } from '@shopify/remix-oxygen';
 import { AppSession } from '~/lib/session';
-import { CART_QUERY_FRAGMENT } from '~/lib/fragments';
+import { CART_MUTATE_FRAGMENT, CART_QUERY_FRAGMENT } from '~/lib/fragments';
 
 /**
  * Export a fetch handler in module format.
@@ -74,6 +74,7 @@ export default {
           maxage: 60 * 60 * 24 * 7
         }),
         cartQueryFragment: CART_QUERY_FRAGMENT,
+        cartMutateFragment: CART_MUTATE_FRAGMENT,
       });
 
       /**
