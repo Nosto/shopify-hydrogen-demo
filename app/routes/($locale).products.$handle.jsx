@@ -116,6 +116,8 @@ export function HydrateFallback() {
   return <p>Loading Game...</p>;
 }
 
+clientLoader.hydrate = true;
+
 export default function Product() {
   /** @type {LoaderReturnData} */
   const {product, variants, nostoRecommendations} = useLoaderData();
