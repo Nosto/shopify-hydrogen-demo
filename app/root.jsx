@@ -16,7 +16,6 @@ import appStyles from './styles/app.css?url';
 import { Layout } from '~/components/Layout';
 
 import { getNostoData, NostoProvider } from "@nosto/shopify-hydrogen";
-import { NostoSlot } from '~/components/nosto/NostoSlot';
 import nostoStyles from '~/components/nosto/nostoSlot.css?url';
 
 /**
