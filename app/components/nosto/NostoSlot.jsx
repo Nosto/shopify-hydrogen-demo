@@ -8,10 +8,9 @@ export function links() {
 */
 
 export function NostoSlot({nostoRecommendation}) {
-
   function reportClick(productId) {
     window?.nostojs(function (api) {
-      api.defaultSession().recordAttribution('vp', productId, result_id).done();
+      api.defaultSession().recordAttribution('vp', productId, nostoRecommendation.result_id).done();
     });
   }
 
