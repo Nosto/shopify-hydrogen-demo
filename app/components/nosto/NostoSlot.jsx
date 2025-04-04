@@ -7,20 +7,18 @@ export function links() {
 }
 */
 
-export function NostoSlot({ nostoRecommendation }) {
-  let { title, products, result_id } = nostoRecommendation;
-
+export function NostoSlot({nostoRecommendation}) {
   function reportClick(productId) {
     window?.nostojs(function (api) {
-      api.defaultSession().recordAttribution('vp', productId, result_id).done();
+      api.defaultSession().recordAttribution('vp', productId, nostoRecommendation.result_id).done();
     });
   }
 
   return (
     <div className="nosto-container">
-      <h2 className="nosto-title">{title}</h2>
+      <h2 className="nosto-title">{nostoRecommendation?.title}</h2>
       <div className="nosto-list">
-        {products.map((product) => (
+        {nostoRecommendation?.products.map((product) => (
           <NostoItem
             product={product}
             key={product.product_id}

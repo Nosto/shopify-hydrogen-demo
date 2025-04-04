@@ -10,6 +10,7 @@ import {
 } from '@shopify/hydrogen';
 import {getVariantUrl} from '~/lib/variants';
 import {NostoPlacement, NostoProduct} from '@nosto/shopify-hydrogen';
+import {NostoSlot} from '~/components/nosto/NostoSlot';
 
 /**
  * @type {MetaFunction<typeof loader>}
@@ -64,7 +65,7 @@ export async function loader({params, request, context}) {
     variables: {handle},
   });
 
-  return defer({product, variants});
+  return defer({product, variants, nostoRecommendations: {}});
 }
 
 /**
@@ -90,10 +91,38 @@ function redirectToFirstVariant({product, request}) {
   );
 }
 
+export async function clientLoader({serverLoader}) {
+  const serverData = await serverLoader();
+  const clientData = await new Promise(async (resolve) => {
+    nostojs(async (api) => {
+      const result = await api
+        .defaultSession()
+        .viewProduct({
+          product_id: serverData.product?.id,
+          selected_sku_id: serverData.product?.selectedVariant?.sku,
+        })
+        .setPlacements(['productpage-nosto-1'])
+        .load();
+      resolve({
+        nostoRecommendations: result.campaigns?.recommendations || {},
+      });
+    });
+  });
+
+  return {...serverData, ...clientData};
+}
+
+export function HydrateFallback() {
+  return <p>Loading...</p>;
+}
+
+clientLoader.hydrate = true;
+
 export default function Product() {
   /** @type {LoaderReturnData} */
-  const {product, variants} = useLoaderData();
+  const {product, variants, nostoRecommendations} = useLoaderData();
   const {selectedVariant} = product;
+
   let nostoProductId = product?.id?.split('/');
   nostoProductId &&
     (nostoProductId = nostoProductId[nostoProductId.length - 1]);
@@ -105,8 +134,11 @@ export default function Product() {
         product={product}
         variants={variants}
       />
-      <NostoPlacement id="productpage-nosto-1" />
-      <NostoProduct product={nostoProductId} tagging={product} />
+      <NostoPlacement id="productpage-nosto-1">
+        <NostoSlot
+          nostoRecommendation={nostoRecommendations['productpage-nosto-1']}
+        />
+      </NostoPlacement>
     </div>
   );
 }

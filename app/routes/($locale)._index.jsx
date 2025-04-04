@@ -1,9 +1,10 @@
-import {defer} from '@shopify/remix-oxygen';
-import {Await, useLoaderData, Link} from '@remix-run/react';
-import {Suspense} from 'react';
-import {Image, Money} from '@shopify/hydrogen';
+import { defer } from '@shopify/remix-oxygen';
+import { Await, Link, useLoaderData } from '@remix-run/react';
+import { Suspense } from 'react';
+import { Image, Money } from '@shopify/hydrogen';
 
-import { NostoHome, NostoPlacement } from '@nosto/shopify-hydrogen';
+import { NostoPlacement } from '@nosto/shopify-hydrogen';
+import { NostoSlot } from '~/components/nosto/NostoSlot';
 
 /**
  * @type {MetaFunction}
@@ -21,23 +22,63 @@ export async function loader({context}) {
   const featuredCollection = collections.nodes[0];
   const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
 
-  return defer({featuredCollection, recommendedProducts});
+  return defer({
+    featuredCollection,
+    recommendedProducts,
+    nostoRecommendations: {},
+  });
 }
+
+export async function clientLoader({serverLoader}) {
+  const recoLoader = () =>
+    new Promise(async (resolve) => {
+      window?.nostojs(async (api) => {
+        const data = await api
+          .defaultSession()
+          .viewFrontPage()
+          .setPlacements(['frontpage-nosto-1', 'frontpage-nosto-3'])
+          .load();
+
+        resolve({
+          nostoRecommendations: data.campaigns?.recommendations || {},
+        });
+      });
+    });
+
+  const [serverData, clientData] = await Promise.all([
+    serverLoader(),
+    recoLoader(),
+  ]);
+  return {...serverData, ...clientData};
+}
+
+export function HydrateFallback() {
+  return <p>Loading...</p>;
+}
+
+clientLoader.hydrate = true;
 
 export default function Homepage() {
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
+
   return (
     <div className="home">
       <div>
         {/*<Image src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" width={100} height={100}/>*/}
       </div>
-
-      <NostoPlacement id="frontpage-nosto-1"/>
-      <NostoPlacement id="frontpage-nosto-3"/>
-      <NostoHome/>
       <FeaturedCollection collection={data.featuredCollection}/>
       <RecommendedProducts products={data.recommendedProducts}/>
+      <NostoPlacement id="frontpage-nosto-1">
+        <NostoSlot
+          nostoRecommendation={data.nostoRecommendations['frontpage-nosto-1']}
+        />
+      </NostoPlacement>
+      <NostoPlacement id="frontpage-nosto-3">
+        <NostoSlot
+          nostoRecommendation={data.nostoRecommendations['frontpage-nosto-3']}
+        />
+      </NostoPlacement>
     </div>
   );
 }
@@ -57,7 +98,7 @@ function FeaturedCollection({collection}) {
     >
       {image && (
         <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
+          <Image data={image} sizes="100vw"/>
         </div>
       )}
       <h1>{collection.title}</h1>
@@ -91,7 +132,7 @@ function RecommendedProducts({products}) {
                   />
                   <h4>{product.title}</h4>
                   <small>
-                    <Money data={product.priceRange.minVariantPrice} />
+                    <Money data={product.priceRange.minVariantPrice}/>
                   </small>
                 </Link>
               ))}
@@ -99,63 +140,63 @@ function RecommendedProducts({products}) {
           )}
         </Await>
       </Suspense>
-      <br />
+      <br/>
     </div>
   );
 }
 
 const FEATURED_COLLECTION_QUERY = `#graphql
-  fragment FeaturedCollection on Collection {
+fragment FeaturedCollection on Collection {
+  id
+  title
+  image {
     id
-    title
-    image {
+    url
+    altText
+    width
+    height
+  }
+  handle
+}
+query FeaturedCollection($country: CountryCode, $language: LanguageCode)
+@inContext(country: $country, language: $language) {
+  collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
+    nodes {
+      ...FeaturedCollection
+    }
+  }
+}
+`;
+
+const RECOMMENDED_PRODUCTS_QUERY = `#graphql
+fragment RecommendedProduct on Product {
+  id
+  title
+  handle
+  priceRange {
+    minVariantPrice {
+      amount
+      currencyCode
+    }
+  }
+  images(first: 1) {
+    nodes {
       id
       url
       altText
       width
       height
     }
-    handle
   }
-  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...FeaturedCollection
-      }
+}
+query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
+@inContext(country: $country, language: $language) {
+  products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+    nodes {
+      ...RecommendedProduct
     }
   }
-`;
-
-const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-  fragment RecommendedProduct on Product {
-    id
-    title
-    handle
-    priceRange {
-      minVariantPrice {
-        amount
-        currencyCode
-      }
-    }
-    images(first: 1) {
-      nodes {
-        id
-        url
-        altText
-        width
-        height
-      }
-    }
-  }
-  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-    @inContext(country: $country, language: $language) {
-    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
-      nodes {
-        ...RecommendedProduct
-      }
-    }
-  }
+}
 `;
 
 /** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
