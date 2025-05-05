@@ -1,12 +1,7 @@
-import {json} from '@shopify/remix-oxygen';
-import {useLoaderData, Link} from '@remix-run/react';
-import {
-  Pagination,
-  getPaginationVariables,
-  Image,
-  Money,
-} from '@shopify/hydrogen';
-import {useVariantUrl} from '~/lib/variants';
+import { json } from '@shopify/remix-oxygen';
+import { Link, useLoaderData } from '@remix-run/react';
+import { getPaginationVariables, Image, Money, Pagination, } from '@shopify/hydrogen';
+import { useVariantUrl } from '~/lib/variants';
 
 /**
  * @type {MetaFunction<typeof loader>}
@@ -31,6 +26,26 @@ export async function loader({request, context}) {
   return json({products});
 }
 
+export async function clientLoader({serverLoader}) {
+  const serverData = await serverLoader();
+  //should be able to get category name from serverData
+  const clientData = await new Promise(async (resolve) => {
+    nostojs(async (api) => {
+      const result = await api
+        .defaultSession()
+        .viewCategory("my category")
+        .load();
+      resolve({
+        nostoRecommendations: result.campaigns?.recommendations || {},
+      });
+    });
+  });
+
+  return {...serverData, ...clientData};
+}
+
+clientLoader.hydrate = true;
+
 export default function Collection() {
   /** @type {LoaderReturnData} */
   const {products} = useLoaderData();
@@ -44,8 +59,8 @@ export default function Collection() {
             <PreviousLink>
               {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
             </PreviousLink>
-            <ProductsGrid products={nodes} />
-            <br />
+            <ProductsGrid products={nodes}/>
+            <br/>
             <NextLink>
               {isLoading ? 'Loading...' : <span>Load more ↓</span>}
             </NextLink>
@@ -102,70 +117,70 @@ function ProductItem({product, loading}) {
       )}
       <h4>{product.title}</h4>
       <small>
-        <Money data={product.priceRange.minVariantPrice} />
+        <Money data={product.priceRange.minVariantPrice}/>
       </small>
     </Link>
   );
 }
 
 const PRODUCT_ITEM_FRAGMENT = `#graphql
-  fragment MoneyProductItem on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment ProductItem on Product {
+fragment MoneyProductItem on MoneyV2 {
+  amount
+  currencyCode
+}
+fragment ProductItem on Product {
+  id
+  handle
+  title
+  featuredImage {
     id
-    handle
-    title
-    featuredImage {
-      id
-      altText
-      url
-      width
-      height
+    altText
+    url
+    width
+    height
+  }
+  priceRange {
+    minVariantPrice {
+      ...MoneyProductItem
     }
-    priceRange {
-      minVariantPrice {
-        ...MoneyProductItem
-      }
-      maxVariantPrice {
-        ...MoneyProductItem
-      }
+    maxVariantPrice {
+      ...MoneyProductItem
     }
-    variants(first: 1) {
-      nodes {
-        selectedOptions {
-          name
-          value
-        }
+  }
+  variants(first: 1) {
+    nodes {
+      selectedOptions {
+        name
+        value
       }
     }
   }
+}
 `;
 
 // NOTE: https://shopify.dev/docs/api/storefront/2024-01/objects/product
 const CATALOG_QUERY = `#graphql
-  query Catalog(
-    $country: CountryCode
-    $language: LanguageCode
-    $first: Int
-    $last: Int
-    $startCursor: String
-    $endCursor: String
-  ) @inContext(country: $country, language: $language) {
-    products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
-      nodes {
-        ...ProductItem
-      }
-      pageInfo {
-        hasPreviousPage
-        hasNextPage
-        startCursor
-        endCursor
-      }
+query Catalog(
+  $country: CountryCode
+  $language: LanguageCode
+  $first: Int
+  $last: Int
+  $startCursor: String
+  $endCursor: String
+) @inContext(country: $country, language: $language) {
+  products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
+    nodes {
+      ...ProductItem
+    }
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      startCursor
+      endCursor
     }
   }
-  ${PRODUCT_ITEM_FRAGMENT}
+}
+${PRODUCT_ITEM_FRAGMENT}
 `;
 
 /** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
