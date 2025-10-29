@@ -1,32 +1,54 @@
+import {createContext, useContext, useEffect, useState} from 'react';
+
 /**
- * A side bar component with Overlay that works without JavaScript.
+ * A side bar component with Overlay
  * @example
  * ```jsx
- * <Aside id="search-aside" heading="SEARCH">
+ * <Aside type="search" heading="SEARCH">
  *  <input type="search" />
  *  ...
  * </Aside>
  * ```
  * @param {{
  *   children?: React.ReactNode;
+ *   type: AsideType;
  *   heading: React.ReactNode;
- *   id?: string;
  * }}
  */
-export function Aside({children, heading, id = 'aside'}) {
+export function Aside({children, heading, type}) {
+  const {type: activeType, close} = useAside();
+  const expanded = type === activeType;
+
+  useEffect(() => {
+    const abortController = new AbortController();
+
+    if (expanded) {
+      document.addEventListener(
+        'keydown',
+        function handler(event) {
+          if (event.key === 'Escape') {
+            close();
+          }
+        },
+        {signal: abortController.signal},
+      );
+    }
+    return () => abortController.abort();
+  }, [close, expanded]);
+
   return (
-    <div aria-modal className="overlay" id={id} role="dialog">
-      <button
-        className="close-outside"
-        onClick={() => {
-          history.go(-1);
-          window.location.hash = '';
-        }}
-      />
+    <div
+      aria-modal
+      className={`overlay ${expanded ? 'expanded' : ''}`}
+      role="dialog"
+    >
+      <button className="close-outside" onClick={close} />
       <aside>
         <header>
           <h3>{heading}</h3>
-          <CloseAside />
+          <button className="close reset" onClick={close} aria-label="Close">
+            &times;
+          </button>
         </header>
         <main>{children}</main>
       </aside>
@@ -34,11 +56,39 @@ export function Aside({children, heading, id = 'aside'}) {
   );
 }
 
-function CloseAside() {
+const AsideContext = createContext(null);
+
+Aside.Provider = function AsideProvider({children}) {
+  const [type, setType] = useState('closed');
+
   return (
-    /* eslint-disable-next-line jsx-a11y/anchor-is-valid */
-    <a className="close" href="#" onChange={() => history.go(-1)}>
-      &times;
-    </a>
+    <AsideContext.Provider
+      value={{
+        type,
+        open: setType,
+        close: () => setType('closed'),
+      }}
+    >
+      {children}
+    </AsideContext.Provider>
   );
+};
+
+export function useAside() {
+  const aside = useContext(AsideContext);
+  if (!aside) {
+    throw new Error('useAside must be used within an AsideProvider');
+  }
+  return aside;
 }
+
+/** @typedef {'search' | 'cart' | 'mobile' | 'closed'} AsideType */
+/**
+ * @typedef {{
+ *   type: AsideType;
+ *   open: (mode: AsideType) => void;
+ *   close: () => void;
+ * }} AsideContextValue
+ */
+
+/** @typedef {import('react').ReactNode} ReactNode */

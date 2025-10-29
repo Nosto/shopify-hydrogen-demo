@@ -1,15 +1,14 @@
-import {json} from '@shopify/remix-oxygen';
-import {Link, useLoaderData} from '@remix-run/react';
+import {Link, useLoaderData} from 'react-router';
 
 /**
- * @type {MetaFunction<typeof loader>}
+ * @type {Route.MetaFunction}
  */
 export const meta = ({data}) => {
   return [{title: `Hydrogen | ${data?.policy.title ?? ''}`}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({params, context}) {
   if (!params.handle) {
@@ -37,7 +36,7 @@ export async function loader({params, context}) {
     throw new Response('Could not find the policy', {status: 404});
   }
 
-  return json({policy});
+  return {policy};
 }
 
 export default function Policy() {
@@ -99,7 +98,6 @@ const POLICY_CONTENT_QUERY = `#graphql
  * >} SelectedPolicies
  */
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @typedef {import('./+types/policies.$handle').Route} Route */
 /** @typedef {import('@shopify/hydrogen/storefront-api-types').Shop} Shop */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

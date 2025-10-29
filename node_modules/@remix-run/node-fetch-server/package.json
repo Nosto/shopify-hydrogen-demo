@@ -1,0 +1,55 @@
+{
+  "name": "@remix-run/node-fetch-server",
+  "version": "0.9.0",
+  "description": "Build servers for Node.js using the web fetch API",
+  "author": "Michael Jackson <mjijackson@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/remix-run/remix.git",
+    "directory": "packages/node-fetch-server"
+  },
+  "homepage": "https://github.com/remix-run/remix/tree/main/packages/node-fetch-server#readme",
+  "license": "MIT",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist",
+    "src",
+    "!src/**/*.test.ts"
+  ],
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.0",
+    "esbuild": "^0.20.2"
+  },
+  "keywords": [
+    "http",
+    "server",
+    "request",
+    "response",
+    "fetch",
+    "web"
+  ],
+  "scripts": {
+    "bench": "bash ./bench/runner.sh",
+    "build:types": "tsc --project tsconfig.build.json",
+    "build:esm": "esbuild src/index.ts --bundle --outfile=dist/index.js --format=esm --platform=node --sourcemap",
+    "build:cjs": "esbuild src/index.ts --bundle --outfile=dist/index.cjs --format=cjs --platform=node --sourcemap",
+    "build": "pnpm run build:types && pnpm run build:esm && pnpm run build:cjs",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "test": "node --disable-warning=ExperimentalWarning --test ./src/**/*.test.ts"
+  }
+}

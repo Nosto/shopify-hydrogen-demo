@@ -1,5 +1,5 @@
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({request}) {
   throw new Response(`${new URL(request.url).pathname} not found`, {
@@ -11,5 +11,5 @@ export default function CatchAllPage() {
   return null;
 }
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
+/** @typedef {import('./+types/$').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

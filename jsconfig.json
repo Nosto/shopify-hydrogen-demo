@@ -12,8 +12,14 @@
     }
   },
   "include": [
-    "./**/*.d.ts",
-    "./**/*.js",
-    "./**/*.jsx"
+    "env.d.ts",
+    "app/**/*.js",
+    "app/**/*.jsx",
+    "app/**/*.d.ts",
+    "*.js",
+    "*.jsx",
+    "*.d.ts",
+    ".graphqlrc.js",
+    ".react-router/types/**/*"
   ]
 }

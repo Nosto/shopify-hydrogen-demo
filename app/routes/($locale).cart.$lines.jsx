@@ -1,4 +1,4 @@
-import {redirect} from '@shopify/remix-oxygen';
+import {redirect} from 'react-router';
 
 /**
  * Automatically creates a new cart based on the URL and redirects straight to checkout.
@@ -17,7 +17,7 @@ import {redirect} from '@shopify/remix-oxygen';
  * /cart/41007289663544:1,41007289696312:2?discount=HYDROBOARD
  *
  * ```
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({request, context, params}) {
   const {cart} = context;
@@ -69,5 +69,5 @@ export default function Component() {
   return null;
 }
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
+/** @typedef {import('./+types/cart.$lines').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

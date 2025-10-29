@@ -1,43 +1,36 @@
 import {CUSTOMER_UPDATE_MUTATION} from '~/graphql/customer-account/CustomerUpdateMutation';
-import {json} from '@shopify/remix-oxygen';
 import {
+  data,
   Form,
   useActionData,
   useNavigation,
   useOutletContext,
-} from '@remix-run/react';
+} from 'react-router';
 
 /**
- * @type {MetaFunction}
+ * @type {Route.MetaFunction}
  */
 export const meta = () => {
   return [{title: 'Profile'}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({context}) {
-  await context.customerAccount.handleAuthStatus();
+  context.customerAccount.handleAuthStatus();
 
-  return json(
-    {},
-    {
-      headers: {
-        'Set-Cookie': await context.session.commit(),
-      },
-    },
-  );
+  return {};
 }
 
 /**
- * @param {ActionFunctionArgs}
+ * @param {Route.ActionArgs}
  */
 export async function action({request, context}) {
   const {customerAccount} = context;
 
   if (request.method !== 'PUT') {
-    return json({error: 'Method not allowed'}, {status: 405});
+    return data({error: 'Method not allowed'}, {status: 405});
   }
 
   const form = await request.formData();
@@ -60,6 +53,7 @@ export async function action({request, context}) {
       {
         variables: {
           customer,
+          language: customerAccount.i18n.language,
         },
       },
     );
@@ -72,25 +66,15 @@ export async function action({request, context}) {
       throw new Error('Customer profile update failed.');
     }
 
-    return json(
-      {
-        error: null,
-        customer: data?.customerUpdate?.customer,
-      },
-      {
-        headers: {
-          'Set-Cookie': await context.session.commit(),
-        },
-      },
-    );
+    return {
+      error: null,
+      customer: data?.customerUpdate?.customer,
+    };
   } catch (error) {
-    return json(
+    return data(
       {error: error.message, customer: null},
       {
         status: 400,
-        headers: {
-          'Set-Cookie': await context.session.commit(),
-        },
       },
     );
   }
@@ -159,8 +143,6 @@ export default function AccountProfile() {
 
 /** @typedef {import('customer-accountapi.generated').CustomerFragment} CustomerFragment */
 /** @typedef {import('@shopify/hydrogen/customer-account-api-types').CustomerUpdateInput} CustomerUpdateInput */
-/** @typedef {import('@shopify/remix-oxygen').ActionFunctionArgs} ActionFunctionArgs */
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @typedef {import('./+types/account.profile').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof action>} ActionReturnData */
