@@ -1,28 +1,52 @@
-import {Suspense} from 'react';
-import {defer, redirect} from '@shopify/remix-oxygen';
-import {Await, Link, useLoaderData} from '@remix-run/react';
+import {useLoaderData} from 'react-router';
 import {
-  CartForm,
   getSelectedProductOptions,
-  Image,
-  Money,
-  VariantSelector,
+  Analytics,
+  useOptimisticVariant,
+  getProductOptions,
+  getAdjacentAndFirstAvailableVariants,
+  useSelectedOptionInUrlParam,
 } from '@shopify/hydrogen';
-import {getVariantUrl} from '~/lib/variants';
-import {NostoPlacement, NostoProduct} from '@nosto/shopify-hydrogen';
-import {NostoSlot} from '~/components/nosto/NostoSlot';
+import {ProductPrice} from '~/components/ProductPrice';
+import {ProductImage} from '~/components/ProductImage';
+import {ProductForm} from '~/components/ProductForm';
+import {redirectIfHandleIsLocalized} from '~/lib/redirect';
+import { NostoPlacement } from '@nosto/shopify-hydrogen';
+import { NostoSlot } from '~/components/nosto/NostoSlot';
+import { useEffect, useState } from 'react';
 
 /**
- * @type {MetaFunction<typeof loader>}
+ * @type {Route.MetaFunction}
  */
 export const meta = ({data}) => {
-  return [{title: `Hydrogen | ${data?.product.title ?? ''}`}];
+  return [
+    {title: `Hydrogen | ${data?.product.title ?? ''}`},
+    {
+      rel: 'canonical',
+      href: `/products/${data?.product.handle}`,
+    },
+  ];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs} args
  */
-export async function loader({params, request, context}) {
+export async function loader(args) {
+  // Start fetching non-critical data without blocking time to first byte
+  const deferredData = loadDeferredData(args);
+
+  // Await the critical data required to render initial state of the page
+  const criticalData = await loadCriticalData(args);
+
+  return {...deferredData, ...criticalData};
+}
+
+/**
+ * Load data necessary for rendering content above the fold. This is the critical data
+ * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
+ * @param {Route.LoaderArgs}
+ */
+async function loadCriticalData({context, params, request}) {
   const {handle} = params;
   const {storefront} = context;
 
@@ -30,443 +54,214 @@ export async function loader({params, request, context}) {
     throw new Error('Expected product handle to be defined');
   }
 
-  // await the query for the critical product data
-  const {product} = await storefront.query(PRODUCT_QUERY, {
-    variables: {handle, selectedOptions: getSelectedProductOptions(request)},
-  });
+  const [{product}] = await Promise.all([
+    storefront.query(PRODUCT_QUERY, {
+      variables: {handle, selectedOptions: getSelectedProductOptions(request)},
+    }),
+    // Add other queries here, so that they are loaded in parallel
+  ]);
 
   if (!product?.id) {
     throw new Response(null, {status: 404});
   }
 
-  const firstVariant = product.variants.nodes[0];
-  const firstVariantIsDefault = Boolean(
-    firstVariant.selectedOptions.find(
-      (option) => option.name === 'Title' && option.value === 'Default Title',
-    ),
-  );
+  // The API handle might be localized, so redirect to the localized handle
+  redirectIfHandleIsLocalized(request, {handle, data: product});
 
-  if (firstVariantIsDefault) {
-    product.selectedVariant = firstVariant;
-  } else {
-    // if no selected variant was returned from the selected options,
-    // we redirect to the first variant's url with it's selected options applied
-    if (!product.selectedVariant) {
-      throw redirectToFirstVariant({product, request});
-    }
-  }
-
-  // In order to show which variants are available in the UI, we need to query
-  // all of them. But there might be a *lot*, so instead separate the variants
-  // into it's own separate query that is deferred. So there's a brief moment
-  // where variant options might show as available when they're not, but after
-  // this deffered query resolves, the UI will update.
-  const variants = storefront.query(VARIANTS_QUERY, {
-    variables: {handle},
-  });
-
-  return defer({product, variants, nostoRecommendations: {}});
+  return {
+    product,
+  };
 }
 
 /**
- * @param {{
- *   product: ProductFragment;
- *   request: Request;
- * }}
+ * Load data for rendering content below the fold. This data is deferred and will be
+ * fetched after the initial page load. If it's unavailable, the page should still 200.
+ * Make sure to not throw any errors here, as it will cause the page to 500.
+ * @param {Route.LoaderArgs}
  */
-function redirectToFirstVariant({product, request}) {
-  const url = new URL(request.url);
-  const firstVariant = product.variants.nodes[0];
+function loadDeferredData({context, params}) {
+  // Put any API calls that is not critical to be available on first page render
+  // For example: product reviews, product recommendations, social feeds.
 
-  return redirect(
-    getVariantUrl({
-      pathname: url.pathname,
-      handle: product.handle,
-      selectedOptions: firstVariant.selectedOptions,
-      searchParams: new URLSearchParams(url.search),
-    }),
-    {
-      status: 302,
-    },
-  );
+  return {};
 }
-
-export async function clientLoader({serverLoader}) {
-  const serverData = await serverLoader();
-  const clientData = await new Promise(async (resolve) => {
-    nostojs(async (api) => {
-      const result = await api
-        .defaultSession()
-        .viewProduct({
-          product_id: serverData.product?.id,
-          selected_sku_id: serverData.product?.selectedVariant?.sku,
-        })
-        .setPlacements(['productpage-nosto-1'])
-        .load();
-      resolve({
-        nostoRecommendations: result.campaigns?.recommendations || {},
-      });
-    });
-  });
-
-  return {...serverData, ...clientData};
-}
-
-export function HydrateFallback() {
-  return <p>Loading...</p>;
-}
-
-clientLoader.hydrate = true;
 
 export default function Product() {
   /** @type {LoaderReturnData} */
-  const {product, variants, nostoRecommendations} = useLoaderData();
-  const {selectedVariant} = product;
+  const { product } = useLoaderData();
+  const [nostoRecommendations, setNostoRecommendations] = useState({});
+  const { title, descriptionHtml, id } = product;
+  
+  // Optimistically selects a variant with given available variant information
+  const selectedVariant = useOptimisticVariant(
+    product.selectedOrFirstAvailableVariant,
+    getAdjacentAndFirstAvailableVariants(product),
+  );
+  
+    useEffect(() => {
+      // This runs after hydration — both on first load and on client navigations
+      window?.nostojs(async (api) => {
+        const result = await api
+        .defaultSession()
+        .viewProduct({
+          product_id: id,
+          selected_sku_id: selectedVariant.sku,
+        })
+        .setPlacements(['productpage-nosto-1'])
+        .load();
+  
+        setNostoRecommendations(result.campaigns?.recommendations || {});
+      });
+    }, [selectedVariant]);
 
-  let nostoProductId = product?.id?.split('/');
-  nostoProductId &&
-    (nostoProductId = nostoProductId[nostoProductId.length - 1]);
+  // Sets the search param to the selected variant without navigation
+  // only when no search params are set in the url
+  useSelectedOptionInUrlParam(selectedVariant.selectedOptions);
+
+  // Get the product options array
+  const productOptions = getProductOptions({
+    ...product,
+    selectedOrFirstAvailableVariant: selectedVariant,
+  });
+
   return (
     <div className="product">
       <ProductImage image={selectedVariant?.image} />
-      <ProductMain
-        selectedVariant={selectedVariant}
-        product={product}
-        variants={variants}
-      />
+      <div className="product-main">
+        <h1>{title}</h1>
+        <ProductPrice
+          price={selectedVariant?.price}
+          compareAtPrice={selectedVariant?.compareAtPrice}
+        />
+        <br />
+        <ProductForm
+          productOptions={productOptions}
+          selectedVariant={selectedVariant}
+        />
+        <br />
+        <br />
+        <p>
+          <strong>Description</strong>
+        </p>
+        <br />
+        <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
+        <br />
+      </div>
       <NostoPlacement id="productpage-nosto-1">
         <NostoSlot
           nostoRecommendation={nostoRecommendations['productpage-nosto-1']}
         />
       </NostoPlacement>
-    </div>
-  );
-}
-
-/**
- * @param {{image: ProductVariantFragment['image']}}
- */
-function ProductImage({image}) {
-  if (!image) {
-    return <div className="product-image" />;
-  }
-  return (
-    <div className="product-image">
-      <Image
-        alt={image.altText || 'Product Image'}
-        aspectRatio="1/1"
-        data={image}
-        key={image.id}
-        sizes="(min-width: 45em) 50vw, 100vw"
+      <Analytics.ProductView
+        data={{
+          products: [
+            {
+              id: product.id,
+              title: product.title,
+              price: selectedVariant?.price.amount || '0',
+              vendor: product.vendor,
+              variantId: selectedVariant?.id || '',
+              variantTitle: selectedVariant?.title || '',
+              quantity: 1,
+            },
+          ],
+        }}
       />
     </div>
   );
 }
 
-/**
- * @param {{
- *   product: ProductFragment;
- *   selectedVariant: ProductFragment['selectedVariant'];
- *   variants: Promise<ProductVariantsQuery>;
- * }}
- */
-function ProductMain({selectedVariant, product, variants}) {
-  const {title, descriptionHtml} = product;
-  return (
-    <div className="product-main">
-      <h1>{title}</h1>
-      <ProductPrice selectedVariant={selectedVariant} />
-      <br />
-      <Suspense
-        fallback={
-          <ProductForm
-            product={product}
-            selectedVariant={selectedVariant}
-            variants={[]}
-          />
-        }
-      >
-        <Await
-          errorElement="There was a problem loading product variants"
-          resolve={variants}
-        >
-          {(data) => (
-            <ProductForm
-              product={product}
-              selectedVariant={selectedVariant}
-              variants={data.product?.variants.nodes || []}
-            />
-          )}
-        </Await>
-      </Suspense>
-      <br />
-      <br />
-      <p>
-        <strong>Description</strong>
-      </p>
-      <br />
-      <div dangerouslySetInnerHTML={{__html: descriptionHtml}} />
-      <br />
-    </div>
-  );
-}
-
-/**
- * @param {{
- *   selectedVariant: ProductFragment['selectedVariant'];
- * }}
- */
-function ProductPrice({selectedVariant}) {
-  return (
-    <div className="product-price">
-      {selectedVariant?.compareAtPrice ? (
-        <>
-          <p>Sale</p>
-          <br />
-          <div className="product-price-on-sale">
-            {selectedVariant ? <Money data={selectedVariant.price} /> : null}
-            <s>
-              <Money data={selectedVariant.compareAtPrice} />
-            </s>
-          </div>
-        </>
-      ) : (
-        selectedVariant?.price && <Money data={selectedVariant?.price} />
-      )}
-    </div>
-  );
-}
-
-/**
- * @param {{
- *   product: ProductFragment;
- *   selectedVariant: ProductFragment['selectedVariant'];
- *   variants: Array<ProductVariantFragment>;
- * }}
- */
-function ProductForm({product, selectedVariant, variants}) {
-  return (
-    <div className="product-form">
-      <VariantSelector
-        handle={product.handle}
-        options={product.options}
-        variants={variants}
-      >
-        {({option}) => <ProductOptions key={option.name} option={option} />}
-      </VariantSelector>
-      <br />
-      <AddToCartButton
-        disabled={!selectedVariant || !selectedVariant.availableForSale}
-        onClick={() => {
-          window.location.href = window.location.href + '#cart-aside';
-        }}
-        lines={
-          selectedVariant
-            ? [
-                {
-                  merchandiseId: selectedVariant.id,
-                  quantity: 1,
-                },
-              ]
-            : []
-        }
-      >
-        {selectedVariant?.availableForSale ? 'Add to cart' : 'Sold out'}
-      </AddToCartButton>
-    </div>
-  );
-}
-
-/**
- * @param {{option: VariantOption}}
- */
-function ProductOptions({option}) {
-  return (
-    <div className="product-options" key={option.name}>
-      <h5>{option.name}</h5>
-      <div className="product-options-grid">
-        {option.values.map(({value, isAvailable, isActive, to}) => {
-          return (
-            <Link
-              className="product-options-item"
-              key={option.name + value}
-              prefetch="intent"
-              preventScrollReset
-              replace
-              to={to}
-              style={{
-                border: isActive ? '1px solid black' : '1px solid transparent',
-                opacity: isAvailable ? 1 : 0.3,
-              }}
-            >
-              {value}
-            </Link>
-          );
-        })}
-      </div>
-      <br />
-    </div>
-  );
-}
-
-/**
- * @param {{
- *   analytics?: unknown;
- *   children: React.ReactNode;
- *   disabled?: boolean;
- *   lines: CartLineInput[];
- *   onClick?: () => void;
- * }}
- */
-function AddToCartButton({analytics, children, disabled, lines, onClick}) {
-  return (
-    <>
-      <CartForm
-        route="/cart"
-        inputs={{lines: lines, other: 'data'}}
-        action={CartForm.ACTIONS.LinesAdd}
-      >
-        {(fetcher) => (
-          <>
-            <input
-              name="analytics"
-              type="hidden"
-              value={JSON.stringify(analytics)}
-            />
-            <button
-              type="submit"
-              onClick={onClick}
-              disabled={disabled ?? fetcher.state !== 'idle'}
-            >
-              {children}
-            </button>
-          </>
-        )}
-      </CartForm>
-      <CartForm
-        route="/cart"
-        action={CartForm.ACTIONS.LinesAdd}
-        inputs={{
-          lines,
-          redirectToCheckout: true,
-        }}
-      >
-        <button disabled={disabled ?? fetcher.state !== 'idle'}>Buy Now</button>
-      </CartForm>
-    </>
-  );
-}
-
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
-fragment ProductVariant on ProductVariant {
-  availableForSale
-  compareAtPrice {
-    amount
-    currencyCode
-  }
-  id
-  image {
-    __typename
+  fragment ProductVariant on ProductVariant {
+    availableForSale
+    compareAtPrice {
+      amount
+      currencyCode
+    }
     id
-    url
-    altText
-    width
-    height
-  }
-  price {
-    amount
-    currencyCode
-  }
-  product {
+    image {
+      __typename
+      id
+      url
+      altText
+      width
+      height
+    }
+    price {
+      amount
+      currencyCode
+    }
+    product {
+      title
+      handle
+    }
+    selectedOptions {
+      name
+      value
+    }
+    sku
     title
-    handle
+    unitPrice {
+      amount
+      currencyCode
+    }
   }
-  selectedOptions {
-    name
-    value
-  }
-  sku
-  title
-  unitPrice {
-    amount
-    currencyCode
-  }
-}
 `;
 
 const PRODUCT_FRAGMENT = `#graphql
-fragment Product on Product {
-  id
-  title
-  vendor
-  handle
-  descriptionHtml
-  description
-  options {
-    name
-    values
-  }
-  selectedVariant: variantBySelectedOptions(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
-    ...ProductVariant
-  }
-  variants(first: 1) {
-    nodes {
+  fragment Product on Product {
+    id
+    title
+    vendor
+    handle
+    descriptionHtml
+    description
+    encodedVariantExistence
+    encodedVariantAvailability
+    options {
+      name
+      optionValues {
+        name
+        firstSelectableVariant {
+          ...ProductVariant
+        }
+        swatch {
+          color
+          image {
+            previewImage {
+              url
+            }
+          }
+        }
+      }
+    }
+    selectedOrFirstAvailableVariant(selectedOptions: $selectedOptions, ignoreUnknownOptions: true, caseInsensitiveMatch: true) {
       ...ProductVariant
     }
+    adjacentVariants (selectedOptions: $selectedOptions) {
+      ...ProductVariant
+    }
+    seo {
+      description
+      title
+    }
   }
-  seo {
-    description
-    title
-  }
-}
-${PRODUCT_VARIANT_FRAGMENT}
+  ${PRODUCT_VARIANT_FRAGMENT}
 `;
 
 const PRODUCT_QUERY = `#graphql
-query Product(
-  $country: CountryCode
-  $handle: String!
-  $language: LanguageCode
-  $selectedOptions: [SelectedOptionInput!]!
-) @inContext(country: $country, language: $language) {
-  product(handle: $handle) {
-    ...Product
-  }
-}
-${PRODUCT_FRAGMENT}
-`;
-
-const PRODUCT_VARIANTS_FRAGMENT = `#graphql
-fragment ProductVariants on Product {
-  variants(first: 250) {
-    nodes {
-      ...ProductVariant
+  query Product(
+    $country: CountryCode
+    $handle: String!
+    $language: LanguageCode
+    $selectedOptions: [SelectedOptionInput!]!
+  ) @inContext(country: $country, language: $language) {
+    product(handle: $handle) {
+      ...Product
     }
   }
-}
-${PRODUCT_VARIANT_FRAGMENT}
+  ${PRODUCT_FRAGMENT}
 `;
 
-const VARIANTS_QUERY = `#graphql
-${PRODUCT_VARIANTS_FRAGMENT}
-query ProductVariants(
-  $country: CountryCode
-  $language: LanguageCode
-  $handle: String!
-) @inContext(country: $country, language: $language) {
-  product(handle: $handle) {
-    ...ProductVariants
-  }
-}
-`;
-
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
-/** @typedef {import('@remix-run/react').FetcherWithComponents} FetcherWithComponents */
-/** @typedef {import('storefrontapi.generated').ProductFragment} ProductFragment */
-/** @typedef {import('storefrontapi.generated').ProductVariantsQuery} ProductVariantsQuery */
-/** @typedef {import('storefrontapi.generated').ProductVariantFragment} ProductVariantFragment */
-/** @typedef {import('@shopify/hydrogen').VariantOption} VariantOption */
-/** @typedef {import('@shopify/hydrogen/storefront-api-types').CartLineInput} CartLineInput */
-/** @typedef {import('@shopify/hydrogen/storefront-api-types').SelectedOption} SelectedOption */
+/** @typedef {import('./+types/products.$handle').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

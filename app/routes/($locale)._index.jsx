@@ -1,82 +1,128 @@
-import { defer } from '@shopify/remix-oxygen';
-import { Await, Link, useLoaderData } from '@remix-run/react';
-import { Suspense } from 'react';
-import { Image, Money } from '@shopify/hydrogen';
-
+import {Await, useLoaderData, Link} from 'react-router';
+import {Suspense} from 'react';
+import {Image} from '@shopify/hydrogen';
+import {ProductItem} from '~/components/ProductItem';
 import { NostoPlacement } from '@nosto/shopify-hydrogen';
 import { NostoSlot } from '~/components/nosto/NostoSlot';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 /**
- * @type {MetaFunction}
+ * @type {Route.MetaFunction}
  */
 export const meta = () => {
   return [{title: 'Hydrogen | Home'}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs} args
  */
-export async function loader({context}) {
-  const {storefront} = context;
-  const {collections} = await storefront.query(FEATURED_COLLECTION_QUERY);
-  const featuredCollection = collections.nodes[0];
-  const recommendedProducts = storefront.query(RECOMMENDED_PRODUCTS_QUERY);
+export async function loader(args) {
+  // Start fetching non-critical data without blocking time to first byte
+  const deferredData = loadDeferredData(args);
 
-  return defer({
-    featuredCollection,
-    recommendedProducts,
+  // Await the critical data required to render initial state of the page
+  const criticalData = await loadCriticalData(args);
+
+  return {
+    ...deferredData,
+    ...criticalData,
     nostoRecommendations: {},
-  });
+  };
 }
 
-export async function clientLoader({serverLoader}) {
-  const recoLoader = () =>
-    new Promise(async (resolve) => {
-      window?.nostojs(async (api) => {
-        const data = await api
-          .defaultSession()
-          .viewFrontPage()
-          .setPlacements(['frontpage-nosto-1', 'frontpage-nosto-3'])
-          .load();
+// export async function clientLoader({serverLoader}) {
+//   const recoLoader = () =>
+//     new Promise(async (resolve) => {
+//       window?.nostojs(async (api) => {
+//         const data = await api
+//           .defaultSession()
+//           .viewFrontPage()
+//           .setPlacements(['frontpage-nosto-1', 'frontpage-nosto-3'])
+//           .load();
 
-        resolve({
-          nostoRecommendations: data.campaigns?.recommendations || {},
-        });
-      });
+//         resolve({
+//           nostoRecommendations: data.campaigns?.recommendations || {},
+//         });
+//       });
+//     })
+
+//   const [serverData, clientData] = await Promise.all([
+//     serverLoader(),
+//     recoLoader(),
+//   ]);
+//   return {...serverData, ...clientData};
+// }
+
+// clientLoader.hydrate = true;
+
+/**
+ * Load data necessary for rendering content above the fold. This is the critical data
+ * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
+ * @param {Route.LoaderArgs}
+ */
+async function loadCriticalData({context}) {
+  const [{collections}] = await Promise.all([
+    context.storefront.query(FEATURED_COLLECTION_QUERY),
+    // Add other queries here, so that they are loaded in parallel
+  ]);
+
+  return {
+    featuredCollection: collections.nodes[0],
+  };
+}
+
+/**
+ * Load data for rendering content below the fold. This data is deferred and will be
+ * fetched after the initial page load. If it's unavailable, the page should still 200.
+ * Make sure to not throw any errors here, as it will cause the page to 500.
+ * @param {Route.LoaderArgs}
+ */
+function loadDeferredData({context}) {
+  const recommendedProducts = context.storefront
+    .query(RECOMMENDED_PRODUCTS_QUERY)
+    .catch((error) => {
+      // Log query errors, but don't throw them so the page can still render
+      console.error(error);
+      return null;
     });
 
-  const [serverData, clientData] = await Promise.all([
-    serverLoader(),
-    recoLoader(),
-  ]);
-  return {...serverData, ...clientData};
+  return {
+    recommendedProducts,
+  };
 }
-
-export function HydrateFallback() {
-  return <p>Loading...</p>;
-}
-
-clientLoader.hydrate = true;
 
 export default function Homepage() {
+    const [nostoRecommendations, setNostoRecommendations] = useState({});
+
+  useEffect(() => {
+    // This runs after hydration — both on first load and on client navigations
+    window?.nostojs(async (api) => {
+      const result = await api
+        .defaultSession()
+        .viewFrontPage()
+        .setPlacements(["frontpage-nosto-1", "frontpage-nosto-3"])
+        .load();
+
+      setNostoRecommendations(result.campaigns?.recommendations || {});
+    });
+  }, []);
+
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
-
+  console.log('Testi:', nostoRecommendations)
   return (
     <div className="home">
-      <div>
-        {/*<Image src="https://nosto.com/wp-content/uploads/Hydrogen-Feature.png" width={100} height={100}/>*/}
-      </div>
-      <FeaturedCollection collection={data.featuredCollection}/>
-      <RecommendedProducts products={data.recommendedProducts}/>
+      <FeaturedCollection collection={data.featuredCollection} />
+      <RecommendedProducts products={data.recommendedProducts} />
       <NostoPlacement id="frontpage-nosto-1">
         <NostoSlot
-          nostoRecommendation={data.nostoRecommendations['frontpage-nosto-1']}
+          nostoRecommendation={nostoRecommendations['frontpage-nosto-1']}
         />
       </NostoPlacement>
       <NostoPlacement id="frontpage-nosto-3">
         <NostoSlot
-          nostoRecommendation={data.nostoRecommendations['frontpage-nosto-3']}
+          nostoRecommendation={nostoRecommendations['frontpage-nosto-3']}
         />
       </NostoPlacement>
     </div>
@@ -98,7 +144,7 @@ function FeaturedCollection({collection}) {
     >
       {image && (
         <div className="featured-collection-image">
-          <Image data={image} sizes="100vw"/>
+          <Image data={image} sizes="100vw" />
         </div>
       )}
       <h1>{collection.title}</h1>
@@ -108,7 +154,7 @@ function FeaturedCollection({collection}) {
 
 /**
  * @param {{
- *   products: Promise<RecommendedProductsQuery>;
+ *   products: Promise<RecommendedProductsQuery | null>;
  * }}
  */
 function RecommendedProducts({products}) {
@@ -117,70 +163,57 @@ function RecommendedProducts({products}) {
       <h2>Recommended Products</h2>
       <Suspense fallback={<div>Loading...</div>}>
         <Await resolve={products}>
-          {({products}) => (
+          {(response) => (
             <div className="recommended-products-grid">
-              {products.nodes.map((product) => (
-                <Link
-                  key={product.id}
-                  className="recommended-product"
-                  to={`/products/${product.handle}`}
-                >
-                  <Image
-                    data={product.images.nodes[0]}
-                    aspectRatio="1/1"
-                    sizes="(min-width: 45em) 20vw, 50vw"
-                  />
-                  <h4>{product.title}</h4>
-                  <small>
-                    <Money data={product.priceRange.minVariantPrice}/>
-                  </small>
-                </Link>
-              ))}
+              {response
+                ? response.products.nodes.map((product) => (
+                    <ProductItem key={product.id} product={product} />
+                  ))
+                : null}
             </div>
           )}
         </Await>
       </Suspense>
-      <br/>
+      <br />
     </div>
   );
 }
 
 const FEATURED_COLLECTION_QUERY = `#graphql
-fragment FeaturedCollection on Collection {
-  id
-  title
-  image {
+  fragment FeaturedCollection on Collection {
     id
-    url
-    altText
-    width
-    height
+    title
+    image {
+      id
+      url
+      altText
+      width
+      height
+    }
+    handle
   }
-  handle
-}
-query FeaturedCollection($country: CountryCode, $language: LanguageCode)
-@inContext(country: $country, language: $language) {
-  collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
-    nodes {
-      ...FeaturedCollection
+  query FeaturedCollection($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    collections(first: 1, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...FeaturedCollection
+      }
     }
   }
-}
 `;
 
 const RECOMMENDED_PRODUCTS_QUERY = `#graphql
-fragment RecommendedProduct on Product {
-  id
-  title
-  handle
-  priceRange {
-    minVariantPrice {
-      amount
-      currencyCode
+  fragment RecommendedProduct on Product {
+    id
+    title
+    handle
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
     }
-  }
-  images(first: 1) {
-    nodes {
+    featuredImage {
       id
       url
       altText
@@ -188,19 +221,17 @@ fragment RecommendedProduct on Product {
       height
     }
   }
-}
-query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
-@inContext(country: $country, language: $language) {
-  products(first: 4, sortKey: UPDATED_AT, reverse: true) {
-    nodes {
-      ...RecommendedProduct
+  query RecommendedProducts ($country: CountryCode, $language: LanguageCode)
+    @inContext(country: $country, language: $language) {
+    products(first: 4, sortKey: UPDATED_AT, reverse: true) {
+      nodes {
+        ...RecommendedProduct
+      }
     }
   }
-}
 `;
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @typedef {import('./+types/_index').Route} Route */
 /** @typedef {import('storefrontapi.generated').FeaturedCollectionFragment} FeaturedCollectionFragment */
 /** @typedef {import('storefrontapi.generated').RecommendedProductsQuery} RecommendedProductsQuery */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

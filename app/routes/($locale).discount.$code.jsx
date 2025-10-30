@@ -1,4 +1,4 @@
-import {redirect} from '@shopify/remix-oxygen';
+import {redirect} from 'react-router';
 
 /**
  * Automatically applies a discount found on the url
@@ -10,7 +10,7 @@ import {redirect} from '@shopify/remix-oxygen';
  * /discount/FREESHIPPING?redirect=/products
  *
  * ```
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({request, context, params}) {
   const {cart} = context;
@@ -47,5 +47,5 @@ export async function loader({request, context, params}) {
   });
 }
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
+/** @typedef {import('./+types/discount.$code').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

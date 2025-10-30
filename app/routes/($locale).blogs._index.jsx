@@ -1,30 +1,58 @@
-import {json} from '@shopify/remix-oxygen';
-import {Link, useLoaderData} from '@remix-run/react';
-import {Pagination, getPaginationVariables} from '@shopify/hydrogen';
+import {Link, useLoaderData} from 'react-router';
+import {getPaginationVariables} from '@shopify/hydrogen';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 /**
- * @type {MetaFunction}
+ * @type {Route.MetaFunction}
  */
 export const meta = () => {
   return [{title: `Hydrogen | Blogs`}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs} args
  */
-export const loader = async ({request, context: {storefront}}) => {
+export async function loader(args) {
+  // Start fetching non-critical data without blocking time to first byte
+  const deferredData = loadDeferredData(args);
+
+  // Await the critical data required to render initial state of the page
+  const criticalData = await loadCriticalData(args);
+
+  return {...deferredData, ...criticalData};
+}
+
+/**
+ * Load data necessary for rendering content above the fold. This is the critical data
+ * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
+ * @param {Route.LoaderArgs}
+ */
+async function loadCriticalData({context, request}) {
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 10,
   });
 
-  const {blogs} = await storefront.query(BLOGS_QUERY, {
-    variables: {
-      ...paginationVariables,
-    },
-  });
+  const [{blogs}] = await Promise.all([
+    context.storefront.query(BLOGS_QUERY, {
+      variables: {
+        ...paginationVariables,
+      },
+    }),
+    // Add other queries here, so that they are loaded in parallel
+  ]);
 
-  return json({blogs});
-};
+  return {blogs};
+}
+
+/**
+ * Load data for rendering content below the fold. This data is deferred and will be
+ * fetched after the initial page load. If it's unavailable, the page should still 200.
+ * Make sure to not throw any errors here, as it will cause the page to 500.
+ * @param {Route.LoaderArgs}
+ */
+function loadDeferredData({context}) {
+  return {};
+}
 
 export default function Blogs() {
   /** @type {LoaderReturnData} */
@@ -34,32 +62,18 @@ export default function Blogs() {
     <div className="blogs">
       <h1>Blogs</h1>
       <div className="blogs-grid">
-        <Pagination connection={blogs}>
-          {({nodes, isLoading, PreviousLink, NextLink}) => {
-            return (
-              <>
-                <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-                </PreviousLink>
-                {nodes.map((blog) => {
-                  return (
-                    <Link
-                      className="blog"
-                      key={blog.handle}
-                      prefetch="intent"
-                      to={`/blogs/${blog.handle}`}
-                    >
-                      <h2>{blog.title}</h2>
-                    </Link>
-                  );
-                })}
-                <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-                </NextLink>
-              </>
-            );
-          }}
-        </Pagination>
+        <PaginatedResourceSection connection={blogs}>
+          {({node: blog}) => (
+            <Link
+              className="blog"
+              key={blog.handle}
+              prefetch="intent"
+              to={`/blogs/${blog.handle}`}
+            >
+              <h2>{blog.title}</h2>
+            </Link>
+          )}
+        </PaginatedResourceSection>
       </div>
     </div>
   );
@@ -99,6 +113,8 @@ const BLOGS_QUERY = `#graphql
   }
 `;
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @typedef {BlogsQuery['blogs']['nodes'][0]} BlogNode */
+
+/** @typedef {import('./+types/blogs._index').Route} Route */
+/** @typedef {import('storefrontapi.generated').BlogsQuery} BlogsQuery */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

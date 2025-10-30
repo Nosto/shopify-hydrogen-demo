@@ -1,30 +1,30 @@
-import {json, redirect} from '@shopify/remix-oxygen';
-import {useLoaderData} from '@remix-run/react';
-import {Money, Image, flattenConnection} from '@shopify/hydrogen';
+import {redirect, useLoaderData} from 'react-router';
+import {Money, Image} from '@shopify/hydrogen';
 import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
 
 /**
- * @type {MetaFunction<typeof loader>}
+ * @type {Route.MetaFunction}
  */
 export const meta = ({data}) => {
   return [{title: `Order ${data?.order?.name}`}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
-export async function loader({params, context, request}) {
+export async function loader({params, context}) {
+  const {customerAccount} = context;
   if (!params.id) {
     return redirect('/account/orders');
   }
 
   const orderId = atob(params.id);
-  const {data, errors} = await context.customerAccount.query(
-    CUSTOMER_ORDER_QUERY,
-    {
-      variables: {orderId},
+  const {data, errors} = await customerAccount.query(CUSTOMER_ORDER_QUERY, {
+    variables: {
+      orderId,
+      language: customerAccount.i18n.language,
     },
-  );
+  });
 
   if (errors?.length || !data?.order) {
     throw new Error('Order not found');
@@ -32,33 +32,35 @@ export async function loader({params, context, request}) {
 
   const {order} = data;
 
-  const lineItems = flattenConnection(order.lineItems);
-  const discountApplications = flattenConnection(order.discountApplications);
-  const fulfillmentStatus = flattenConnection(order.fulfillments)[0].status;
+  // Extract line items directly from nodes array
+  const lineItems = order.lineItems.nodes;
 
+  // Extract discount applications directly from nodes array
+  const discountApplications = order.discountApplications.nodes;
+
+  // Get fulfillment status from first fulfillment node
+  const fulfillmentStatus = order.fulfillments.nodes[0]?.status ?? 'N/A';
+
+  // Get first discount value with proper type checking
   const firstDiscount = discountApplications[0]?.value;
 
+  // Type guard for MoneyV2 discount
   const discountValue =
-    firstDiscount?.__typename === 'MoneyV2' && firstDiscount;
+    firstDiscount?.__typename === 'MoneyV2' ? firstDiscount : null;
 
+  // Type guard for percentage discount
   const discountPercentage =
-    firstDiscount?.__typename === 'PricingPercentageValue' &&
-    firstDiscount?.percentage;
+    firstDiscount?.__typename === 'PricingPercentageValue'
+      ? firstDiscount.percentage
+      : null;
 
-  return json(
-    {
-      order,
-      lineItems,
-      discountValue,
-      discountPercentage,
-      fulfillmentStatus,
-    },
-    {
-      headers: {
-        'Set-Cookie': await context.session.commit(),
-      },
-    },
-  );
+  return {
+    order,
+    lineItems,
+    discountValue,
+    discountPercentage,
+    fulfillmentStatus,
+  };
 }
 
 export default function OrderRoute() {
@@ -74,6 +76,9 @@ export default function OrderRoute() {
     <div className="account-order">
       <h2>Order {order.name}</h2>
       <p>Placed on {new Date(order.processedAt).toDateString()}</p>
+      {order.confirmationNumber && (
+        <p>Confirmation: {order.confirmationNumber}</p>
+      )}
       <br />
       <div>
         <table>
@@ -210,7 +215,7 @@ function OrderLineRow({lineItem}) {
   );
 }
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @typedef {import('./+types/account.orders.$id').Route} Route */
 /** @typedef {import('customer-accountapi.generated').OrderLineItemFullFragment} OrderLineItemFullFragment */
+/** @typedef {import('customer-accountapi.generated').OrderQuery} OrderQuery */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

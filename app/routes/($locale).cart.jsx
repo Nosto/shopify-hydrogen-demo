@@ -1,21 +1,21 @@
-import {Await} from '@remix-run/react';
-import {Suspense} from 'react';
-import {CartForm, parseGid} from '@shopify/hydrogen';
-import {json} from '@shopify/remix-oxygen';
-import {CartMain} from '~/components/Cart';
-import {useRootLoaderData} from '~/lib/root-data';
-import {ROBOTS_QUERY} from './[robots.txt]';
-import {checkTokenToCustomer} from '~/utils/checkTokenToNostoCustomer';
+import {useLoaderData, data} from 'react-router';
+import {CartForm} from '@shopify/hydrogen';
+import {CartMain} from '~/components/CartMain';
 
 /**
- * @type {MetaFunction}
+ * @type {Route.MetaFunction}
  */
 export const meta = () => {
   return [{title: `Hydrogen | Cart`}];
 };
 
 /**
- * @param {ActionFunctionArgs}
+ * @type {HeadersFunction}
+ */
+export const headers = ({actionHeaders}) => actionHeaders;
+
+/**
+ * @param {Route.ActionArgs}
  */
 export async function action({request, context}) {
   const {cart} = context;
@@ -53,6 +53,23 @@ export async function action({request, context}) {
       result = await cart.updateDiscountCodes(discountCodes);
       break;
     }
+    case CartForm.ACTIONS.GiftCardCodesUpdate: {
+      const formGiftCardCode = inputs.giftCardCode;
+
+      // User inputted gift card code
+      const giftCardCodes = formGiftCardCode ? [formGiftCardCode] : [];
+
+      // Combine gift card codes already applied on cart
+      giftCardCodes.push(...inputs.giftCardCodes);
+
+      result = await cart.updateGiftCardCodes(giftCardCodes);
+      break;
+    }
+    case CartForm.ACTIONS.GiftCardCodesRemove: {
+      const appliedGiftCardIds = inputs.giftCardCodes;
+      result = await cart.removeGiftCardCodes(appliedGiftCardIds);
+      break;
+    }
     case CartForm.ACTIONS.BuyerIdentityUpdate: {
       result = await cart.updateBuyerIdentity({
         ...inputs.buyerIdentity,
@@ -63,10 +80,10 @@ export async function action({request, context}) {
       throw new Error(`${action} cart action is not defined`);
   }
 
-  const cartId = result.cart.id;
-  const headers = cart.setCartId(result.cart.id);
+  const cartId = result?.cart?.id;
+  const headers = cartId ? cart.setCartId(result.cart.id) : new Headers();
   if (inputs.redirectToCheckout === true) {
-    const {shop} = await context.storefront.query(ROBOTS_QUERY);
+    const { shop } = await context.storefront.query(ROBOTS_QUERY);
     const cookies = request.headers.get('Cookie') || '';
     const sessionId =
       cookies
@@ -83,14 +100,16 @@ export async function action({request, context}) {
       headers.set('Location', redirectTo);
     }
   }
-  const {cart: cartResult, errors} = result;
 
   headers.append('Set-Cookie', await context.session.commit());
 
-  return json(
+  const {cart: cartResult, errors, warnings} = result;
+
+  return data(
     {
       cart: cartResult,
       errors,
+      warnings,
       analytics: {
         cartId,
       },
@@ -99,28 +118,28 @@ export async function action({request, context}) {
   );
 }
 
+/**
+ * @param {Route.LoaderArgs}
+ */
+export async function loader({context}) {
+  const {cart} = context;
+  return await cart.get();
+}
+
 export default function Cart() {
-  const rootData = useRootLoaderData();
-  const cartPromise = rootData.cart;
+  /** @type {LoaderReturnData} */
+  const cart = useLoaderData();
 
   return (
     <div className="cart">
       <h1>Cart</h1>
-      <Suspense fallback={<p>Loading cart ...</p>}>
-        <Await
-          resolve={cartPromise}
-          errorElement={<div>An error occurred</div>}
-        >
-          {(cart) => {
-            return <CartMain layout="page" cart={cart} />;
-          }}
-        </Await>
-      </Suspense>
+      <CartMain layout="page" cart={cart} />
     </div>
   );
 }
 
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @typedef {import('react-router').HeadersFunction} HeadersFunction */
+/** @typedef {import('./+types/cart').Route} Route */
 /** @typedef {import('@shopify/hydrogen').CartQueryDataReturn} CartQueryDataReturn */
-/** @typedef {import('@shopify/remix-oxygen').ActionFunctionArgs} ActionFunctionArgs */
+/** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof action>} ActionReturnData */

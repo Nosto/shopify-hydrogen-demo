@@ -1,10 +1,10 @@
-import {json} from '@shopify/remix-oxygen';
 import {
+  data,
   Form,
   useActionData,
   useNavigation,
   useOutletContext,
-} from '@remix-run/react';
+} from 'react-router';
 import {
   UPDATE_ADDRESS_MUTATION,
   DELETE_ADDRESS_MUTATION,
@@ -12,30 +12,23 @@ import {
 } from '~/graphql/customer-account/CustomerAddressMutations';
 
 /**
- * @type {MetaFunction}
+ * @type {Route.MetaFunction}
  */
 export const meta = () => {
   return [{title: 'Addresses'}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({context}) {
-  await context.customerAccount.handleAuthStatus();
+  context.customerAccount.handleAuthStatus();
 
-  return json(
-    {},
-    {
-      headers: {
-        'Set-Cookie': await context.session.commit(),
-      },
-    },
-  );
+  return {};
 }
 
 /**
- * @param {ActionFunctionArgs}
+ * @param {Route.ActionArgs}
  */
 export async function action({request, context}) {
   const {customerAccount} = context;
@@ -53,13 +46,10 @@ export async function action({request, context}) {
     // this will ensure redirecting to login never happen for mutatation
     const isLoggedIn = await customerAccount.isLoggedIn();
     if (!isLoggedIn) {
-      return json(
+      return data(
         {error: {[addressId]: 'Unauthorized'}},
         {
           status: 401,
-          headers: {
-            'Set-Cookie': await context.session.commit(),
-          },
         },
       );
     }
@@ -95,7 +85,11 @@ export async function action({request, context}) {
           const {data, errors} = await customerAccount.mutate(
             CREATE_ADDRESS_MUTATION,
             {
-              variables: {address, defaultAddress},
+              variables: {
+                address,
+                defaultAddress,
+                language: customerAccount.i18n.language,
+              },
             },
           );
 
@@ -111,37 +105,24 @@ export async function action({request, context}) {
             throw new Error('Customer address create failed.');
           }
 
-          return json(
-            {
-              error: null,
-              createdAddress: data?.customerAddressCreate?.customerAddress,
-              defaultAddress,
-            },
-            {
-              headers: {
-                'Set-Cookie': await context.session.commit(),
-              },
-            },
-          );
+          return {
+            error: null,
+            createdAddress: data?.customerAddressCreate?.customerAddress,
+            defaultAddress,
+          };
         } catch (error) {
           if (error instanceof Error) {
-            return json(
+            return data(
               {error: {[addressId]: error.message}},
               {
                 status: 400,
-                headers: {
-                  'Set-Cookie': await context.session.commit(),
-                },
               },
             );
           }
-          return json(
+          return data(
             {error: {[addressId]: error}},
             {
               status: 400,
-              headers: {
-                'Set-Cookie': await context.session.commit(),
-              },
             },
           );
         }
@@ -157,6 +138,7 @@ export async function action({request, context}) {
                 address,
                 addressId: decodeURIComponent(addressId),
                 defaultAddress,
+                language: customerAccount.i18n.language,
               },
             },
           );
@@ -173,37 +155,24 @@ export async function action({request, context}) {
             throw new Error('Customer address update failed.');
           }
 
-          return json(
-            {
-              error: null,
-              updatedAddress: address,
-              defaultAddress,
-            },
-            {
-              headers: {
-                'Set-Cookie': await context.session.commit(),
-              },
-            },
-          );
+          return {
+            error: null,
+            updatedAddress: address,
+            defaultAddress,
+          };
         } catch (error) {
           if (error instanceof Error) {
-            return json(
+            return data(
               {error: {[addressId]: error.message}},
               {
                 status: 400,
-                headers: {
-                  'Set-Cookie': await context.session.commit(),
-                },
               },
             );
           }
-          return json(
+          return data(
             {error: {[addressId]: error}},
             {
               status: 400,
-              headers: {
-                'Set-Cookie': await context.session.commit(),
-              },
             },
           );
         }
@@ -215,7 +184,10 @@ export async function action({request, context}) {
           const {data, errors} = await customerAccount.mutate(
             DELETE_ADDRESS_MUTATION,
             {
-              variables: {addressId: decodeURIComponent(addressId)},
+              variables: {
+                addressId: decodeURIComponent(addressId),
+                language: customerAccount.i18n.language,
+              },
             },
           );
 
@@ -231,69 +203,47 @@ export async function action({request, context}) {
             throw new Error('Customer address delete failed.');
           }
 
-          return json(
-            {error: null, deletedAddress: addressId},
-            {
-              headers: {
-                'Set-Cookie': await context.session.commit(),
-              },
-            },
-          );
+          return {error: null, deletedAddress: addressId};
         } catch (error) {
           if (error instanceof Error) {
-            return json(
+            return data(
               {error: {[addressId]: error.message}},
               {
                 status: 400,
-                headers: {
-                  'Set-Cookie': await context.session.commit(),
-                },
               },
             );
           }
-          return json(
+          return data(
             {error: {[addressId]: error}},
             {
               status: 400,
-              headers: {
-                'Set-Cookie': await context.session.commit(),
-              },
             },
           );
         }
       }
 
       default: {
-        return json(
+        return data(
           {error: {[addressId]: 'Method not allowed'}},
           {
             status: 405,
-            headers: {
-              'Set-Cookie': await context.session.commit(),
-            },
           },
         );
       }
     }
   } catch (error) {
     if (error instanceof Error) {
-      return json(
+      return data(
         {error: error.message},
         {
           status: 400,
-          headers: {
-            'Set-Cookie': await context.session.commit(),
-          },
         },
       );
     }
-    return json(
+    return data(
       {error},
       {
         status: 400,
-        headers: {
-          'Set-Cookie': await context.session.commit(),
-        },
       },
     );
   }
@@ -403,7 +353,14 @@ function ExistingAddresses({addresses, defaultAddress}) {
 }
 
 /**
- * @param {Class<useNavigation>['state']>}
+ * @param {{
+ *   addressId: AddressFragment['id'];
+ *   address: CustomerAddressInput;
+ *   defaultAddress: CustomerFragment['defaultAddress'];
+ *   children: (props: {
+ *     stateForMethod: (method: 'PUT' | 'POST' | 'DELETE') => Fetcher['state'];
+ *   }) => React.ReactNode;
+ * }}
  */
 export function AddressForm({addressId, address, defaultAddress, children}) {
   const {state, formMethod} = useNavigation();
@@ -564,8 +521,7 @@ export function AddressForm({addressId, address, defaultAddress, children}) {
 /** @typedef {import('@shopify/hydrogen/customer-account-api-types').CustomerAddressInput} CustomerAddressInput */
 /** @typedef {import('customer-accountapi.generated').AddressFragment} AddressFragment */
 /** @typedef {import('customer-accountapi.generated').CustomerFragment} CustomerFragment */
-/** @typedef {import('@shopify/remix-oxygen').ActionFunctionArgs} ActionFunctionArgs */
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
+/** @template T @typedef {import('react-router').Fetcher<T>} Fetcher */
+/** @typedef {import('./+types/account.addresses').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof action>} ActionReturnData */

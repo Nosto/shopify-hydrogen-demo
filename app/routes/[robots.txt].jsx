@@ -1,7 +1,7 @@
 import {parseGid} from '@shopify/hydrogen';
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({request, context}) {
   const url = new URL(request.url);
@@ -110,7 +110,7 @@ Disallow: /.well-known/shopify/monorail
 ${sitemapUrl ? `Sitemap: ${sitemapUrl}` : ''}`;
 }
 
-export const ROBOTS_QUERY = `#graphql
+const ROBOTS_QUERY = `#graphql
   query StoreRobots($country: CountryCode, $language: LanguageCode)
    @inContext(country: $country, language: $language) {
     shop {
@@ -119,5 +119,5 @@ export const ROBOTS_QUERY = `#graphql
   }
 `;
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
+/** @typedef {import('./+types/[robots.txt]').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

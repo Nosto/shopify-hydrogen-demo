@@ -1,5 +1,10 @@
-import {json} from '@shopify/remix-oxygen';
-import {Form, NavLink, Outlet, useLoaderData} from '@remix-run/react';
+import {
+  data as remixData,
+  Form,
+  NavLink,
+  Outlet,
+  useLoaderData,
+} from 'react-router';
 import {CUSTOMER_DETAILS_QUERY} from '~/graphql/customer-account/CustomerDetailsQuery';
 
 export function shouldRevalidate() {
@@ -7,23 +12,25 @@ export function shouldRevalidate() {
 }
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs}
  */
 export async function loader({context}) {
-  const {data, errors} = await context.customerAccount.query(
-    CUSTOMER_DETAILS_QUERY,
-  );
+  const {customerAccount} = context;
+  const {data, errors} = await customerAccount.query(CUSTOMER_DETAILS_QUERY, {
+    variables: {
+      language: customerAccount.i18n.language,
+    },
+  });
 
   if (errors?.length || !data?.customer) {
     throw new Error('Customer not found');
   }
 
-  return json(
+  return remixData(
     {customer: data.customer},
     {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Set-Cookie': await context.session.commit(),
       },
     },
   );
@@ -86,5 +93,5 @@ function Logout() {
   );
 }
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
+/** @typedef {import('./+types/account').Route} Route */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

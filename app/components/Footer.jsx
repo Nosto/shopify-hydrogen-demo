@@ -1,28 +1,37 @@
-import {NavLink} from '@remix-run/react';
-import {useRootLoaderData} from '~/lib/root-data';
+import {Suspense} from 'react';
+import {Await, NavLink} from 'react-router';
 
 /**
- * @param {FooterQuery & {shop: HeaderQuery['shop']}}
+ * @param {FooterProps}
  */
-export function Footer({menu, shop}) {
+export function Footer({footer: footerPromise, header, publicStoreDomain}) {
   return (
-    <footer className="footer">
-      {menu && shop?.primaryDomain?.url && (
-        <FooterMenu menu={menu} primaryDomainUrl={shop.primaryDomain.url} />
-      )}
-    </footer>
+    <Suspense>
+      <Await resolve={footerPromise}>
+        {(footer) => (
+          <footer className="footer">
+            {footer?.menu && header.shop.primaryDomain?.url && (
+              <FooterMenu
+                menu={footer.menu}
+                primaryDomainUrl={header.shop.primaryDomain.url}
+                publicStoreDomain={publicStoreDomain}
+              />
+            )}
+          </footer>
+        )}
+      </Await>
+    </Suspense>
   );
 }
 
 /**
  * @param {{
  *   menu: FooterQuery['menu'];
- *   primaryDomainUrl: HeaderQuery['shop']['primaryDomain']['url'];
+ *   primaryDomainUrl: FooterProps['header']['shop']['primaryDomain']['url'];
+ *   publicStoreDomain: string;
  * }}
  */
-function FooterMenu({menu, primaryDomainUrl}) {
-  const {publicStoreDomain} = useRootLoaderData();
-
+function FooterMenu({menu, primaryDomainUrl, publicStoreDomain}) {
   return (
     <nav className="footer-menu" role="navigation">
       {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
@@ -109,6 +118,13 @@ function activeLinkStyle({isActive, isPending}) {
     color: isPending ? 'grey' : 'white',
   };
 }
+
+/**
+ * @typedef {Object} FooterProps
+ * @property {Promise<FooterQuery|null>} footer
+ * @property {HeaderQuery} header
+ * @property {string} publicStoreDomain
+ */
 
 /** @typedef {import('storefrontapi.generated').FooterQuery} FooterQuery */
 /** @typedef {import('storefrontapi.generated').HeaderQuery} HeaderQuery */

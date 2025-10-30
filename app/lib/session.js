@@ -1,4 +1,4 @@
-import { createCookieSessionStorage } from '@shopify/remix-oxygen';
+import {createCookieSessionStorage} from 'react-router';
 
 /**
  * This is a custom session implementation for your Hydrogen shop.
@@ -6,6 +6,12 @@ import { createCookieSessionStorage } from '@shopify/remix-oxygen';
  * swap out the cookie-based implementation with something else!
  */
 export class AppSession {
+  /**
+   * @public
+   * @default false
+   */
+  isPending = false;
+
   #sessionStorage;
   #session;
 
@@ -54,10 +60,12 @@ export class AppSession {
   }
 
   get unset() {
+    this.isPending = true;
     return this.#session.unset;
   }
 
   get set() {
+    this.isPending = true;
     return this.#session.set;
   }
 
@@ -66,10 +74,11 @@ export class AppSession {
   }
 
   commit() {
+    this.isPending = false;
     return this.#sessionStorage.commitSession(this.#session);
   }
 }
 
 /** @typedef {import('@shopify/hydrogen').HydrogenSession} HydrogenSession */
-/** @typedef {import('@shopify/remix-oxygen').SessionStorage} SessionStorage */
-/** @typedef {import('@shopify/remix-oxygen').Session} Session */
+/** @typedef {import('react-router').SessionStorage} SessionStorage */
+/** @typedef {import('react-router').Session} Session */

@@ -1,34 +1,56 @@
-import {json} from '@shopify/remix-oxygen';
-import {useLoaderData, Link} from '@remix-run/react';
-import {
-  Pagination,
-  getPaginationVariables,
-  Image,
-  Money,
-} from '@shopify/hydrogen';
-import {useVariantUrl} from '~/lib/variants';
+import {useLoaderData} from 'react-router';
+import {getPaginationVariables} from '@shopify/hydrogen';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
+import {ProductItem} from '~/components/ProductItem';
 
 /**
- * @type {MetaFunction<typeof loader>}
+ * @type {Route.MetaFunction}
  */
 export const meta = () => {
   return [{title: `Hydrogen | Products`}];
 };
 
 /**
- * @param {LoaderFunctionArgs}
+ * @param {Route.LoaderArgs} args
  */
-export async function loader({request, context}) {
+export async function loader(args) {
+  // Start fetching non-critical data without blocking time to first byte
+  const deferredData = loadDeferredData(args);
+
+  // Await the critical data required to render initial state of the page
+  const criticalData = await loadCriticalData(args);
+
+  return {...deferredData, ...criticalData};
+}
+
+/**
+ * Load data necessary for rendering content above the fold. This is the critical data
+ * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
+ * @param {Route.LoaderArgs}
+ */
+async function loadCriticalData({context, request}) {
   const {storefront} = context;
   const paginationVariables = getPaginationVariables(request, {
     pageBy: 8,
   });
 
-  const {products} = await storefront.query(CATALOG_QUERY, {
-    variables: {...paginationVariables},
-  });
+  const [{products}] = await Promise.all([
+    storefront.query(CATALOG_QUERY, {
+      variables: {...paginationVariables},
+    }),
+    // Add other queries here, so that they are loaded in parallel
+  ]);
+  return {products};
+}
 
-  return json({products});
+/**
+ * Load data for rendering content below the fold. This data is deferred and will be
+ * fetched after the initial page load. If it's unavailable, the page should still 200.
+ * Make sure to not throw any errors here, as it will cause the page to 500.
+ * @param {Route.LoaderArgs}
+ */
+function loadDeferredData({context}) {
+  return {};
 }
 
 export default function Collection() {
@@ -38,82 +60,28 @@ export default function Collection() {
   return (
     <div className="collection">
       <h1>Products</h1>
-      <Pagination connection={products}>
-        {({nodes, isLoading, PreviousLink, NextLink}) => (
-          <>
-            <PreviousLink>
-              {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-            </PreviousLink>
-            <ProductsGrid products={nodes} />
-            <br />
-            <NextLink>
-              {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-            </NextLink>
-          </>
-        )}
-      </Pagination>
-    </div>
-  );
-}
-
-/**
- * @param {{products: ProductItemFragment[]}}
- */
-function ProductsGrid({products}) {
-  return (
-    <div className="products-grid">
-      {products.map((product, index) => {
-        return (
+      <PaginatedResourceSection
+        connection={products}
+        resourcesClassName="products-grid"
+      >
+        {({node: product, index}) => (
           <ProductItem
             key={product.id}
             product={product}
             loading={index < 8 ? 'eager' : undefined}
           />
-        );
-      })}
+        )}
+      </PaginatedResourceSection>
     </div>
   );
 }
 
-/**
- * @param {{
- *   product: ProductItemFragment;
- *   loading?: 'eager' | 'lazy';
- * }}
- */
-function ProductItem({product, loading}) {
-  const variant = product.variants.nodes[0];
-  const variantUrl = useVariantUrl(product.handle, variant.selectedOptions);
-  return (
-    <Link
-      className="product-item"
-      key={product.id}
-      prefetch="intent"
-      to={variantUrl}
-    >
-      {product.featuredImage && (
-        <Image
-          alt={product.featuredImage.altText || product.title}
-          aspectRatio="1/1"
-          data={product.featuredImage}
-          loading={loading}
-          sizes="(min-width: 45em) 400px, 100vw"
-        />
-      )}
-      <h4>{product.title}</h4>
-      <small>
-        <Money data={product.priceRange.minVariantPrice} />
-      </small>
-    </Link>
-  );
-}
-
-const PRODUCT_ITEM_FRAGMENT = `#graphql
-  fragment MoneyProductItem on MoneyV2 {
+const COLLECTION_ITEM_FRAGMENT = `#graphql
+  fragment MoneyCollectionItem on MoneyV2 {
     amount
     currencyCode
   }
-  fragment ProductItem on Product {
+  fragment CollectionItem on Product {
     id
     handle
     title
@@ -126,24 +94,16 @@ const PRODUCT_ITEM_FRAGMENT = `#graphql
     }
     priceRange {
       minVariantPrice {
-        ...MoneyProductItem
+        ...MoneyCollectionItem
       }
       maxVariantPrice {
-        ...MoneyProductItem
-      }
-    }
-    variants(first: 1) {
-      nodes {
-        selectedOptions {
-          name
-          value
-        }
+        ...MoneyCollectionItem
       }
     }
   }
 `;
 
-// NOTE: https://shopify.dev/docs/api/storefront/2024-01/objects/product
+// NOTE: https://shopify.dev/docs/api/storefront/latest/objects/product
 const CATALOG_QUERY = `#graphql
   query Catalog(
     $country: CountryCode
@@ -155,7 +115,7 @@ const CATALOG_QUERY = `#graphql
   ) @inContext(country: $country, language: $language) {
     products(first: $first, last: $last, before: $startCursor, after: $endCursor) {
       nodes {
-        ...ProductItem
+        ...CollectionItem
       }
       pageInfo {
         hasPreviousPage
@@ -165,10 +125,9 @@ const CATALOG_QUERY = `#graphql
       }
     }
   }
-  ${PRODUCT_ITEM_FRAGMENT}
+  ${COLLECTION_ITEM_FRAGMENT}
 `;
 
-/** @typedef {import('@shopify/remix-oxygen').LoaderFunctionArgs} LoaderFunctionArgs */
-/** @template T @typedef {import('@remix-run/react').MetaFunction<T>} MetaFunction */
-/** @typedef {import('storefrontapi.generated').ProductItemFragment} ProductItemFragment */
+/** @typedef {import('./+types/collections.all').Route} Route */
+/** @typedef {import('storefrontapi.generated').CollectionItemFragment} CollectionItemFragment */
 /** @typedef {import('@shopify/remix-oxygen').SerializeFrom<typeof loader>} LoaderReturnData */

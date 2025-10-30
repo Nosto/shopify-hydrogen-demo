@@ -1,9 +1,9 @@
-import {useLocation} from '@remix-run/react';
+import {useLocation} from 'react-router';
 import {useMemo} from 'react';
 
 /**
  * @param {string} handle
- * @param {SelectedOption[]} selectedOptions
+ * @param {SelectedOption[]} [selectedOptions]
  */
 export function useVariantUrl(handle, selectedOptions) {
   const {pathname} = useLocation();
@@ -23,7 +23,7 @@ export function useVariantUrl(handle, selectedOptions) {
  *   handle: string;
  *   pathname: string;
  *   searchParams: URLSearchParams;
- *   selectedOptions: SelectedOption[];
+ *   selectedOptions?: SelectedOption[];
  * }}
  */
 export function getVariantUrl({
@@ -39,7 +39,7 @@ export function getVariantUrl({
     ? `${match[0]}products/${handle}`
     : `/products/${handle}`;
 
-  selectedOptions.forEach((option) => {
+  selectedOptions?.forEach((option) => {
     searchParams.set(option.name, option.value);
   });
 
