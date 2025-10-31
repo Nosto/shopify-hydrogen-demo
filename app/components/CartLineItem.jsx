@@ -14,7 +14,22 @@ import {useAside} from './Aside';
  */
 export function CartLineItem({layout, line}) {
   const {id, merchandise} = line;
-  const {product, title, image, selectedOptions} = merchandise;
+  const { product, title, image, selectedOptions } = merchandise;
+  
+  if (id?.includes('pending')) {
+    return (
+      <li key={id} className="cart-line animate-pulse flex items-center gap-4 p-2">
+        <div className="w-[100px] h-[100px] bg-gray-200 rounded-md" />
+        <div className="flex flex-col gap-2 flex-1">
+          <div className="w-2/3 h-4 bg-gray-200 rounded" />
+          <div className="w-1/3 h-4 bg-gray-200 rounded" />
+          <div className="w-1/2 h-3 bg-gray-200 rounded" />
+          <div className="w-24 h-8 bg-gray-200 rounded mt-2" />
+        </div>
+      </li>
+    );
+  }
+  
   const lineItemUrl = useVariantUrl(product.handle, selectedOptions);
   const {close} = useAside();
 

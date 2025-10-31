@@ -110,7 +110,7 @@ export default function Homepage() {
 
   /** @type {LoaderReturnData} */
   const data = useLoaderData();
-  console.log('Testi:', nostoRecommendations)
+
   return (
     <div className="home">
       <FeaturedCollection collection={data.featuredCollection} />
