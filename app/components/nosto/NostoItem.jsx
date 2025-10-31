@@ -1,7 +1,9 @@
 import { CartForm } from '@shopify/hydrogen';
+import { useAside } from '../Aside';
 
 export function NostoItem({product, onClick}) {
   const selectedVariant = product.skus.find(s => s.available);
+    const {open} = useAside();
   return (
     <div className="nosto-item" onClick={onClick}>
       <a href={product.url}>
@@ -19,15 +21,14 @@ export function NostoItem({product, onClick}) {
             <br/>
             <AddToCartButton
               disabled={!selectedVariant || !selectedVariant.available}
-              onClick={() => {
-                window.location.href = window.location.href + '#cart-aside';
-              }}
+              onClick={() => open('cart')}
               lines={
                 selectedVariant
                   ? [
                     {
                       merchandiseId: `gid://shopify/ProductVariant/${selectedVariant.id}`,
                       quantity: 1,
+                      selectedVariant: selectedVariant
                     },
                   ]
                   : []
