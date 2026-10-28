@@ -14,17 +14,17 @@ jobs:
     timeout-minutes: 30
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@f548e57e544e1ff5a4c46bf1e1b8685f8e4a348a #v7.0.1
 
       - name: Setup node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 #v7.1.0
         with:
-          node-version: '18.19.*'
+          node-version: '22.x'
           check-latest: true
 
       - name: Cache node modules
         id: cache-npm
-        uses: actions/cache@v4
+        uses: actions/cache@3edfce9056124e459a23f683a21433670d47daca #v6.1.0
         env:
           cache-name: cache-node-modules
         with:
@@ -44,16 +44,20 @@ jobs:
         id: set-env
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "env=production" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=production" >> "$GITHUB_OUTPUT"
           else
-            echo "env=preview" >> $GITHUB_ENV
+            echo "DEPLOY_ENV=preview" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and Publish to Oxygen
-        run: npx shopify hydrogen deploy
+        id: deploy
+        # Builds with `react-router build` and deploys dist/client + dist/server (see package.json).
+        # In CI the CLI writes the deployment details, including its URL, to h2_deploy_log.json.
+        run: |
+          npm run deploy
+          echo "url=$(jq -r '.url // empty' h2_deploy_log.json)" >> "$GITHUB_OUTPUT"
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1343547 }}
-          #build_command: "HYDROGEN_ASSET_BASE_URL=$OXYGEN_ASSET_BASE_URL npm run build"
 
       # Create GitHub Deployment
       - name: Create GitHub Deployment
@@ -61,6 +65,6 @@ jobs:
         if: always()
         with:
           token: ${{ github.token }}
-          environment: 'preview'
+          environment: ${{ steps.set-env.outputs.DEPLOY_ENV }}
           preview_url: ${{ steps.deploy.outputs.url }}
           description: ${{ github.event.head_commit.message }}
