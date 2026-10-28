@@ -2,7 +2,7 @@
   "name": "nosto-hydrogen-demo",
   "private": true,
   "sideEffects": false,
-  "version": "2025.10.29",
+  "version": "2026.10.2",
   "type": "module",
   "scripts": {
     "dev": "hydrogen skills check --mode=warn && vite dev",
