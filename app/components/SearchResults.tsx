@@ -2,7 +2,7 @@ import type {ReactNode} from 'react';
 import {Link} from 'react-router';
 import {getSearchResultUrl} from '@shopify/hydrogen';
 
-import {Image} from '~/components/Image';
+import {shopifyImageUrl, srcSetFor} from '~/lib/image';
 import {Money} from '~/components/Money';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import type {RegularSearchItems, RegularSearchReturn} from '~/lib/search';
@@ -131,11 +131,17 @@ function SearchResultsProducts({term, products}: PartialSearchResult<'products'>
             <div className="search-results-item" key={product.id}>
               <Link prefetch="intent" to={productUrl}>
                 {image && (
-                  <Image
-                    data={image}
+                  <img
                     alt={product.title}
+                    src={shopifyImageUrl(image.url, {width: 50})}
+                    srcSet={srcSetFor(image.url, {width: 50})}
                     width={50}
-                    style={{width: 50}}
+                    height={
+                      image.width && image.height
+                        ? Math.round((50 * image.height) / image.width)
+                        : undefined
+                    }
+                    loading="lazy"
                   />
                 )}
                 <div>

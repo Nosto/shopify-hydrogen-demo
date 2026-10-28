@@ -45,7 +45,9 @@ function FooterMenu({
   return (
     <nav className="footer-menu" role="navigation">
       {(menu || FALLBACK_FOOTER_MENU).items.map((item) => {
-        if (!item.url) return null;
+        if (!item.url) {
+          return null;
+        }
         // if the url is internal, we strip the domain
         const url =
           item.url.includes('myshopify.com') ||

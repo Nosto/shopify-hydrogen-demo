@@ -1,7 +1,7 @@
 import {Link, useLoaderData} from 'react-router';
 import {Cache, gql} from '@shopify/hydrogen';
 
-import {Image} from '~/components/Image';
+import {responsiveSrcSet, shopifyImageUrl} from '~/lib/image';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {getPaginationVariables} from '~/lib/pagination';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
@@ -128,12 +128,22 @@ function ArticleItem({
       <Link to={`/blogs/${article.blog.handle}/${article.handle}`}>
         {article.image && (
           <div className="blog-article-image">
-            <Image
+            <img
               alt={article.image.altText || article.title}
-              aspectRatio="3/2"
-              data={article.image}
-              loading={loading}
+              src={shopifyImageUrl(article.image.url, {
+                width: 800,
+                height: 533,
+                crop: 'center',
+              })}
+              srcSet={responsiveSrcSet(
+                article.image.url,
+                [400, 600, 800, 1200],
+                2 / 3,
+              )}
               sizes="(min-width: 768px) 50vw, 100vw"
+              width={800}
+              height={533}
+              loading={loading}
             />
           </div>
         )}

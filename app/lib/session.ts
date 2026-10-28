@@ -39,7 +39,9 @@ export async function createRequestSessionManager(
       session.unset(key);
     },
     async commit() {
-      if (!isPending) return;
+      if (!isPending) {
+        return;
+      }
       isPending = false;
       return {'Set-Cookie': await storage.commitSession(session)};
     },

@@ -59,7 +59,9 @@ export function HeaderMenu({
         </NavLink>
       )}
       {(menu || FALLBACK_HEADER_MENU).items.map((item) => {
-        if (!item.url) return null;
+        if (!item.url) {
+          return null;
+        }
 
         // if the url is internal, we strip the domain
         const url =
@@ -162,7 +164,9 @@ function useOpenCartOnAdd() {
   const wasPending = useRef(hasPendingLines);
 
   useEffect(() => {
-    if (hasPendingLines && !wasPending.current && !isCartPage) open('cart');
+    if (hasPendingLines && !wasPending.current && !isCartPage) {
+      open('cart');
+    }
     wasPending.current = hasPendingLines;
   }, [hasPendingLines, isCartPage, open]);
 }

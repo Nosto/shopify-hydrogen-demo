@@ -10,7 +10,9 @@ export async function checkTokenToCustomer(
   const cartToken = cartIdGid?.replace('gid://shopify/Cart/', '');
   const shopId = shopIdGid?.replace('gid://shopify/Shop/', 'shopify-');
 
-  if (!customerId || !cartToken || !shopId) return;
+  if (!customerId || !cartToken || !shopId) {
+    return;
+  }
 
   const NOSTO_URL = `https://connect.nosto.com/token/${shopId}/${customerId}/${cartToken}`;
 

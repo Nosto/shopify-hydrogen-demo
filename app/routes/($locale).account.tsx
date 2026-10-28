@@ -52,7 +52,7 @@ export default function AccountLayout() {
       <AccountMenu />
       <br />
       <br />
-      <Outlet context={{customer} satisfies AccountOutletContext} />
+      <Outlet context={{customer}} />
     </div>
   );
 }

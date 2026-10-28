@@ -88,7 +88,9 @@ export const middleware: Route.MiddlewareFunction[] = [
         : [cartHandlers, giftCardHandlers, predictiveSearchHandlers],
     });
     // Decided synchronously: a Promise<Response> for handler-owned paths, else null.
-    if (shopifyRoute) return shopifyRoute;
+    if (shopifyRoute) {
+      return shopifyRoute;
+    }
 
     context.set(storefrontClientContext, storefrontClient);
     context.set(storefrontRequestContext, requestContext);
@@ -119,7 +121,9 @@ export const middleware: Route.MiddlewareFunction[] = [
         storefrontClient,
         routeTemplates,
       });
-      if (redirect) return redirect;
+      if (redirect) {
+        return redirect;
+      }
     }
 
     requestContext.applyResponseHeaders(response.headers);
@@ -136,10 +140,14 @@ export const shouldRevalidate: ShouldRevalidateFunction = ({
   nextUrl,
 }) => {
   // revalidate when a mutation is performed e.g add to cart, login...
-  if (formMethod && formMethod !== 'GET') return true;
+  if (formMethod && formMethod !== 'GET') {
+    return true;
+  }
 
   // revalidate when manually revalidating via useRevalidator
-  if (currentUrl.toString() === nextUrl.toString()) return true;
+  if (currentUrl.toString() === nextUrl.toString()) {
+    return true;
+  }
 
   // Defaulting to no revalidation for root loader data to improve performance.
   // When using this feature, you risk your UI getting out of sync with your server.
@@ -266,7 +274,9 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       },
     })
     .then(({data, errors}) => {
-      if (errors?.length) console.error(errors);
+      if (errors?.length) {
+        console.error(errors);
+      }
       return data ?? null;
     })
     .catch((error) => {

@@ -29,7 +29,9 @@ export function PaginatedResourceSection<NodeType>({
   const pageUrl = (direction: 'next' | 'previous', cursor?: string | null) => {
     const params = new URLSearchParams(search);
     params.set('direction', direction);
-    if (cursor) params.set('cursor', cursor);
+    if (cursor) {
+      params.set('cursor', cursor);
+    }
     return `${pathname}?${params}`;
   };
 

@@ -39,9 +39,13 @@ function useCartViewedAnalytics() {
   const published = useRef(false);
 
   useEffect(() => {
-    if (published.current || !settled) return;
+    if (published.current || !settled) {
+      return;
+    }
     const analytics = getAnalytics();
-    if (!analytics) return;
+    if (!analytics) {
+      return;
+    }
     published.current = true;
     analytics.publish(AnalyticsEvent.CART_VIEWED, {
       cart: toAnalyticsCart(cart),

@@ -1,7 +1,7 @@
 import {Link} from 'react-router';
 import {Cache, gql, type StorefrontApi} from '@shopify/hydrogen';
 import type {Route} from './+types/($locale).collections._index';
-import {Image} from '~/components/Image';
+import {responsiveSrcSet, shopifyImageUrl} from '~/lib/image';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 import {getPaginationVariables} from '~/lib/pagination';
 import {storefrontClientContext} from '~/lib/storefront';
@@ -88,12 +88,18 @@ function CollectionItem({
       prefetch="intent"
     >
       {collection?.image && (
-        <Image
+        <img
           alt={collection.image.altText || collection.title}
-          aspectRatio="1/1"
-          data={collection.image}
-          loading={index < 3 ? 'eager' : undefined}
+          src={shopifyImageUrl(collection.image.url, {
+            width: 400,
+            height: 400,
+            crop: 'center',
+          })}
+          srcSet={responsiveSrcSet(collection.image.url, [400, 600, 800], 1)}
           sizes="(min-width: 45em) 400px, 100vw"
+          width={400}
+          height={400}
+          loading={index < 3 ? 'eager' : 'lazy'}
         />
       )}
       <h5>{collection.title}</h5>

@@ -38,7 +38,9 @@ let cached:
  * request, so create them on first use and reuse them for the life of the worker.
  */
 export function getCustomerAccountSetup(env: Env) {
-  if (!env.SHOP_ID || !env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID) return null;
+  if (!env.SHOP_ID || !env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID) {
+    return null;
+  }
 
   const key = `${env.SHOP_ID}:${env.PUBLIC_CUSTOMER_ACCOUNT_API_CLIENT_ID}`;
   if (cached?.key !== key) {
@@ -74,7 +76,9 @@ export function createCustomerAccount(
 
 export async function isCustomerLoggedIn(context: Readonly<RouterContextProvider>) {
   const account = context.get(customerAccountContext);
-  if (!account) return false;
+  if (!account) {
+    return false;
+  }
   return account.customerSession.isLoggedIn(
     account.sessionManager,
     account.requestContext,
@@ -102,7 +106,9 @@ export async function requireCustomerAccount(
     sessionManager,
     requestContext,
   );
-  if (accessToken) return {client: account.client, accessToken};
+  if (accessToken) {
+    return {client: account.client, accessToken};
+  }
 
   const refreshed = url.searchParams.has('refreshed');
   if (

@@ -322,7 +322,8 @@ button.reset:hover:not(:has(> *)) {
 
 .predictive-search-result-item a img {
   margin-right: 0.75rem;
-  height: 100%;
+  width: 50px;
+  height: 50px;
 }
 
 .search-result {

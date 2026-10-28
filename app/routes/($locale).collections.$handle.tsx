@@ -165,8 +165,7 @@ export default function Collection({loaderData}: Route.ComponentProps) {
         void navigate(
           {search},
           {replace: searchParams.size > 0, preventScrollReset: true},
-        )
-      }
+        )}
     >
       <CollectionBrowser {...loaderData} />
     </CollectionProvider>
@@ -280,7 +279,9 @@ function ProductGrid({
     const params = new URLSearchParams(search);
     params.delete('before');
     params.delete('after');
-    if (cursor) params.set(param, cursor);
+    if (cursor) {
+      params.set(param, cursor);
+    }
     return `${pathname}?${params}`;
   };
 
@@ -401,13 +402,17 @@ function PriceRangeInput({
       [minInput.current, min],
       [maxInput.current, max],
     ] as const) {
-      if (!input) continue;
+      if (!input) {
+        continue;
+      }
       const matches =
         value === ''
           ? input.value === ''
           : input.value !== '' && Number(input.value) === value;
       if (!matches) {
-        if (timer.current) clearTimeout(timer.current);
+        if (timer.current) {
+          clearTimeout(timer.current);
+        }
         timer.current = null;
         input.value = String(value);
       }
@@ -416,7 +421,9 @@ function PriceRangeInput({
 
   useEffect(() => {
     function cancelPendingSubmit() {
-      if (timer.current) clearTimeout(timer.current);
+      if (timer.current) {
+        clearTimeout(timer.current);
+      }
       timer.current = null;
     }
 
@@ -427,8 +434,12 @@ function PriceRangeInput({
         new URLSearchParams(window.location.search),
       );
       const price = filters.find((filter) => filter.price)?.price;
-      if (minInput.current) minInput.current.value = String(price?.min ?? '');
-      if (maxInput.current) maxInput.current.value = String(price?.max ?? '');
+      if (minInput.current) {
+        minInput.current.value = String(price?.min ?? '');
+      }
+      if (maxInput.current) {
+        maxInput.current.value = String(price?.max ?? '');
+      }
     }
 
     // Any form submission (native Enter included) already carries the typed price.
@@ -443,7 +454,9 @@ function PriceRangeInput({
   }, []);
 
   function submitAfterTyping(event: ChangeEvent<HTMLInputElement>) {
-    if (timer.current) clearTimeout(timer.current);
+    if (timer.current) {
+      clearTimeout(timer.current);
+    }
     const form = event.currentTarget.form;
     timer.current = setTimeout(() => {
       timer.current = null;
@@ -536,7 +549,9 @@ function isMutuallyExclusive(filter: AvailableFilter) {
 
 function uncheckSiblings(input: HTMLInputElement) {
   const form = input.form;
-  if (!form) return;
+  if (!form) {
+    return;
+  }
   for (const element of Array.from(form.elements)) {
     if (
       element instanceof HTMLInputElement &&
@@ -559,7 +574,9 @@ function CheckboxFilterValue({
   value: AvailableFilter['values'][number];
 }) {
   const entries = filterValueInputParamEntries(value.input);
-  if (entries.length !== 1) return null;
+  if (entries.length !== 1) {
+    return null;
+  }
 
   const [{name, value: paramValue}] = entries;
 

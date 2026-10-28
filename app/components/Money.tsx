@@ -8,6 +8,8 @@ type MoneyProps = {
 
 /** Replacement for classic Hydrogen's `<Money>`, built on `formatMoney()`. */
 export function Money({data, as: Component = 'span', className}: MoneyProps) {
-  if (!data) return null;
+  if (!data) {
+    return null;
+  }
   return <Component className={className}>{formatPrice(data)}</Component>;
 }

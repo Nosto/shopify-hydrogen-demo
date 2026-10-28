@@ -80,7 +80,9 @@ export function createContentSecurityPolicy({
     ],
     'frame-ancestors': ["'none'"],
   };
-  if (!isDev) directives['upgrade-insecure-requests'] = [];
+  if (!isDev) {
+    directives['upgrade-insecure-requests'] = [];
+  }
 
   return Object.entries(directives)
     .map(([name, values]) => [name, ...values].join(' '))

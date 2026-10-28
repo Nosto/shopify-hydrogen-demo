@@ -12,7 +12,9 @@ let bus: StorefrontAnalytics | null = null;
 
 /** The analytics bus that `<ShopifyScripts>` creates. `null` during SSR. */
 export function getAnalytics(): StorefrontAnalytics | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined') {
+    return null;
+  }
   bus ??= window.Shopify?.analytics ?? null;
   return bus;
 }
@@ -31,7 +33,9 @@ export function hasPendingCartWork({pending, revalidating}: CartState) {
 
 /** Maps the cart store data to the analytics cart shape (mirrors the library's cart tracker). */
 export function toAnalyticsCart(cart: CartData | null): AnalyticsCart | null {
-  if (!cart?.id || !cart.updatedAt) return null;
+  if (!cart?.id || !cart.updatedAt) {
+    return null;
+  }
   return {
     id: cart.id,
     updatedAt: cart.updatedAt,
@@ -39,7 +43,9 @@ export function toAnalyticsCart(cart: CartData | null): AnalyticsCart | null {
     lines: {
       nodes: cart.lines.nodes.flatMap((line) => {
         const merchandise = line.merchandise;
-        if (!merchandise) return [];
+        if (!merchandise) {
+          return [];
+        }
         const product = merchandise.product;
         return [
           {

@@ -8,7 +8,7 @@ import {
 import {usePredictiveSearch} from '@shopify/hydrogen/react';
 
 import {useAside} from './Aside';
-import {Image} from '~/components/Image';
+import {shopifyImageUrl, srcSetFor} from '~/lib/image';
 import {Money} from '~/components/Money';
 import {routeTemplates} from '~/lib/route-templates';
 
@@ -33,7 +33,8 @@ type SearchResultsPredictiveProps = {
   children: (args: SearchResultsPredictiveArgs) => ReactNode;
 };
 
-const IMAGE_STYLE = {width: 50, height: 50};
+/** Predictive search thumbnails render at 50x50, cropped to square. */
+const THUMBNAIL_SIZE = {width: 50, height: 50, crop: 'center'} as const;
 
 /**
  * Component that renders predictive search results.
@@ -74,7 +75,9 @@ function SearchResultsPredictiveArticles({
   articles,
   closeSearch,
 }: PartialPredictiveSearchResult<'articles'>) {
-  if (!articles.length) return null;
+  if (!articles.length) {
+    return null;
+  }
 
   return (
     <div className="predictive-search-result" key="articles">
@@ -90,12 +93,13 @@ function SearchResultsPredictiveArticles({
             <li className="predictive-search-result-item" key={article.id}>
               <Link onClick={closeSearch} to={articleUrl}>
                 {article.image?.url && (
-                  <Image
-                    data={article.image}
+                  <img
                     alt={article.image.altText ?? ''}
+                    src={shopifyImageUrl(article.image.url, THUMBNAIL_SIZE)}
+                    srcSet={srcSetFor(article.image.url, THUMBNAIL_SIZE)}
                     width={50}
-                    aspectRatio="1/1"
-                    style={IMAGE_STYLE}
+                    height={50}
+                    loading="lazy"
                   />
                 )}
                 <div>
@@ -115,7 +119,9 @@ function SearchResultsPredictiveCollections({
   collections,
   closeSearch,
 }: PartialPredictiveSearchResult<'collections'>) {
-  if (!collections.length) return null;
+  if (!collections.length) {
+    return null;
+  }
 
   return (
     <div className="predictive-search-result" key="collections">
@@ -131,12 +137,13 @@ function SearchResultsPredictiveCollections({
             <li className="predictive-search-result-item" key={collection.id}>
               <Link onClick={closeSearch} to={collectionUrl}>
                 {collection.image?.url && (
-                  <Image
-                    data={collection.image}
+                  <img
                     alt={collection.image.altText ?? ''}
+                    src={shopifyImageUrl(collection.image.url, THUMBNAIL_SIZE)}
+                    srcSet={srcSetFor(collection.image.url, THUMBNAIL_SIZE)}
                     width={50}
-                    aspectRatio="1/1"
-                    style={IMAGE_STYLE}
+                    height={50}
+                    loading="lazy"
                   />
                 )}
                 <div>
@@ -156,7 +163,9 @@ function SearchResultsPredictivePages({
   pages,
   closeSearch,
 }: PartialPredictiveSearchResult<'pages'>) {
-  if (!pages.length) return null;
+  if (!pages.length) {
+    return null;
+  }
 
   return (
     <div className="predictive-search-result" key="pages">
@@ -188,7 +197,9 @@ function SearchResultsPredictiveProducts({
   products,
   closeSearch,
 }: PartialPredictiveSearchResult<'products'>) {
-  if (!products.length) return null;
+  if (!products.length) {
+    return null;
+  }
 
   return (
     <div className="predictive-search-result" key="products">
@@ -206,12 +217,13 @@ function SearchResultsPredictiveProducts({
             <li className="predictive-search-result-item" key={product.id}>
               <Link to={productUrl} onClick={closeSearch}>
                 {image && (
-                  <Image
-                    data={image}
+                  <img
                     alt={image.altText ?? ''}
+                    src={shopifyImageUrl(image.url, THUMBNAIL_SIZE)}
+                    srcSet={srcSetFor(image.url, THUMBNAIL_SIZE)}
                     width={50}
-                    aspectRatio="1/1"
-                    style={IMAGE_STYLE}
+                    height={50}
+                    loading="lazy"
                   />
                 )}
                 <div>
@@ -233,12 +245,16 @@ function SearchResultsPredictiveQueries({
 }: PartialPredictiveSearchResult<'queries', never> & {
   queriesDatalistId: string;
 }) {
-  if (!queries.length) return null;
+  if (!queries.length) {
+    return null;
+  }
 
   return (
     <datalist id={queriesDatalistId}>
       {queries.map((suggestion) => {
-        if (!suggestion) return null;
+        if (!suggestion) {
+          return null;
+        }
 
         return <option key={suggestion.text} value={suggestion.text} />;
       })}

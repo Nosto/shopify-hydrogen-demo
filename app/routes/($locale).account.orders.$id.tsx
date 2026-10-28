@@ -1,6 +1,6 @@
 import {redirect, useLoaderData} from 'react-router';
 
-import {Image} from '~/components/Image';
+import {shopifyImageUrl, srcSetFor} from '~/lib/image';
 import {Money} from '~/components/Money';
 import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
 import {requireCustomerAccount} from '~/lib/customer-account';
@@ -192,7 +192,22 @@ function OrderLineRow({lineItem}: {lineItem: OrderLineItem}) {
         <div>
           {lineItem?.image && (
             <div>
-              <Image data={lineItem.image} width={96} />
+              <img
+                alt={lineItem.image.altText ?? ''}
+                src={shopifyImageUrl(lineItem.image.url, {
+                  width: 96,
+                  height: 96,
+                  crop: 'center',
+                })}
+                srcSet={srcSetFor(lineItem.image.url, {
+                  width: 96,
+                  height: 96,
+                  crop: 'center',
+                })}
+                width={96}
+                height={96}
+                loading="lazy"
+              />
             </div>
           )}
           <div>

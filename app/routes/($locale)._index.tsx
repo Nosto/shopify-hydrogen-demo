@@ -2,7 +2,7 @@ import {Await, Link} from 'react-router';
 import {Suspense, useEffect, useState} from 'react';
 import {Cache, gql, type StorefrontApi} from '@shopify/hydrogen';
 import type {Route} from './+types/($locale)._index';
-import {Image} from '~/components/Image';
+import {responsiveSrcSet, shopifyImageUrl} from '~/lib/image';
 import {ProductItem} from '~/components/ProductItem';
 import {storefrontClientContext} from '~/lib/storefront';
 import {NostoPlacement} from '@nosto/shopify-hydrogen';
@@ -62,7 +62,9 @@ function loadDeferredData({context}: Route.LoaderArgs) {
   const recommendedProducts = storefront
     .graphql(RECOMMENDED_PRODUCTS_QUERY, {cache: Cache.short()})
     .then(({data, errors}) => {
-      if (errors) throw errors;
+      if (errors) {
+        throw errors;
+      }
       return data ?? null;
     })
     .catch((error: unknown) => {
@@ -116,7 +118,9 @@ function FeaturedCollection({
 }: {
   collection: FeaturedCollectionQuery['collections']['nodes'][number] | null;
 }) {
-  if (!collection) return null;
+  if (!collection) {
+    return null;
+  }
   const image = collection.image;
   return (
     <Link
@@ -125,7 +129,14 @@ function FeaturedCollection({
     >
       {image && (
         <div className="featured-collection-image">
-          <Image data={image} sizes="100vw" />
+          <img
+            alt={image.altText ?? ''}
+            src={shopifyImageUrl(image.url, {width: 1200})}
+            srcSet={responsiveSrcSet(image.url, [600, 900, 1200, 1600, 2000])}
+            sizes="100vw"
+            width={image.width ?? undefined}
+            height={image.height ?? undefined}
+          />
         </div>
       )}
       <h1>{collection.title}</h1>

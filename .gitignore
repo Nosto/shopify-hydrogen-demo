@@ -8,3 +8,6 @@ node_modules
 .shopify
 .react-router/
 *-graphql-env.d.ts
+
+.agents
+.claude

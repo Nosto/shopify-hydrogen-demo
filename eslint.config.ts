@@ -1,29 +1,21 @@
-import {
-  fixupConfigRules,
-  fixupPluginRules,
-  type FixupPluginDefinition,
-} from '@eslint/compat';
-import eslintComments from '@eslint-community/eslint-plugin-eslint-comments';
+import js from '@eslint/js';
+import eslintComments from '@eslint-community/eslint-plugin-eslint-comments/configs';
+import stylistic from '@stylistic/eslint-plugin';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import importPlugin from 'eslint-plugin-import';
+import jest from 'eslint-plugin-jest';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import jsxA11Y from 'eslint-plugin-jsx-a11y';
+import type {Linter} from 'eslint';
 import globals from 'globals';
-import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import _import from 'eslint-plugin-import';
-import tsParser from '@typescript-eslint/parser';
-import jest from 'eslint-plugin-jest';
-import path from 'node:path';
-import {fileURLToPath} from 'node:url';
-import js from '@eslint/js';
-import {FlatCompat} from '@eslint/eslintrc';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
+const TS_FILES = ['**/*.{ts,tsx}'];
+
+/** Scopes shared configs to TypeScript files. */
+function forTypeScript(configs: Linter.Config[]) {
+  return configs.map((config) => ({...config, files: TS_FILES}));
+}
 
 export default [
   {
@@ -35,80 +27,23 @@ export default [
       '**/*.graphql.ts',
       '**/*.generated.d.ts',
       '**/.react-router/',
-      '**/packages/hydrogen/dist/',
     ],
   },
-  ...fixupConfigRules(
-    compat.extends(
-      'eslint:recommended',
-      'plugin:@eslint-community/eslint-comments/recommended',
-      'plugin:react/recommended',
-      'plugin:react-hooks/recommended',
-      'plugin:jsx-a11y/recommended',
-    ),
-  ),
+  js.configs.recommended,
+  eslintComments.recommended,
+  react.configs.flat.recommended,
+  react.configs.flat['jsx-runtime'],
+  reactHooks.configs.flat.recommended,
+  jsxA11y.flatConfigs.recommended,
   {
     plugins: {
-      '@eslint-community/eslint-comments': fixupPluginRules(eslintComments),
-      react: fixupPluginRules(react),
-      'react-hooks': fixupPluginRules(reactHooks as FixupPluginDefinition),
-      'jsx-a11y': fixupPluginRules(jsxA11Y),
+      '@stylistic': stylistic,
     },
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.node,
       },
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-      },
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
-    rules: {
-      '@eslint-community/eslint-comments/no-unused-disable': 'error',
-      'no-console': [
-        'warn',
-        {
-          allow: ['warn', 'error'],
-        },
-      ],
-      'no-use-before-define': 'off',
-      'no-warning-comments': 'off',
-      'object-shorthand': [
-        'error',
-        'always',
-        {
-          avoidQuotes: true,
-        },
-      ],
-      'no-useless-escape': 'off',
-      'no-case-declarations': 'off',
-    },
-  },
-  ...fixupConfigRules(
-    compat.extends(
-      'plugin:react/recommended',
-      'plugin:react/jsx-runtime',
-      'plugin:react-hooks/recommended',
-      'plugin:jsx-a11y/recommended',
-    ),
-  ).map((config) => ({
-    ...config,
-    files: ['**/*.{js,jsx,ts,tsx}'],
-  })),
-  {
-    files: ['**/*.{js,jsx,ts,tsx}'],
-    plugins: {
-      react: fixupPluginRules(react),
-      'jsx-a11y': fixupPluginRules(jsxA11Y),
     },
     settings: {
       react: {
@@ -116,66 +51,43 @@ export default [
       },
       formComponents: ['Form'],
       linkComponents: [
-        {
-          name: 'Link',
-          linkAttribute: 'to',
-        },
-        {
-          name: 'NavLink',
-          linkAttribute: 'to',
-        },
+        {name: 'Link', linkAttribute: 'to'},
+        {name: 'NavLink', linkAttribute: 'to'},
       ],
-      'import/resolver': {
-        typescript: {},
-      },
     },
     rules: {
+      '@eslint-community/eslint-comments/no-unused-disable': 'error',
+      curly: ['error', 'all'],
+      'no-console': ['warn', {allow: ['warn', 'error']}],
+      'no-use-before-define': 'off',
+      'no-warning-comments': 'off',
+      'object-shorthand': ['error', 'always', {avoidQuotes: true}],
+      'no-useless-escape': 'off',
+      'no-case-declarations': 'off',
       'jsx-a11y/control-has-associated-label': 'off',
       'jsx-a11y/label-has-for': 'off',
       'react/display-name': 'off',
       'react/no-array-index-key': 'warn',
       'react/prop-types': 'off',
-      'react/react-in-jsx-scope': 'off',
     },
   },
-  ...fixupConfigRules(
-    compat.extends(
-      'plugin:@typescript-eslint/recommended',
-      'plugin:import/recommended',
-      'plugin:import/typescript',
-    ),
-  ).map((config) => ({
-    ...config,
-    files: ['**/*.{ts,tsx}'],
-  })),
+  ...forTypeScript([
+    ...(typescriptEslint.configs['flat/recommended'] as Linter.Config[]),
+    importPlugin.flatConfigs.recommended,
+    importPlugin.flatConfigs.typescript,
+  ]),
   {
-    files: ['**/*.{ts,tsx}'],
-    plugins: {
-      '@typescript-eslint': fixupPluginRules(
-        typescriptEslint as unknown as FixupPluginDefinition,
-      ),
-      import: fixupPluginRules(_import),
-    },
+    files: TS_FILES,
     languageOptions: {
-      parser: tsParser,
       parserOptions: {
         project: './tsconfig.json',
-        tsconfigRootDir: __dirname,
-        ecmaFeatures: {
-          jsx: true,
-        },
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     settings: {
       'import/internal-regex': '^~/',
-      'import/resolvers': {
-        node: {
-          extensions: ['.ts', '.tsx'],
-        },
-        typescript: {
-          alwaysTryTypes: true,
-          project: __dirname,
-        },
+      'import/resolver': {
+        typescript: {},
       },
     },
     rules: {
@@ -189,23 +101,14 @@ export default [
           leadingUnderscore: 'allowSingleOrDouble',
           trailingUnderscore: 'allowSingleOrDouble',
         },
-        {
-          selector: 'typeLike',
-          format: ['PascalCase'],
-        },
+        {selector: 'typeLike', format: ['PascalCase']},
         {
           selector: 'typeParameter',
           format: ['PascalCase'],
           leadingUnderscore: 'allow',
         },
-        {
-          selector: 'interface',
-          format: ['PascalCase'],
-        },
-        {
-          selector: 'property',
-          format: null,
-        },
+        {selector: 'interface', format: ['PascalCase']},
+        {selector: 'property', format: null},
       ],
       '@typescript-eslint/no-empty-function': 'off',
       '@typescript-eslint/no-empty-interface': 'off',
@@ -216,32 +119,15 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
-      'react/prop-types': 'off',
+      'jsx-a11y/click-events-have-key-events': 'off',
+      '@stylistic/curly-newline': ['error', 'always'],
+      '@stylistic/jsx-curly-newline': 'error',
+      '@stylistic/brace-style': 'error',
     },
   },
   {
-    files: ['**/.eslintrc.cjs'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-  },
-  ...compat.extends('plugin:jest/recommended').map((config) => ({
-    ...config,
+    ...jest.configs['flat/recommended'],
     files: ['**/*.test.*'],
-  })),
-  {
-    files: ['**/*.test.*'],
-    plugins: {
-      jest,
-    },
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        ...globals.jest,
-      },
-    },
   },
   {
     files: ['**/*.server.*'],
@@ -249,4 +135,4 @@ export default [
       'react-hooks/rules-of-hooks': 'off',
     },
   },
-];
+] satisfies Linter.Config[];

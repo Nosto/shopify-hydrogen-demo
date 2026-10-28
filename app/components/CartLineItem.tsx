@@ -2,7 +2,7 @@ import type {CartLine} from '@shopify/hydrogen';
 import {Link} from 'react-router';
 import {useVariantUrl} from '~/lib/variants';
 import {useCart, useCartForm} from '~/lib/cart';
-import {Image} from '~/components/Image';
+import {shopifyImageUrl, srcSetFor} from '~/lib/image';
 import {Money} from '~/components/Money';
 import {useAside} from './Aside';
 import type {CartLayout} from './CartMain';
@@ -51,13 +51,13 @@ export function CartLineItem({
   return (
     <li key={id} className="cart-line">
       {image && (
-        <Image
+        <img
           alt={title}
-          aspectRatio="1/1"
-          data={image}
-          loading="lazy"
-          sizes="100px"
+          src={shopifyImageUrl(image.url, {width: 100, height: 100, crop: 'center'})}
+          srcSet={srcSetFor(image.url, {width: 100, height: 100, crop: 'center'})}
           width={100}
+          height={100}
+          loading="lazy"
         />
       )}
 
@@ -113,7 +113,9 @@ function CartLineQuantity({
   const {formProps, register} = useCartForm();
   const lineErrors = useCart((state) => state.errors.lines.get(line.id));
 
-  if (!line || typeof line?.quantity === 'undefined') return null;
+  if (!line || typeof line?.quantity === 'undefined') {
+    return null;
+  }
   const {id: lineId, quantity} = line;
   const isOptimistic = lineId.startsWith(OPTIMISTIC_LINE_ID_PREFIX);
   const errorId = `cart-line-error-${lineId}`;

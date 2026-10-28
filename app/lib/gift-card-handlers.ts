@@ -37,7 +37,9 @@ type GiftCardRequest =
   | {intent: 'remove'; giftCardId: string};
 
 function parseGiftCardRequest(body: unknown): GiftCardRequest | null {
-  if (!body || typeof body !== 'object') return null;
+  if (!body || typeof body !== 'object') {
+    return null;
+  }
   const {intent, code, giftCardId} = body as Record<string, unknown>;
   if (intent === 'add' && typeof code === 'string') {
     // Gift card codes are entered with spaces for readability

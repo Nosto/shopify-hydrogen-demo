@@ -78,8 +78,12 @@ function getBuyerIp(headers: Headers) {
     'x-forwarded-for',
   ]) {
     const ip = headers.get(header)?.split(',')[0]?.trim();
-    if (ip) return ip;
+    if (ip) {
+      return ip;
+    }
   }
-  if (process.env.NODE_ENV !== 'production') return '127.0.0.1';
+  if (process.env.NODE_ENV !== 'production') {
+    return '127.0.0.1';
+  }
   throw new Error('No buyer IP header on the request');
 }

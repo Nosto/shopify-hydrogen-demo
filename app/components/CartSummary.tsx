@@ -40,7 +40,9 @@ export function CartSummary({
 }
 
 function CartCheckoutActions({checkoutUrl}: {checkoutUrl?: string | null}) {
-  if (!checkoutUrl) return null;
+  if (!checkoutUrl) {
+    return null;
+  }
 
   return (
     <div>
@@ -175,7 +177,9 @@ function CartGiftCard({
         messages.push('Could not update gift cards.');
       }
       setErrors(messages);
-      if (response.ok) refresh();
+      if (response.ok) {
+        refresh();
+      }
       return response.ok && !messages.length;
     } catch {
       setErrors(['Could not update gift cards.']);
@@ -189,9 +193,13 @@ function CartGiftCard({
     event.preventDefault();
     const form = event.currentTarget;
     const code = new FormData(form).get('giftCardCode')?.toString().trim();
-    if (!code) return;
+    if (!code) {
+      return;
+    }
     // Clear the gift card code input after the gift card is added
-    if (await submitGiftCard({intent: 'add', code})) form.reset();
+    if (await submitGiftCard({intent: 'add', code})) {
+      form.reset();
+    }
   }
 
   return (

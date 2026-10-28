@@ -133,9 +133,12 @@ function OrderSearchForm({
       ?.toString()
       .trim();
 
-    if (name) params.set(ORDER_FILTER_FIELDS.NAME, name);
-    if (confirmationNumber)
+    if (name) {
+      params.set(ORDER_FILTER_FIELDS.NAME, name);
+    }
+    if (confirmationNumber) {
       params.set(ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER, confirmationNumber);
+    }
 
     setSearchParams(params);
   };

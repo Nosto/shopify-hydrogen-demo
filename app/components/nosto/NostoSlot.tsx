@@ -45,7 +45,9 @@ type NostoWindow = Window & {
 
 /** Runs `callback` once the Nosto client script is ready. No-op during SSR. */
 export function withNosto(callback: (api: NostoApi) => void | Promise<void>) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {
+    return;
+  }
   (window as NostoWindow).nostojs?.(callback);
 }
 
@@ -55,7 +57,9 @@ export function NostoSlot({
   nostoRecommendation?: NostoRecommendation;
 }) {
   function reportClick(productId: string) {
-    if (!nostoRecommendation) return;
+    if (!nostoRecommendation) {
+      return;
+    }
     withNosto(function (api) {
       api
         .defaultSession()

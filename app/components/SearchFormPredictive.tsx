@@ -52,7 +52,9 @@ export function SearchFormPredictive({
 
   // Clear the input and stale suggestions when the search aside closes
   useEffect(() => {
-    if (aside.type === 'search') return;
+    if (aside.type === 'search') {
+      return;
+    }
     clear();
     formRef.current?.reset();
   }, [aside.type, clear]);

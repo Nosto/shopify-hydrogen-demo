@@ -1,7 +1,7 @@
 import {useLoaderData} from 'react-router';
 import {Cache, gql} from '@shopify/hydrogen';
 
-import {Image} from '~/components/Image';
+import {responsiveSrcSet, shopifyImageUrl} from '~/lib/image';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {storefrontClientContext} from '~/lib/storefront';
 
@@ -100,7 +100,16 @@ export default function Article() {
         </div>
       </h1>
 
-      {image && <Image data={image} sizes="90vw" loading="eager" />}
+      {image && (
+        <img
+          alt={image.altText ?? ''}
+          src={shopifyImageUrl(image.url, {width: 1200})}
+          srcSet={responsiveSrcSet(image.url, [600, 900, 1200, 1600, 2000])}
+          sizes="90vw"
+          width={image.width ?? undefined}
+          height={image.height ?? undefined}
+        />
+      )}
       <div
         dangerouslySetInnerHTML={{__html: contentHtml}}
         className="article"

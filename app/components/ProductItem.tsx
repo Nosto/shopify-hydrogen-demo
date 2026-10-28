@@ -1,5 +1,5 @@
 import {Link} from 'react-router';
-import {Image} from '~/components/Image';
+import {responsiveSrcSet, shopifyImageUrl} from '~/lib/image';
 import {Money} from '~/components/Money';
 import type {MoneyLike} from '~/lib/money';
 import {useVariantUrl} from '~/lib/variants';
@@ -34,12 +34,14 @@ export function ProductItem({
       to={variantUrl}
     >
       {image && (
-        <Image
+        <img
           alt={image.altText || product.title}
-          aspectRatio="1/1"
-          data={image}
-          loading={loading}
+          src={shopifyImageUrl(image.url, {width: 400, height: 400, crop: 'center'})}
+          srcSet={responsiveSrcSet(image.url, [400, 600, 800], 1)}
           sizes="(min-width: 45em) 400px, 100vw"
+          width={400}
+          height={400}
+          loading={loading}
         />
       )}
       <h4>{product.title}</h4>

@@ -101,7 +101,9 @@ function useCartViewedAnalytics() {
       published.current = false;
       return;
     }
-    if (!settled || published.current) return;
+    if (!settled || published.current) {
+      return;
+    }
     published.current = true;
     getAnalytics()?.publish(AnalyticsEvent.CART_VIEWED, {
       cart: toAnalyticsCart(cartStateRef.current.data),

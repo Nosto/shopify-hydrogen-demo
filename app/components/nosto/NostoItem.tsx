@@ -1,13 +1,18 @@
 import {AddToCartButton} from '../AddToCartButton';
 import {useAside} from '../Aside';
 
+export type Sku = {
+  id: string;
+  available: boolean;
+};
+
 export type NostoProduct = {
   product_id: string;
   url: string;
   name: string;
   thumb_url: string;
   price_text: string;
-  skus: Array<{id: string; available: boolean}>;
+  skus: Array<Sku>;
 };
 
 export function NostoItem({

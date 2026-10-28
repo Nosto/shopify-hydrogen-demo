@@ -1,4 +1,4 @@
-import {Image} from '~/components/Image';
+import {responsiveSrcSet, shopifyImageUrl} from '~/lib/image';
 
 type ProductImageData = {
   id?: string | null;
@@ -14,12 +14,14 @@ export function ProductImage({image}: {image?: ProductImageData | null}) {
   }
   return (
     <div className="product-image">
-      <Image
+      <img
         alt={image.altText || 'Product Image'}
-        aspectRatio="1/1"
-        data={image}
         key={image.id ?? image.url}
+        src={shopifyImageUrl(image.url, {width: 1000, height: 1000, crop: 'center'})}
+        srcSet={responsiveSrcSet(image.url, [400, 600, 800, 1000, 1400], 1)}
         sizes="(min-width: 45em) 50vw, 100vw"
+        width={1000}
+        height={1000}
       />
     </div>
   );

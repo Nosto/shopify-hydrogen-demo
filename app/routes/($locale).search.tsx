@@ -39,7 +39,9 @@ export default function SearchPage() {
   const {term, result, error} = useLoaderData<typeof loader>();
 
   useEffect(() => {
-    if (!term) return;
+    if (!term) {
+      return;
+    }
     getAnalytics()?.publish(AnalyticsEvent.SEARCH_VIEWED, {
       searchTerm: term,
       searchResults: {totalCount: result?.total ?? 0},
@@ -235,7 +237,9 @@ async function regularSearch({
   const term = String(url.searchParams.get('q') || '').trim();
 
   // A blank term renders the empty state without querying the Storefront API
-  if (!term) return {type: 'regular', term, result: null};
+  if (!term) {
+    return {type: 'regular', term, result: null};
+  }
 
   // Search articles, pages, and products for the `q` term
   const {data, errors} = await storefront.graphql(SEARCH_QUERY, {

@@ -19,7 +19,7 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.19.*'
+          node-version: '22.x'
           check-latest: true
 
       - name: Cache node modules
@@ -50,7 +50,12 @@ jobs:
           fi
 
       - name: Build and Publish to Oxygen
-        run: npx shopify hydrogen deploy
+        id: deploy
+        # Builds with `react-router build` and deploys dist/client + dist/server (see package.json).
+        # In CI the CLI writes the deployment details, including its URL, to h2_deploy_log.json.
+        run: |
+          npm run deploy
+          echo "url=$(jq -r '.url // empty' h2_deploy_log.json)" >> "$GITHUB_OUTPUT"
         env:
           SHOPIFY_HYDROGEN_DEPLOYMENT_TOKEN: ${{ secrets.OXYGEN_DEPLOYMENT_TOKEN_1343547 }}
           #build_command: "HYDROGEN_ASSET_BASE_URL=$OXYGEN_ASSET_BASE_URL npm run build"
@@ -61,6 +66,6 @@ jobs:
         if: always()
         with:
           token: ${{ github.token }}
-          environment: 'preview'
+          environment: ${{ env.env }}
           preview_url: ${{ steps.deploy.outputs.url }}
           description: ${{ github.event.head_commit.message }}
