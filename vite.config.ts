@@ -12,9 +12,6 @@ export default defineConfig({
   plugins: [localHttps({enabled}), tailwindcss(), ...oxygen(), reactRouter()],
   resolve: {
     tsconfigPaths: true,
-    // @nosto/shopify-hydrogen is linked with `file:` and ships its own copies of its peers.
-    // Use one copy so React, React Router contexts and Hydrogen's branded types are shared.
-    dedupe: ['react', 'react-dom', 'react-router', '@shopify/hydrogen'],
   },
   build: {
     // Allow a strict Content-Security-Policy

@@ -28,13 +28,7 @@
     "noEmit": true,
     "types": ["@shopify/oxygen-workers-types", "react-router", "vite/client"],
     "paths": {
-      "~/*": ["./app/*"],
-      // @nosto/shopify-hydrogen is linked with `file:` and has its own node_modules;
-      // resolve its peer types to this app's copies so they stay the same types.
-      "@shopify/hydrogen": ["./node_modules/@shopify/hydrogen/dist/core/index.d.mts"],
-      "@shopify/hydrogen/customer-account": [
-        "./node_modules/@shopify/hydrogen/dist/customer-account/index.d.mts"
-      ]
+      "~/*": ["./app/*"]
     },
     "rootDirs": [".", "./.react-router/types"],
     "plugins": [{"name": "@shopify/hydrogen/ts-plugin"}]
